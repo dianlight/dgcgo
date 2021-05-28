@@ -6,8 +6,8 @@ import {
   useStore as vuexUseStore,
 } from 'vuex'
 
-// import example from './module-example'
-// import { ExampleStateInterface } from './module-example/state';
+import tightcnc from './module-tightcnc'
+import { TightCNCStateInterface } from './module-tightcnc/state';
 
 /*
  * If not building with SSR mode, you can
@@ -22,7 +22,8 @@ export interface StateInterface {
   // Define your own store structure, using submodules if needed
   // example: ExampleStateInterface;
   // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
-  example: unknown
+  //example: unknown
+  tightcnc: TightCNCStateInterface
 }
 
 // provide typings for `this.$store`
@@ -38,6 +39,7 @@ export const storeKey: InjectionKey<VuexStore<StateInterface>> = Symbol('vuex-ke
 export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
+      tightcnc
       // example
     },
 

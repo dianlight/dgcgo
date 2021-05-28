@@ -10,6 +10,7 @@
     :gcode="gcode"
     :gcgrid="true"
     :dark-mode="$q.dark.isActive"
+    @onprogress='progress'
   />
 </template>
 
@@ -53,6 +54,12 @@ export default class WorkBench extends Vue.with(Props) {
           console.log('Letto GCODE!', this.gcode.length);
         });
     // console.log(this.gcode);
+  }
+
+  progress(progress:number){
+    if(progress == 0)this.$q.loadingBar.start()
+    else if(progress == 100)this.$q.loadingBar.stop()
+    else this.$q.loadingBar.increment(progress)
   }
 
   //changeLanguage(lang: string): void {

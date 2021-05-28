@@ -119,7 +119,11 @@ module.exports = configure(function(ctx) {
         // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
         framework: {
             config: {
-                dark: 'auto'
+                dark: 'auto',
+                loadingBar: {
+                    position: 'bottom',
+                    size: '15px'
+                }
             },
 
             // iconSet: 'material-icons', // Quasar icon set
@@ -133,7 +137,9 @@ module.exports = configure(function(ctx) {
             // directives: [],
 
             // Quasar plugins
-            plugins: []
+            plugins: [
+                'LoadingBar'
+            ],
         },
 
         // animations: 'all', // --- includes all animations
@@ -223,7 +229,7 @@ module.exports = configure(function(ctx) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
         electron: {
-            bundler: 'packager', // 'packager' or 'builder'
+            bundler: 'builder', // 'packager' or 'builder'
 
             packager: {
                 // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options

@@ -1,10 +1,12 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import log from 'electron-log'
 import electron_cfg from 'electron-cfg'
 import { autoUpdater } from 'electron-updater'
+import yaml from 'yaml'
+import { ChildProcess, fork } from 'child_process';
 
 try {
     if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -89,4 +91,55 @@ app.on('activate', () => {
     if (mainWindow === null) {
         void createWindow()
     }
+})
+
+/** Tight CNC Server */
+const tight_path = path.join(__dirname,'..', 'node_modules', 'tightcnc', 'bin', 'tightcnc-server.js');
+
+const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');
+
+const tightcnc_env = Object.assign(process.env, {
+  'TIGHTCNC_CONFIG': tightcnc_conf
+});
+
+let tightcnc: ChildProcess | undefined = undefined;
+
+ipcMain.handle('StartTightCNC', (event, ...args) => {
+   if (tightcnc) {
+        console.error('Tight Server PID already running ', tightcnc.pid);
+   } 
+  console.log(tightcnc_env['TIGHTCNC_CONFIG']);
+  //  console.log("0",typeof args[0], yaml.stringify(args[0]));
+  //  console.log("1",typeof args[1], args[1]);
+  fs.writeFileSync(tightcnc_conf, yaml.stringify(args[0]));
+  //  const tightcnc = spawn(process.argv[0], [tight_path], {
+  tightcnc = fork(tight_path, {
+    env: tightcnc_env,
+    silent: true,
+    //    stdio: ['pipe','pipe', 'ipc']
+  }).on('error', (error) => {
+    console.error('TightCNC Error:', error);
+  }).on('close', (code) => {
+      const newLocal = 'TightCNC Exit code'
+    console.error(newLocal, code);
+  });
+
+  tightcnc.stderr?.on('data', (data: Buffer) => {
+    console.error('E:', data.toString());
+  });
+
+  tightcnc.stdout?.on('data', (data: Buffer) => {
+    console.info('O', data.toString());
+  });
+
+  app.on('quit', () => {
+    tightcnc?.kill('SIGTERM');
+  });
+
+  return tightcnc.pid;
+})
+
+ipcMain.handle('StopTightCNC', (_event, ..._args) => {
+    tightcnc?.kill('SIGTERM');
+    return 
 })

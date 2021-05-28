@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh LpR fFf">
+  <q-layout view="hHh lpR fFf">
     <q-header elevated>
       <q-toolbar>
         <q-btn
@@ -32,6 +32,14 @@
 
         <div>Quasar v{{ $q.version }}</div>
 
+        <q-badge rounded color="red" v-if="lastStatus?.controller.error">
+          <q-tooltip>
+          {{ lastStatus?.controller.errorData.message }}
+          </q-tooltip>
+        </q-badge> 
+        <q-badge rounded color="yellow" />
+        <q-badge rounded color="yellow" />
+
         <q-btn
           flat
           dense
@@ -52,7 +60,7 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      elevated
+      bordered
       side="left"
     >
       <q-list>
@@ -155,8 +163,11 @@ import { useI18n } from 'vue-i18n'
 export default class MainLayout extends Vue {
 
   locale = useI18n({useScope: 'global'}).locale
+  get lastStatus(){
+    return this.$store.state.tightcnc.lastStatus
+  }
 
-  leftDrawerOpen = false;
+  leftDrawerOpen = true;
   rightDrawerOpen = false;
   essentialLinks = linksList;
   toggleLeftDrawer () {
@@ -171,5 +182,7 @@ export default class MainLayout extends Vue {
     { value: 'en', label: 'English'},
     { value: 'it', label: 'Italiano'}
   ]
+
+
 }
 </script>

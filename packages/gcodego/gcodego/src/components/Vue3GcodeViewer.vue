@@ -119,6 +119,9 @@ export default defineComponent({
       space: { start: { x: 0, y: 0 }, stop: { x: 0, y: 0 } },
     };
   },
+ emits: {
+   onprogress: null
+ },
  watch: {
     gcode(newData: string, oldData: string) {
      if (newData != oldData) {
@@ -141,6 +144,7 @@ export default defineComponent({
     this.motionColor.darkMode = this.darkMode || false
     //  console.log("GCODE UPDATE EVENT!", this.gcodedata, this.reload);
     if (this.gcode && this.reload) {
+      this.$emit('onprogress',0)
       this.reload = false;
 
       const vertices:Array<THREE.Vector3> = [] 
@@ -209,7 +213,6 @@ export default defineComponent({
         vertexIndex: number // remember current vertex index
       } [] = []
 
-
       toolPath.loadFromString(this.gcode, (err: unknown, data: string) => {
             if(err)console.error(err)
             frames.push({
@@ -217,9 +220,11 @@ export default defineComponent({
                 vertexIndex: vertices.length // remember current vertex index
             });
       })
-//        .on("data",(event: { line: string, words: Array<string|number>})=>{
-//          console.log("Data:",event)
-//        })
+        .on('data',(event: { line: string, words: Array<string|number>})=>{
+        //  console.log("Data:",event)
+          if(this.gcode)
+            this.$emit('onprogress',event.line.length / this.gcode.length * 100)
+        })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
             const workpiece = new THREE.Line(
@@ -272,6 +277,8 @@ export default defineComponent({
             }
 
             this.render3d()
+            this.$emit('onprogress',100)
+
 
         })
     }

@@ -16,6 +16,12 @@ contextBridge.exposeInMainWorld('log', {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
+        invoke: (channel, data) => {
+            let validChannels = ['StartTightCNC', 'StopTightCNC'];
+            if (validChannels.includes(channel)) {
+                return ipcRenderer.invoke(channel, data);
+            }
+        },
         send: (channel, data) => {
             // whitelist channels
             let validChannels = ['toMain'];
@@ -24,7 +30,7 @@ contextBridge.exposeInMainWorld(
             }
         },
         receive: (channel, func) => {
-            let validChannels = ['fromMain', 'shouldUseDarkColors'];
+            let validChannels = ['fromMain'];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
                 console.log('mount listener for', channel);
@@ -35,9 +41,9 @@ contextBridge.exposeInMainWorld(
 );
 
 // Spectron
-console.log('--1-->', contextBridge)
-console.log('--2-->', process.argv)
-    //if (contextBridge.argv.indexOf('--insecure-test') > 1) {
-    //    console.warn("Insecure Test Environment")
-    //    window.require = require;
-    //}
+//console.log('--1-->', contextBridge)
+//console.log('--2-->', process.argv)
+//if (contextBridge.argv.indexOf('--insecure-test') > 1) {
+//    console.warn("Insecure Test Environment")
+//    window.require = require;
+//}
