@@ -5,12 +5,12 @@
     ref="container"
   />
   <span class="p-buttonset control">
-    <Button 
+    <!--Button 
       label="Center" 
       icon="pi pi-table" 
       class="p-button-sm p-button-rounded" 
       @click="center()" 
-    />
+    /-->
     <!--Button label="Delete" icon="pi pi-trash" class="p-button-sm p-button-rounded"/>
     <Button label="Cancel" icon="pi pi-times" class="p-button-sm p-button-rounded"/-->
   </span>

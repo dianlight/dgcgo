@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh LpR fFf">
     <q-header elevated>
       <q-toolbar>
         <q-btn
@@ -12,6 +12,9 @@
         />
 
         <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
           Quasar App
         </q-toolbar-title>
 
@@ -28,13 +31,29 @@
         />
 
         <div>Quasar v{{ $q.version }}</div>
+
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleRightDrawer"
+        />
       </q-toolbar>
+
+      <q-tabs align="left">
+        <q-route-tab to="/" label="Home" />
+        <q-route-tab to="/workbench" label="Workbanch" />
+        <q-route-tab to="/terminal" label="Terminal" />
+      </q-tabs>
     </q-header>
 
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      bordered
+      elevated
+      side="left"
     >
       <q-list>
         <q-item-label
@@ -51,9 +70,25 @@
       </q-list>
     </q-drawer>
 
+    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" elevated>
+      <!-- drawer content -->
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer elevated class="bg-secondary">
+      <q-toolbar>
+        <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar>
+          <div>Title</div>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
+
   </q-layout>
 </template>
 
@@ -61,6 +96,12 @@
 import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
+  {
+    title: 'Home',
+    caption: 'home',
+    icon: 'home',
+    link: '/'
+  },
   {
     title: 'Docs',
     caption: 'quasar.dev',
@@ -116,9 +157,14 @@ export default class MainLayout extends Vue {
   locale = useI18n({useScope: 'global'}).locale
 
   leftDrawerOpen = false;
+  rightDrawerOpen = false;
   essentialLinks = linksList;
   toggleLeftDrawer () {
     this.leftDrawerOpen = !this.leftDrawerOpen
+  }
+
+  toggleRightDrawer () {
+    this.rightDrawerOpen = !this.rightDrawerOpen
   }
 
   localeOptions = [

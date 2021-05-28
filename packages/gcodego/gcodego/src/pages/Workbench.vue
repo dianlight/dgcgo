@@ -17,7 +17,7 @@
 //import i18n, { setI18nLanguage } from "@/i18n";
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
-import { useQuasar } from 'quasar'
+//import { useQuasar } from 'quasar'
 
 class Props {
   url = '';
@@ -34,7 +34,7 @@ class Props {
 })
 export default class WorkBench extends Vue.with(Props) {
 
-  $q = useQuasar()
+  //$q = useQuasar()
 
   gcode = ''
 

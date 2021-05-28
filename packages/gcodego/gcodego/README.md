@@ -6,7 +6,8 @@ A GCode sender and application.
 
 - [ ] Builder
   - [x] Patch package
-  - [ ] offline-github-changelog
+  - [x] offline-github-changelog
+  - [x] quasar icongenie
 - [ ] Unit test
   - [ ] @quasar/testing ( not yet compatible )
 - [ ] Electron
@@ -14,14 +15,14 @@ A GCode sender and application.
   - [x] Electron-cfg
   - [x] Electron-updater
   - [ ] Electron-default-Menu
-  - [ ] electron-icon-builder
+  - [x] ~~electron-icon-builder~~ ( Used Quasar icongeine)
   - [ ] electron-process-type
 - [ ] Vue
   - [ ] Vue Auto router
   - [x] Vuei18n
     - [x] Dynamic loader
     - [x] Language switcher
-  - [ ] Vue3-gcode-viewer
+  - [x] Vue3-gcode-viewer
 
 ## Install the dependencies
 
