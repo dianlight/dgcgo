@@ -54,6 +54,7 @@
         <q-route-tab to="/" label="Home" />
         <q-route-tab to="/workbench" label="Workbanch" />
         <q-route-tab to="/terminal" label="Terminal" />
+        <q-route-tab to="/preferences" label="Preferences" />
       </q-tabs>
     </q-header>
 
