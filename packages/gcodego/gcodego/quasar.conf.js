@@ -10,6 +10,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
 const path = require('path')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = configure(function(ctx) {
     return {
@@ -75,7 +76,22 @@ module.exports = configure(function(ctx) {
 
             // https://v2.quasar.dev/quasar-cli/handling-webpack
             // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             chainWebpack(chain, { isServer, isClient }) {
+                //   chain.node.set('fs', 'empty').end()
+                chain.plugin('node-polyfill-webpack-plugin').use(NodePolyfillPlugin)
+
+                chain.resolve.set('fallback', {
+                    fs: false,
+                })
+
+                /*
+                                chain.externals({
+                                    'fs': '{}',
+                                    'timers': '{}',
+                                    'stream': '{}'
+                                })
+                */
                 chain.module.rule('localefiles')
                     .test(/\.(json5?|ya?ml)$/)
                     .type('javascript/auto')

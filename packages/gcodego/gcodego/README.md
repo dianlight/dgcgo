@@ -14,7 +14,10 @@ A GCode sender and application.
   - [x] Electron-cfg
   - [x] Electron-updater
   - [ ] Electron-default-Menu
+  - [ ] electron-icon-builder
+  - [ ] electron-process-type
 - [ ] Vue
+  - [ ] Vue Auto router
   - [x] Vuei18n
     - [x] Dynamic loader
     - [x] Language switcher

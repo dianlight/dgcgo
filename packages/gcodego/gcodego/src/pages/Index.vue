@@ -6,6 +6,9 @@
       :todos="todos"
       :meta="meta"
     ></example-component>
+    <router-link :to="{name:'workbench',params: { url: '/demo/simpletest.nc'}}">
+      Demo View 3D - Simple Test
+    </router-link>    
   </q-page>
 </template>
 
