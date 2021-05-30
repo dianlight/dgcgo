@@ -1,79 +1,71 @@
 <template>
-<div class="q-pa-md" style="max-width: 400px">
-    <q-form
-      @submit="onSubmit"
-      @reset="onReset"
-      class="q-gutter-md"
-    >
-      <q-input
-        filled
-        v-model="name"
-        label="Your name *"
-        hint="Name and surname"
-        lazy-rules
-        :rules="[ val => val && val.length > 0 || 'Please type something']"
-      />
+    <div class="q-pa-xs" style="max-width: 400px">
+        <dynamic-form :form="form" @change="valueChanged" />
+        <div>
+            <q-btn label="Submit" type="submit" color="primary" :form="form.id"/>
+            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+        </div>
 
-      <q-input
-        filled
-        type="number"
-        v-model="age"
-        label="Your age *"
-        lazy-rules
-        :rules="[
-          val => val !== null && val !== '' || 'Please type your age',
-          val => val > 0 && val < 100 || 'Please type a real age'
-        ]"
-      />
-
-      <q-toggle v-model="accept" label="I accept the license and terms" />
-
-      <div>
-        <q-btn label="Submit" type="submit" color="primary"/>
-        <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-      </div>
-    </q-form>
-
-  </div>
+    </div>
 </template>
 
 <script lang="ts">
+import { Controllers, Config } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
-
+import {
+  CheckboxField,
+  TextField,
+  SelectField,
+  NumberField,
+} from '@asigloo/vue-dynamic-forms';
 
 @Options({})
 export default class Preferences extends Vue {
 
-    name = ''
-    age = ''
-    accept = false
-
-//  mounted(): void {}
-
-    onSubmit():void {
-        if (this.accept !== true) {
-          this.$q.notify({
-            color: 'red-5',
-            textColor: 'white',
-            icon: 'warning',
-            message: 'You need to accept the license and terms first'
-          })
-        }
-        else {
-          this.$q.notify({
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Submitted'
-          })
-        }
-      }
-
-    onReset ():void {
-        this.name = ''
-        this.age = ''
-        this.accept = false
+    form = {
+      id: 'tightcnc-config',
+      fields: {
+        enableServer: CheckboxField({
+          label: 'Enable TightCNC Server',          
+        }),  
+        authKey: TextField({
+          label: 'TightCNC Auth Key',        
+        }),
+        host: TextField({
+            label: 'TightCNC Host'        
+        }),
+        serverPort: NumberField({
+            label: 'TightCNC Server Port',
+            min:1,
+            max:65535,
+            step: 1
+        }),
+        controller: SelectField({
+          label: 'CNC Controller Type',
+          options: [
+            {
+              value: Controllers.grbl,
+              label: Controllers.grbl.toString(),
+            },
+            {
+              value: Controllers.TinyG,
+              label: Controllers.TinyG.toString() + '*Not yet supported*',
+              disabled: true
+            }
+          ],
+        })
+      },
     }
 
+    valueChanged(values:Config) {
+      console.log('Values', values);
+    }
 }
 </script>
+
+<style lang="scss">
+//    $input-bg: #e2eb5d52;
+//    $input-border-color: #aec64c;
+
+    @import '~@asigloo/vue-dynamic-forms/dist/themes/default.scss';
+</style>

@@ -12,16 +12,14 @@ import { createI18n, LocaleMessages, VueMessageType } from 'vue-i18n';
  */
 function loadLocaleMessages(): LocaleMessages<VueMessageType> {
   const messages: LocaleMessages<VueMessageType> = {}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const locales = require.context('../i18n', true, /[A-Za-z0-9-_,\s]+\.json$/i)
   console.log(locales)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,  @typescript-eslint/no-unsafe-member-access
     locales.keys().forEach(key => {
       const matched = /([A-Za-z0-9-_]+)\./i.exec(key)
       if (matched && matched.length > 1) {
         const locale = matched[1]
         console.log('Found locale:',locale)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         messages[locale] = locales(key).default
       }
     })

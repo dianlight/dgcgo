@@ -10,6 +10,7 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
+        <q-separator vertical inset />
 
         <q-toolbar-title>
           <q-avatar>
@@ -30,7 +31,11 @@
           style="min-width: 150px"
         />
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-separator vertical inset />
+
+        <div>Quasar <q-badge>v{{ $q.version }}</q-badge></div>
+
+        <q-separator vertical inset />
 
         <q-badge rounded color="red" v-if="lastStatus?.controller.error">
           <q-tooltip>
@@ -40,6 +45,8 @@
         <q-badge rounded color="yellow" />
         <q-badge rounded color="yellow" />
 
+        <q-separator vertical inset />
+        
         <q-btn
           flat
           dense
@@ -50,7 +57,7 @@
         />
       </q-toolbar>
 
-      <q-tabs align="left">
+      <q-tabs align="center">
         <q-route-tab to="/" label="Home" />
         <q-route-tab to="/workbench" label="Workbanch" />
         <q-route-tab to="/terminal" label="Terminal" />
