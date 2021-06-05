@@ -2,7 +2,7 @@
 
 A GCode sender and application. The aim of the project is to create a universal sender for cheap CNCs.
 
-_The ambition of the project is the creation of a software like "Octoprint" for the world of CNC and also integrate a CAM part to lacorate directly from Gerber files (PCB factory) and SVG (laser works) etc etc._
+_The ambition of the project is the creation of software like "Octoprint" for the world of CNC and also integrate a CAM part to start directly from Gerber files (PCB factory) and SVG (laser works) etc etc._
 
 <span style="color:red">**Warning!**</span>
 
@@ -10,19 +10,19 @@ _The ambition of the project is the creation of a software like "Octoprint" for 
 
 ## Why?
 
-Since I decided to make my own PCBs for my pogetti I bought a Chinese CNC 1610 with grbl firmware. I immediately realized that unlike the world of 3D printers where semi-professional quality software are available for free in the world of CNC the situation is very different. Many software are dated and not optimized for new hardware and operating systems. Others lack of features as me necessary (like autolevel). There are specialized ones for Laser, Spindle but each one is missing something.
+Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with grbl firmware. I immediately realized that unlike the world of 3D printers where semi-professional quality software is available for free in the world of CNC the situation is very different. Many software are dated and not optimized for new hardware and operating systems. Others lack features as necessary (like auto-level). There are specialized ones for Laser, Spindle but each one is missing something.
 
 ## Software I was inspired by
 
-- Octoprint: I have been using it for years for my 3D prints as a "Gcode Sernder" and control center for my printer. Being able to make a CNC equivalent would be an accomplishment.
+- Octoprint: I have been using it for years for my 3D prints as a "Gcode Sender" and control center for my printer. Being able to make a CNC equivalent would be an accomplishment.
 
-- bCNC: Great software for CNC control. Unfortunately the fact that it is written in python with an outdated graphical framework means that it can only run from a PC and not via the web like Octoprint. It also makes it difficult to install on non Intel/Windows architectures like my Apple M1.
+- bCNC: Great software for CNC control. Unfortunately, the fact that it is written in python with an outdated graphical framework means that it can only run from a PC and not via the web like Octoprint. It also makes it difficult to install on non-Intel/Windows architectures like my Apple M1.
 
-- UGS: Nice software with several interesting features. Unfortunately it lacks a stable Autolevel so it's unusable in my case.
+- UGS: Nice software with several interesting features. Unfortunately, it lacks a stable Autolevel so it's unusable in my case.
 
-- FletCAM: Excellent CAM for the realization of PCB starting from Gerber design files. Lots of features but being written in Python/QT is difficult to install on MacOS in arm mode and is very unstable.
+- FletCAM: Excellent CAM for the realization of PCB starting from Gerber design files. Lots of features but is written in Python/QT is difficult to install on macOS in arm mode and is very unstable.
 
-- Pcb2Gcode: Command line software for building PCBs from Gerber files. Very good functionality but it needs an adequate UI that runs also on non Intel/Windows architectures.
+- Pcb2Gcode: Command-line software for building PCBs from Gerber files. Very good functionality but it needs an adequate UI that runs also on non-Intel/Windows architectures.
 
 ## Project scope
 
@@ -60,6 +60,9 @@ Since I decided to make my own PCBs for my pogetti I bought a Chinese CNC 1610 w
   - [x] Vue3-gcode-viewer
   - [x] Dynamic Form ( temp solution )
 - [ ] UI
+  - [ ] Multilangiage
+    - [ ] English
+    - [ ] Italian
   - [ ] Web Menu for non electron view (autohide?)
     - [ ] GCode upload
       - [ ] Gcode open for Electron based
@@ -75,9 +78,10 @@ Since I decided to make my own PCBs for my pogetti I bought a Chinese CNC 1610 w
   - [ ] Control Widget
     - [ ] Work 0 setting
     - [ ] Jog support
-      - [ ] Web Remote control ( Mobile Phones on same network? )
+      - [ ] Web Remote control ( Mobile Phones on the same network? )
         - [ ] QrCode based link
   - [ ] Autolever Widget
+  - [ ] Change tool Widget
   - [ ] Probe Widget
     - [ ] Home
     - [ ] Z-Probe
@@ -103,7 +107,7 @@ Since I decided to make my own PCBs for my pogetti I bought a Chinese CNC 1610 w
     - [ ] Support GRBL
     - [ ] Support TinyG
   - [ ] TightCNC Fork/Extending
-    - [ ] Typescript Types
+    - [ ] Typescript Types / Typescript version
     - [ ] Support for raw socket comunication
     - [ ] Support fro websocket comunication
     - [ ] Support start without config
@@ -116,6 +120,16 @@ Since I decided to make my own PCBs for my pogetti I bought a Chinese CNC 1610 w
     - [ ] More firmware
       - [ ] Support grblHal
       - [ ] Support Marlin
+- [ ] Documentation
+  - [ ] README
+    - [ ] Better and complete
+  - [ ] ROADMAP
+  - [ ] CHANGELOG
+  - [ ] LICENSE
+  - [ ] CONTRIB
+  - [ ] UI DOCUMENTATION
+  - [ ] ISSUE TEMPLATE
+  - [ ] UI
 
 ## Install the dependencies
 

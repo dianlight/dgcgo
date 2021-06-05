@@ -16,7 +16,9 @@
         "postinstall": "patch-package --exclude",
         "version": "offline-github-changelog -p > CHANGELOG.md && git add CHANGELOG.md",
         "gen:icons": "icongenie generate",
-        "gen:native": "electron-rebuild"
+        "gen:native": "electron-rebuild",
+        "gen:license": "yarn icenses generate-disclaimer > DEPS_LICENSES.md",
+        "check:update": "quasar upgrade"
     },
     "dependencies": {
         "@asigloo/vue-dynamic-forms": "^3.14.0",
@@ -31,7 +33,7 @@
         "gcode-toolpath": "^2.2.0",
         "quasar": "^2.0.0-beta.1",
         "three": "^0.129.0",
-        "tightcnc": "^0.2.0",
+        "tightcnc": "link:../tightcnc",
         "vue-class-component": "^8.0.0-rc.1",
         "vue-i18n": "^9.0.0-beta.0",
         "xerror": "^2.0.0",
@@ -43,16 +45,16 @@
         "@quasar/app": "^3.0.0-beta.28",
         "@quasar/icongenie": "^2.3.3",
         "@types/colornames": "^1.1.1",
-        "@types/node": "^15.6.1",
-        "@types/three": "^0.128.0",
+        "@types/node": "^15.12.1",
+        "@types/three": "^0.129.1",
         "@types/webpack-env": "^1.16.0",
-        "@typescript-eslint/eslint-plugin": "^4.25.0",
-        "@typescript-eslint/parser": "^4.25.0",
-        "electron": "^13.0.1",
+        "@typescript-eslint/eslint-plugin": "^4.26.0",
+        "@typescript-eslint/parser": "^4.26.0",
+        "electron": "^13.1.1",
         "electron-builder": "^22.10.5",
         "electron-devtools-installer": "^3.2.0",
         "electron-rebuild": "^2.3.5",
-        "eslint": "^7.27.0",
+        "eslint": "^7.28.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-jest": "^24.3.6",
         "eslint-plugin-vue": "^7.10.0",
@@ -75,9 +77,9 @@
         "not dead"
     ],
     "engines": {
-        "node": ">= 12.22.1",
-        "npm": ">= 6.13.4",
-        "yarn": ">= 1.21.1"
+        "node": ">= 14.17.0",
+        "npm": ">= 6.14.13",
+        "yarn": ">= 1.22.10"
     },
     "repository": {
         "type": "git",
