@@ -34,9 +34,9 @@ yarn-error.log*
 
 # Yarn 2.x
 .yarn/*
-#!.yarn/cache
 !.yarn/patches
-!.yarn/plugins
 !.yarn/releases
+!.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+.pnp.*

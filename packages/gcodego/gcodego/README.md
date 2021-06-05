@@ -60,7 +60,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Vue3-gcode-viewer
   - [x] Dynamic Form ( temp solution )
 - [ ] UI
-  - [ ] Multilangiage
+  - [ ] Multi language
     - [ ] English
     - [ ] Italian
   - [ ] Web Menu for non electron view (autohide?)
@@ -101,25 +101,15 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
         - [ ] Timeline visulaizer
           - [ ] Sync with work
 - [ ] GCode Sender
-  - [x] TightCNC vanilla integration
-    - [x] Start / Stop external process
+  - [x] ~~TightCNC vanilla integration~~ _Use my fork_
+    - [x] ~~Start / Stop external process~~ _Use my fork_
+  - [x] USE TightCNC Fork/Extending [dianlight/tightcnc](https://github.com/dianlight/tightcnc/tree/ts-migrate)
     - [ ] Electron packaged
-    - [ ] Support GRBL
-    - [ ] Support TinyG
-  - [ ] TightCNC Fork/Extending
-    - [ ] Typescript Types / Typescript version
-    - [ ] Support for raw socket comunication
-    - [ ] Support fro websocket comunication
-    - [ ] Support start without config
     - [ ] Support for new API
       - [ ] Reload Config
       - [ ] Is Alive
     - [ ] Sender as Worker
       - [ ] Web-Serial/Web-USB API
-      - [ ] support Virtual comunication API ( passtrought to Electron background process?)
-    - [ ] More firmware
-      - [ ] Support grblHal
-      - [ ] Support Marlin
 - [ ] Documentation
   - [ ] README
     - [ ] Better and complete
