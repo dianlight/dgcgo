@@ -1,13 +1,13 @@
 import { MutationTree } from 'vuex';
 import { TightCNCStateInterface } from './state';
-import * as TightCNC from '../../tightcnc/TightCNC'
+import {TightCNCClient,StatusObject} from 'tightcnc'
 
 
 const mutation: MutationTree<TightCNCStateInterface> = {
-  setClient (state: TightCNCStateInterface, client:TightCNC.Client) {
+  setClient (state: TightCNCStateInterface, client:TightCNCClient) {
     state.client = client
   },
-  setLastStatus(state: TightCNCStateInterface, status: TightCNC.Status) {
+  setLastStatus(state: TightCNCStateInterface, status: StatusObject) {
     state.lastStatus = status
   }
 };

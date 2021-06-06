@@ -13,7 +13,7 @@
         "build": "quasar build",
         "build:electron": "quasar build -m electron",
         "gen:patch": "patch-package --exclude '' gcode-toolpath",
-        "postinstall": "patch-package --exclude",
+        "postinstall": "patch-package --exclude && electron-rebuild",
         "version": "offline-github-changelog -p > CHANGELOG.md && git add CHANGELOG.md",
         "gen:icons": "icongenie generate",
         "gen:native": "electron-rebuild",

@@ -37,13 +37,16 @@
 
         <q-separator vertical inset />
 
-        <q-badge rounded color="red" v-if="lastStatus?.controller.error">
+        <q-badge rounded color="red" v-if="lastStatus?.controller?.error">
           <q-tooltip>
-          {{ lastStatus?.controller.errorData.message }}
+          {{ lastStatus?.controller?.errorData/*.message*/ }}
           </q-tooltip>
         </q-badge> 
-        <q-badge rounded color="yellow" />
-        <q-badge rounded color="yellow" />
+        <q-badge rounded color="yellow" v-if="!lastStatus?.controller">
+          <q-tooltip>
+            Missing Configuration! 
+          </q-tooltip>
+        </q-badge>  
 
         <q-separator vertical inset />
         

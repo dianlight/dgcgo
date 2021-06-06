@@ -106,7 +106,8 @@ let tightcnc: ChildProcess | undefined = undefined;
 
 ipcMain.handle('StartTightCNC', (event, ...args) => {
    if (tightcnc) {
-        console.error('Tight Server PID already running ', tightcnc.pid);
+       console.error('Tight Server PID already running ', tightcnc.pid);
+       return tightcnc.pid;
    } 
   console.log(tightcnc_env['TIGHTCNC_CONFIG']);
   //  console.log("0",typeof args[0], yaml.stringify(args[0]));

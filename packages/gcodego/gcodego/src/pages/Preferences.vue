@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { Controllers, Config } from '../tightcnc/TightCNC'
+import { TightCNCConfig } from 'tightcnc'
 import { Options, Vue } from 'vue-class-component';
 import {
   CheckboxField,
@@ -44,12 +44,12 @@ export default class Preferences extends Vue {
           label: 'CNC Controller Type',
           options: [
             {
-              value: Controllers.grbl,
-              label: Controllers.grbl.toString(),
+              value: 'grbl',
+              label: 'grbl',
             },
             {
-              value: Controllers.TinyG,
-              label: Controllers.TinyG.toString() + '*Not yet supported*',
+              value: 'TinyG',
+              label: 'TinyG' + '*Not yet supported*',
               disabled: true
             }
           ],
@@ -57,7 +57,7 @@ export default class Preferences extends Vue {
       },
     }
 
-    valueChanged(values:Config) {
+    valueChanged(values:TightCNCConfig) {
       console.log('Values', values);
     }
 }
