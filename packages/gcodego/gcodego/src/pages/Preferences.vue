@@ -1,12 +1,11 @@
 <template>
-  <div class="q-pa-md">
-    <q-form @submit="onSubmit" class="q-gutter-md row items-start">
-    <div class="q-gutter-md row items-start">
-      <q-input dense v-model="config.host" filled type="text" hint="Host" />
-      <q-input dense v-model="config.serverPort" filled type="number" hint="Port" />
-    </div>
-    <div class="q-gutter-md row items-start">
-      <q-input dense v-model="config.authKey" filled :type="isPwd ? 'password' : 'text'" hint="AuthKey">
+  <h5>TightCNC Preferences</h5>
+  <q-form @submit="onSubmit" @reset="onReset" autofocus>
+    <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
+      <q-input :disable="$q.platform.is.electron" dense v-model="config.host" outlined type="text" label="TightCNC host" />
+      <q-input :disable="$q.platform.is.electron" dense v-model="config.serverPort" outlined type="number" label="TightCNC port" />
+
+      <q-input dense v-model="config.authKey" outlined :type="isPwd ? 'password' : 'text'" label="TightCNC AuthKey" _hint="AuthKey">
         <template v-slot:append>
           <q-icon
             :name="isPwd ? 'visibility_off' : 'visibility'"
@@ -16,49 +15,59 @@
         </template>
       </q-input>
     </div>
-    <div class="q-gutter-md row items-start">
-      <q-select dense outlined v-model="config.controller" :options="controllers" @change="changeControllerType" label="Outlined" />
+    <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
+      <q-select dense outlined emit-value v-model="config.controller" :options="controllers" @change="changeControllerType" label="Controller Type" />
 
-      {{config.controller}}
+      <template v-if="config.controller === 'grbl'">
+        <q-select dense outlined  v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
 
-      <q-select dense outlined v-if="config.controller === 'grbl'" v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
+        <template v-if="portType ==='serial'">
+          <q-input  dense outlined v-model="port" label="Port" />
+          <q-select dense outlined v-model="baudRate" :options="[9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 ]" label="BaudRate" />
+        </template>
 
-      <q-input  dense outlined v-model="port" label="Port" />
+        <template v-if="portType ==='socket'">
+          <q-input  dense outlined v-model="remoteHost" label="Remote Host" />
+          <q-input  dense outlined v-model="remotePort"  type="number" label="Remote Port" />
+        </template>
 
-      <q-select dense outlined v-model="baudRate" :options="[9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 ]" label="BaudRate" />
+        <template v-if="portType ==='grblsim'">
+          <q-input  dense outlined v-model="grblSimPath" label="Path" />
+        </template>
+
+      </template>
     </div>
-      <div class="bg-grey-2 q-pa-sm rounded-borders">
-        Machine available Axis
-        <q-option-group
-          name="usedAxes"
-          v-model="usedAxes"
-          :options="[{label:'X',value:true},{label:'Y',value:true},{label:'Z',value:true}]"
-          type="checkbox"
-          color="primary"
-          inline
-      />
-      </div>
-      <div class="q-gutter-sm">
+    <q-separator class="q-mt-sm"/>
+    <div v-if="config.controller === 'grbl'" class="q-gutter-sm q-mt-sm q-pl-md row items-start">
+      <q-field dense outlined label="Available Axes" stack-label>
         <q-checkbox dense v-model="usedAxes[0]" label="X" color="teal" />
         <q-checkbox dense v-model="usedAxes[1]" label="Y" color="orange" />
         <q-checkbox dense v-model="usedAxes[2]" label="Z" color="red" />
-      </div>
-      <div class="q-gutter-sm">
+      </q-field>
+
+      <q-field dense  outlined label="Homeable Axes" stack-label>
         <q-checkbox dense v-model="homableAxes[0]" label="X" color="teal" />
         <q-checkbox dense v-model="homableAxes[1]" label="Y" color="orange" />
         <q-checkbox dense v-model="homableAxes[2]" label="Z" color="red" />
-      </div>   
-    </q-form>
-  </div>
-  <q-separator/>
-  <div class="q-gutter-md row items-start">
-        <q-btn label="Submit" type="submit" color="primary"/>
-  </div>
+      </q-field>
+    </div>   
+
+    <q-separator class="q-mt-sm"/>
+
+    <div class="q-gutter-md q-mt-sm q-pr-md column items-end">
+         <q-btn-group>
+            <q-btn label="Reset" type="reset" color="negative"/>
+            <q-btn label="Save" type="submit" color="positive"/>
+         </q-btn-group> 
+    </div>
+  </q-form>
 </template>
 
 <script lang="ts">
-import { TightCNCConfig } from 'tightcnc'
+import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig } from 'tightcnc'
+import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
+
 
 @Options({
   components: {}
@@ -74,10 +83,19 @@ export default class Preferences extends Vue {
       homableAxes =  [ true, true, true ]
 
 
-      controllers = [{label:'none', value:undefined },{label:'grbl'},{label:'TinyG *Unsupported*',disable:true}]
+      controllers = [
+        {label:'none', value:undefined },
+        {label:'grbl', value:'grbl'},
+        {label:'TinyG *Unsupported*',disable:true}
+      ]
+
+      remoteHost=''
+      remotePort=23
+
+      grblSimPath=''      
 
       mounted(){
-        this.config = JSON.parse(JSON.stringify(this.$store.state.tightcnc.client?.config || {})) as Partial<TightCNCConfig>
+        this.onReset()
       }
 
       changeControllerType(){
@@ -85,7 +103,49 @@ export default class Preferences extends Vue {
       }
 
       onSubmit(){
-        console.log(this.config)
+        
+        switch(this.config.controller){
+          case 'grbl':
+            if(!this.config.controllers)this.config.controllers = {} as TightCNCControllers
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const acontrol = this.config.controllers[this.config.controller] as TightCNCGrblConfig
+            switch(this.portType){
+              case 'serial':
+                acontrol.port = this.port
+                break;
+              case 'socket':
+                acontrol.port = `${this.portType}://${this.remoteHost}:${this.remotePort}`
+                break;
+              case 'grblsim':
+                acontrol.port = `${this.portType}:${this.grblSimPath}`
+                break;
+            }
+          break;
+        }
+        console.log('Saving:',this.config)
+        Client.saveConfig(this.config)
+       // void this.$store.dispatch('tightcnc/updateClientConfig', this.config)
+      }
+
+      onReset(){
+        this.config = JSON.parse(JSON.stringify(this.$store.state.tightcnc.client?.config || {})) as Partial<TightCNCConfig>
+        if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
+          const acontrol = this.config.controllers[this.config.controller]
+          const porturl = new URL(acontrol?.port ||'')
+          this.portType = porturl.protocol?porturl.protocol.slice(0,-1):'serial'
+          switch(this.portType){
+            case 'serial':
+              this.port = acontrol?.port || ''
+              break;
+            case 'socket':
+              this.remoteHost = porturl.hostname
+              this.remotePort = parseInt(porturl.port)
+              break;
+            case 'grblsim':
+              this.grblSimPath = porturl.href.substr(10)
+              break;
+          }
+        }
       }
 
 //valueChanged(values:TightCNCConfig) {

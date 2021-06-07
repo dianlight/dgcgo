@@ -1,5 +1,6 @@
 import http from 'http';
 import { TightCNCConfig } from 'tightcnc'
+import {v4 as uuidv4} from 'uuid';
 
     /*
     export interface Status {
@@ -67,11 +68,16 @@ import { TightCNCConfig } from 'tightcnc'
         }
         
         static async start(config: Partial<TightCNCConfig>): Promise<Client> {
+            console.log(config)
+            if (!config.authKey) {
+                config.authKey = uuidv4()
+                console.log('Generated AuthKey:',config.authKey)
+            }
             return new Promise((resolve, reject) => {
                 const tight_client = new Client(config);
                 window.api.invoke<Partial<TightCNCConfig>, { serverPort: number, pid: number }>('StartTightCNC', tight_client.config)
                     .then((res) => {
-                        console.info('PID', res.pid);
+                        console.info('TightCNC Pid', res.pid);
                         tight_client.config.serverPort = res.serverPort
                         resolve(tight_client)
                     }).catch((err) => {
@@ -83,6 +89,15 @@ import { TightCNCConfig } from 'tightcnc'
 
         static async stop(): Promise<void> {       
             return window.api.invoke('StopTightCNC')
+        }
+
+        static saveConfig(config: Partial<TightCNCConfig>): void {
+            console.log('Save config!',JSON.stringify(config))
+            window.api.send('SaveTightCNCConfig', JSON.stringify(config));
+        }
+
+        static async loadConfig(): Promise<Partial<TightCNCConfig>> {
+           return window.api.invoke<undefined,Partial<TightCNCConfig>>('LoadTightCNCConfig')
         }
 
 		async op<T>(opname: string, params = {}): Promise<T> {
@@ -115,6 +130,8 @@ import { TightCNCConfig } from 'tightcnc'
 				req.write(postData);
 				req.end();
 			});
-		}
+        }
+        
+
 	}
 

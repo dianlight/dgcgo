@@ -17,20 +17,20 @@ contextBridge.exposeInMainWorld('log', {
 contextBridge.exposeInMainWorld(
     'api', {
         invoke: (channel, data) => {
-            let validChannels = ['StartTightCNC', 'StopTightCNC'];
+            let validChannels = ['StartTightCNC', 'StopTightCNC', 'LoadTightCNCConfig'];
             if (validChannels.includes(channel)) {
                 return ipcRenderer.invoke(channel, data);
             }
         },
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ['toMain'];
+            let validChannels = ['SaveTightCNCConfig'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ['fromMain'];
+            let validChannels = [''];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
                 console.log('mount listener for', channel);

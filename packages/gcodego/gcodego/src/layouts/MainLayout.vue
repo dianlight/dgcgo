@@ -37,6 +37,11 @@
 
         <q-separator vertical inset />
 
+        <q-badge rounded :color="lastStatus?.controller?.ready?'green':'yellow'" v-if="lastStatus?.controller">
+          <q-tooltip>
+          {{ lastStatus?.controller }}
+          </q-tooltip>
+        </q-badge> 
         <q-badge rounded color="red" v-if="lastStatus?.controller?.error">
           <q-tooltip>
           {{ lastStatus?.controller?.errorData/*.message*/ }}
@@ -48,16 +53,6 @@
           </q-tooltip>
         </q-badge>  
 
-        <q-separator vertical inset />
-        
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleRightDrawer"
-        />
       </q-toolbar>
 
       <q-tabs align="center">
@@ -87,10 +82,6 @@
           v-bind="link"
         />
       </q-list>
-    </q-drawer>
-
-    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" elevated>
-      <!-- drawer content -->
     </q-drawer>
 
     <q-page-container>
@@ -179,14 +170,9 @@ export default class MainLayout extends Vue {
   }
 
   leftDrawerOpen = true;
-  rightDrawerOpen = false;
   essentialLinks = linksList;
   toggleLeftDrawer () {
     this.leftDrawerOpen = !this.leftDrawerOpen
-  }
-
-  toggleRightDrawer () {
-    this.rightDrawerOpen = !this.rightDrawerOpen
   }
 
   localeOptions = [

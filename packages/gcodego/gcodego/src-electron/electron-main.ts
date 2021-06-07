@@ -110,7 +110,7 @@ let tightcnc: ChildProcess | undefined = undefined;
 ipcMain.handle('StartTightCNC', async (event, ...args) => {
    if (tightcnc) {
        console.error('Tight Server PID already running ', tightcnc.pid);
-       return tightcnc.pid;
+       tightcnc?.kill('SIGTERM');
    }
     const config: TightCNCConfig = args[0] as TightCNCConfig;
     if (config.serverPort) {
@@ -152,4 +152,16 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
 ipcMain.handle('StopTightCNC', (_event, ..._args) => {
     tightcnc?.kill('SIGTERM');
     return 
+})
+
+ipcMain.on('SaveTightCNCConfig', (_event, ...args) => {
+    console.debug('Saving config',args[0])
+    electron_cfg.set('tightcnc.config', JSON.parse(args[0]))
+
+    return 
+})
+
+ipcMain.handle('LoadTightCNCConfig', (_event, ..._args) => {
+    console.debug('Loadiing config...')
+    return electron_cfg.get('tightcnc.config',{}) as Partial<TightCNCConfig>
 })

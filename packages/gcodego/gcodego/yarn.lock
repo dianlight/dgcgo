@@ -2712,6 +2712,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/uuid@npm:^8":
+  version: 8.3.0
+  resolution: "@types/uuid@npm:8.3.0"
+  checksum: 620985aed8fdb4aed153daca5235f4303457a67a4d181efac0021712eabd9edd7e88895f79730c0e651effde7633b1b61e49a81519ac8d4e75019d2ac9b6412f
+  languageName: node
+  linkType: hard
+
 "@types/verror@npm:^1.10.3":
   version: 1.10.4
   resolution: "@types/verror@npm:1.10.4"
@@ -7728,6 +7735,7 @@ fsevents@~2.3.1:
     "@types/colornames": ^1.1.1
     "@types/node": ^15.12.1
     "@types/three": ^0.129.1
+    "@types/uuid": ^8
     "@types/webpack-env": ^1.16.0
     "@typescript-eslint/eslint-plugin": ^4.26.0
     "@typescript-eslint/parser": ^4.26.0
@@ -7755,6 +7763,7 @@ fsevents@~2.3.1:
     three: ^0.129.0
     tightcnc: "link:../tightcnc"
     typescript: ^4.3.2
+    uuid: ^8.3.2
     vue-class-component: ^8.0.0-rc.1
     vue-i18n: ^9.1.6
     vuex: ^4.0.1
@@ -15419,6 +15428,15 @@ typescript@^4.3.2:
   bin:
     uuid: ./bin/uuid
   checksum: 1ce3f37e214d6d0dc94a6a9663a0365013ace66bc3fd5b203e6f5d2eeb978aaee1192367222386345d30b4c6a447928c501121aa84c637724bf105ef57284949
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: aed2bcef341f95635f308fea8831fb9038b18c485fe7e71feb89d2e05602dfecad0cb6f2246fae096d4da425cca6e8a71056f28abd97ad98cf770a2018853248
   languageName: node
   linkType: hard
 
