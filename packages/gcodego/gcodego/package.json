@@ -28,6 +28,7 @@
         "electron-cfg": "^1.2.6",
         "electron-log": "^4.3.5",
         "electron-updater": "^4.3.9",
+        "find-free-ports": "^2.0.3",
         "gcode-toolpath": "^2.2.0",
         "quasar": "next",
         "three": "^0.129.0",

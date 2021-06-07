@@ -7366,6 +7366,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-free-ports@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "find-free-ports@npm:2.0.3"
+  checksum: fec6e873f7f7bc76efb35c411ced6d7580f4278e8942c44ce0f630713cbf48d92c2c1b49234cbc96c8a462137730f66e202bcca6a7bcfb565abc641cb11c9f71
+  languageName: node
+  linkType: hard
+
 "find-up@npm:^1.0.0":
   version: 1.1.2
   resolution: "find-up@npm:1.1.2"
@@ -7738,6 +7745,7 @@ fsevents@~2.3.1:
     eslint-config-prettier: ^8.3.0
     eslint-plugin-jest: ^24.3.6
     eslint-plugin-vue: ^7.10.0
+    find-free-ports: ^2.0.3
     gcode-toolpath: ^2.2.0
     node-polyfill-webpack-plugin: ^1.1.2
     offline-github-changelog: ^2.3.0

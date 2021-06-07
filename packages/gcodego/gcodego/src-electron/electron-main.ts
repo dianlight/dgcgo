@@ -7,6 +7,9 @@ import electron_cfg from 'electron-cfg'
 import { autoUpdater } from 'electron-updater'
 import yaml from 'yaml'
 import { ChildProcess, fork } from 'child_process';
+import findFreePorts from 'find-free-ports'
+import { TightCNCConfig } from 'app/../tightcnc/types/src'
+
 
 try {
     if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -104,11 +107,17 @@ const tightcnc_env = Object.assign(process.env, {
 
 let tightcnc: ChildProcess | undefined = undefined;
 
-ipcMain.handle('StartTightCNC', (event, ...args) => {
+ipcMain.handle('StartTightCNC', async (event, ...args) => {
    if (tightcnc) {
        console.error('Tight Server PID already running ', tightcnc.pid);
        return tightcnc.pid;
-   } 
+   }
+    const config: TightCNCConfig = args[0] as TightCNCConfig;
+    if (config.serverPort) {
+        [config.serverPort] = await findFreePorts(1)
+        console.info(`Found Free TCP/Port ${config.serverPort}`)
+    }
+ 
   console.log(tightcnc_env['TIGHTCNC_CONFIG']);
   //  console.log("0",typeof args[0], yaml.stringify(args[0]));
   //  console.log("1",typeof args[1], args[1]);
@@ -137,7 +146,7 @@ ipcMain.handle('StartTightCNC', (event, ...args) => {
     tightcnc?.kill('SIGTERM');
   });
 
-  return tightcnc.pid;
+    return { pid:tightcnc.pid, serverPort:config.serverPort };
 })
 
 ipcMain.handle('StopTightCNC', (_event, ..._args) => {

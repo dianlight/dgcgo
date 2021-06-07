@@ -69,13 +69,15 @@ import { TightCNCConfig } from 'tightcnc'
         static async start(config: Partial<TightCNCConfig>): Promise<Client> {
             return new Promise((resolve, reject) => {
                 const tight_client = new Client(config);
-                window.api.invoke<Partial<TightCNCConfig>,number>('StartTightCNC',tight_client.config).then((pid) => {
-                    console.log('PID', pid);
-                    resolve(tight_client)
-                }).catch((err) => {
-                    console.error(err);
-                    reject(err)
-                });
+                window.api.invoke<Partial<TightCNCConfig>, { serverPort: number, pid: number }>('StartTightCNC', tight_client.config)
+                    .then((res) => {
+                        console.info('PID', res.pid);
+                        tight_client.config.serverPort = res.serverPort
+                        resolve(tight_client)
+                    }).catch((err) => {
+                        console.error(err);
+                        reject(err)
+                    });
             })
         }
 

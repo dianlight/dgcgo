@@ -32,7 +32,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] quasar icongenie
   - [ ] Automatic release (github)
 - [ ] Quasar
-  - [ ] inegrate better form creator ( blazier not yet compatible )
+  - [ ] inegrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)
 - [ ] Unit test
   - [ ] @quasar/testing ( not yet compatible )
     - [ ] spectrong integration
