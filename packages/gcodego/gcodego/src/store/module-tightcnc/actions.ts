@@ -17,7 +17,7 @@ const actions: ActionTree<TightCNCStateInterface, StateInterface> = {
           //context.commit('setLastError', err)
           void context.dispatch('clientStatus', client)
         });
-      }, 1000)
+      }, 5000)
     }
   }
 };

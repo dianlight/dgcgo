@@ -1,6 +1,6 @@
 {
     "name": "gcodego",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "A GCode sender and application.",
     "productName": "GCode Go",
     "author": "dianlight <lucio.tarantino@gmail.com>",
@@ -21,9 +21,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
-        "@asigloo/vue-dynamic-forms": "^3.14.0",
-        "@quasar/cli": "^1.2.0",
-        "@quasar/extras": "^1.10.6",
+        "@quasar/extras": "latest",
         "axios": "^0.21.1",
         "colornames": "^1.1.1",
         "core-js": "^3.14.0",
@@ -31,11 +29,12 @@
         "electron-log": "^4.3.5",
         "electron-updater": "^4.3.9",
         "gcode-toolpath": "^2.2.0",
-        "quasar": "^2.0.0-beta.19",
+        "quasar": "next",
         "three": "^0.129.0",
         "tightcnc": "link:../tightcnc",
         "vue-class-component": "^8.0.0-rc.1",
         "vue-i18n": "^9.1.6",
+        "vuex": "^4.0.1",
         "xerror": "^2.0.0",
         "yaml": "^1.10.2"
     },
@@ -43,6 +42,7 @@
         "@babel/eslint-parser": "^7.14.4",
         "@intlify/vue-i18n-loader": "^2.1.0",
         "@quasar/app": "^3.0.0-beta.28",
+        "@quasar/cli": "latest",
         "@quasar/icongenie": "^2.3.3",
         "@types/colornames": "^1.1.1",
         "@types/node": "^15.12.1",

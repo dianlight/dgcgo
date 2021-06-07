@@ -12,16 +12,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@asigloo/vue-dynamic-forms@npm:^3.14.0":
-  version: 3.14.0
-  resolution: "@asigloo/vue-dynamic-forms@npm:3.14.0"
-  dependencies:
-    deep-clone: ^3.0.3
-    deep-object-diff: ^1.1.0
-  checksum: 39ff216e08ae07e596a587ea162f8bd1e0f0a96b3616dd41e73930c0857e82614f3a2f8365ea649c2e1ce05dd71b998e7d6b4a8c32f8422224d4438094c0409f
-  languageName: node
-  linkType: hard
-
 "@babel/code-frame@npm:7.12.11":
   version: 7.12.11
   resolution: "@babel/code-frame@npm:7.12.11"
@@ -2177,7 +2167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/cli@npm:^1.2.0":
+"@quasar/cli@npm:latest":
   version: 1.2.0
   resolution: "@quasar/cli@npm:1.2.0"
   dependencies:
@@ -2214,7 +2204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/extras@npm:^1.10.6":
+"@quasar/extras@npm:latest":
   version: 1.10.6
   resolution: "@quasar/extras@npm:1.10.6"
   checksum: 4488605fc57a740d0007927c566c51272a44a61dd75eb96bda272d2bceab0e01a9d542dd367caef287afd7537737fda694015655593634c2e9ebc130311d5aa4
@@ -5778,13 +5768,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"deep-clone@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "deep-clone@npm:3.0.3"
-  checksum: 254e32304810373389f678402a7e2f517897e1e83a1610965557505382cc8f9efdaa642bdd2394aef52ff6a57ba8b56ba4509cd9d31fe1ae2a092e33077e9131
-  languageName: node
-  linkType: hard
-
 "deep-equal@npm:^1.0.1":
   version: 1.1.1
   resolution: "deep-equal@npm:1.1.1"
@@ -5810,13 +5793,6 @@ __metadata:
   version: 0.1.3
   resolution: "deep-is@npm:0.1.3"
   checksum: 3de58f86af4dec86c8be531a5abaf2e6d8ea98fa2f1d81a3a778d0d8df920ee282043a6ef05bfb4eb699c8551df9ac1b808d4dc71d54cc40ab1efa5ce8792943
-  languageName: node
-  linkType: hard
-
-"deep-object-diff@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "deep-object-diff@npm:1.1.0"
-  checksum: 2667c43932d14c908d03f813cd2846a626bda1d320f8f1dee3c7bd00ff8058713bb8f5d995fabd617e09229cf64bf16e53579233e29da870fd27bde23d5f5b20
   languageName: node
   linkType: hard
 
@@ -7736,12 +7712,11 @@ fsevents@~2.3.1:
   version: 0.0.0-use.local
   resolution: "gcodego@workspace:."
   dependencies:
-    "@asigloo/vue-dynamic-forms": ^3.14.0
     "@babel/eslint-parser": ^7.14.4
     "@intlify/vue-i18n-loader": ^2.1.0
     "@quasar/app": ^3.0.0-beta.28
-    "@quasar/cli": ^1.2.0
-    "@quasar/extras": ^1.10.6
+    "@quasar/cli": latest
+    "@quasar/extras": latest
     "@quasar/icongenie": ^2.3.3
     "@types/colornames": ^1.1.1
     "@types/node": ^15.12.1
@@ -7767,13 +7742,14 @@ fsevents@~2.3.1:
     node-polyfill-webpack-plugin: ^1.1.2
     offline-github-changelog: ^2.3.0
     patch-package: ^6.4.7
-    quasar: ^2.0.0-beta.19
+    quasar: next
     rimraf: ^3.0.2
     three: ^0.129.0
     tightcnc: "link:../tightcnc"
     typescript: ^4.3.2
     vue-class-component: ^8.0.0-rc.1
     vue-i18n: ^9.1.6
+    vuex: ^4.0.1
     xerror: ^2.0.0
     yaml: ^1.10.2
   languageName: unknown
@@ -12790,10 +12766,10 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"quasar@npm:^2.0.0-beta.19":
-  version: 2.0.0-beta.19
-  resolution: "quasar@npm:2.0.0-beta.19"
-  checksum: 16f766dadefb6ecb0f6023e410cc2ac197c246a962715182f7dd9e1709a2b727ee1f8dfccbbe08005a7cc05d89a5dec6372f49a317a6d74202bcc34a6ff20a46
+"quasar@npm:next":
+  version: 2.0.0-rc.1
+  resolution: "quasar@npm:2.0.0-rc.1"
+  checksum: 25b4a3a6bc32aa336c5d77878fb22b6360fdad5035a6405c24f2bc3f87241645c11f291429070cce8c79d3b13d33ad81a2c6f6eb6cac4a7b4b61676e508ed84a
   languageName: node
   linkType: hard
 
@@ -15578,7 +15554,7 @@ typescript@^4.3.2:
   languageName: node
   linkType: hard
 
-"vuex@npm:4.0.1":
+"vuex@npm:4.0.1, vuex@npm:^4.0.1":
   version: 4.0.1
   resolution: "vuex@npm:4.0.1"
   dependencies:

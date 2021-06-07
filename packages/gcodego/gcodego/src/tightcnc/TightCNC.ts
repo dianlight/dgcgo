@@ -1,7 +1,4 @@
-//import path from "path";
-//import { ipcRenderer } from 'electron';
 import http from 'http';
-//import { XError } from 'xerror';
 import { TightCNCConfig } from 'tightcnc'
 
     /*
@@ -47,7 +44,6 @@ import { TightCNCConfig } from 'tightcnc'
           //  controller: 'grbl',
             host: 'http://localhost',
 			serverPort: 12345,
-			/*
             controllers: {
                 grbl: {
                     baudRate: 115200,
@@ -59,12 +55,15 @@ import { TightCNCConfig } from 'tightcnc'
                     homableAxes: [true, true, true]
                 }
             }
-			*/
         }
         
 
 		constructor(config: Partial<TightCNCConfig>) {
 			Object.assign(this.config,config);
+        }
+
+        public getConfig(): Partial<TightCNCConfig> {
+            return this.config;
         }
         
         static async start(config: Partial<TightCNCConfig>): Promise<Client> {
@@ -72,14 +71,6 @@ import { TightCNCConfig } from 'tightcnc'
                 const tight_client = new Client(config);
                 window.api.invoke<Partial<TightCNCConfig>,number>('StartTightCNC',tight_client.config).then((pid) => {
                     console.log('PID', pid);
-                    /*
-                    tight_client.op('getStatus').then( (result)=> {
-                        console.log(result)
-                    }).catch( (err)=>{
-                        console.error(err);
-                        reject(err)
-                    });
-                    */
                     resolve(tight_client)
                 }).catch((err) => {
                     console.error(err);
@@ -93,13 +84,11 @@ import { TightCNCConfig } from 'tightcnc'
         }
 
 		async op<T>(opname: string, params = {}): Promise<T> {
-			//const url = `${this.config.host}:${this.config.serverPort || 2363}/v1/jsonrpc`;
 			const requestData = {
 				method: opname,
 				params: params
 			};
 			const postData = JSON.stringify(requestData);
-			//console.log('Server Url:',url);
 			return new Promise((resolve) => {
 				const req = http.request({
 					hostname: new URL(this.config.host as string).hostname,
@@ -112,26 +101,17 @@ import { TightCNCConfig } from 'tightcnc'
 						'Content-Length': Buffer.byteLength(postData)
 					}
 				}, (res) => {
-				//	console.log(`STATUS: ${res.statusCode}`);
-				//	console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
 					res.setEncoding('utf8');
 					let result = '';
 					res.on('data', (chunk) => {
-						// console.log(`BODY: ${chunk}`);
 						result+=chunk;
 					});
 					res.on('end', () => {
-					//	console.log('No more data in response.');
 						resolve(JSON.parse(result));
 					});
 				});
 				req.write(postData);
 				req.end();
-				//			response = JSON.parse(response);
-				//			if (response.error) {
-				//				throw new Error(response.error);
-				//			}
-				//			return response.result;
 			});
 		}
 	}

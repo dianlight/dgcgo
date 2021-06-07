@@ -1,8 +1,9 @@
-import {TightCNCClient,StatusObject} from 'tightcnc'
+import { Client } from 'src/tightcnc/TightCNC';
+import { StatusObject } from 'tightcnc'
 
 
 export interface TightCNCStateInterface {
-  client?: TightCNCClient
+  client?: Client
   lastStatus?: StatusObject
 }
 
