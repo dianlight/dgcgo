@@ -22,7 +22,21 @@
         <q-select dense outlined  v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
 
         <template v-if="portType ==='serial'">
-          <q-input  dense outlined v-model="port" label="Port" />
+          <q-select dense outlined v-model="port" clearable :options="serials" label="Port" emit-value>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <!--
+              <q-item-section avatar>
+                <q-icon :name="scope.opt.icon" />
+              </q-item-section>
+              -->
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.portInfo.manufacturer }} {{ scope.opt.portInfo.vendorId}} {{ scope.opt.portInfo.productId }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>          
+          </q-select>  
           <q-select dense outlined v-model="baudRate" :options="[9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 ]" label="BaudRate" />
         </template>
 
@@ -64,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig } from 'tightcnc'
+import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
 import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
 
@@ -81,6 +95,7 @@ export default class Preferences extends Vue {
       baudRate = 115200
       usedAxes = [ true, true, true ]
       homableAxes =  [ true, true, true ]
+      serials:{label:string,value:string, portInfo:PortInfo}[] = []
 
 
       controllers = [
@@ -96,6 +111,16 @@ export default class Preferences extends Vue {
 
       mounted(){
         this.onReset()
+        if(this.$store.state.tightcnc.client){
+          void this.$store.state.tightcnc.client.getAvailableSerials().then( serials => {
+            this.serials = serials.map( ss =>  {
+             return {
+              label:ss.path,
+              value:ss.path,
+              portInfo: ss}
+              })
+          })
+        } 
       }
 
       changeControllerType(){
@@ -147,6 +172,8 @@ export default class Preferences extends Vue {
           }
         }
       }
+
+      
 
 //valueChanged(values:TightCNCConfig) {
 //     console.log('Values', values);

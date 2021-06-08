@@ -32,7 +32,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] quasar icongenie
   - [ ] Automatic release (github)
 - [ ] Quasar
-  - [ ] inegrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)
+  - [ ] integrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)
 - [ ] Unit test
   - [ ] @quasar/testing ( not yet compatible )
     - [ ] spectrong integration
@@ -53,14 +53,14 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] Rpi and other SBC support
     - [ ] Octopi like SD image (?)
 - [x] Vue
-  - [x] ~~Vue Auto router~~ ( unisefull )
+  - [x] ~~Vue Auto router~~ ( unusefull )
   - [x] Vuei18n
     - [x] Dynamic loader
     - [x] Language switcher
   - [x] Vue3-gcode-viewer
   - [x] Dynamic Form ( temp solution )
 - [ ] UI
-  - [ ] Multi language
+  - [x] Multi language
     - [ ] English
     - [ ] Italian
   - [ ] Web Menu for non electron view (autohide?)
@@ -95,7 +95,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] GCode viewer
     - [x] Basic Viewer
       - [x] G2/G3 Arch support
-      - [x] Spindle position
+      - [ ] Spindle position
       - [ ] UI view control
         - [ ] Reset/Center
         - [ ] Timeline visulaizer
@@ -103,7 +103,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
 - [ ] GCode Sender
   - [x] ~~TightCNC vanilla integration~~ _Use my fork_
     - [x] ~~Start / Stop external process~~ _Use my fork_
-  - [x] USE TightCNC Fork/Extending [dianlight/tightcnc](https://github.com/dianlight/tightcnc/tree/ts-migrate)
+  - [x] Use TightCNC Fork/Extending [dianlight/tightcnc](https://github.com/dianlight/tightcnc/tree/ts-migrate)
     - [ ] Electron packaged
     - [ ] Support for new API
       - [ ] Reload Config

@@ -1,5 +1,5 @@
 import http from 'http';
-import { TightCNCConfig } from 'tightcnc'
+import { TightCNCConfig,PortInfo } from 'tightcnc'
 import {v4 as uuidv4} from 'uuid';
 
     /*
@@ -106,7 +106,7 @@ import {v4 as uuidv4} from 'uuid';
 				params: params
 			};
 			const postData = JSON.stringify(requestData);
-			return new Promise((resolve) => {
+			return new Promise((resolve,reject) => {
 				const req = http.request({
 					hostname: new URL(this.config.host as string).hostname,
 					port: this.config.serverPort,
@@ -123,15 +123,29 @@ import {v4 as uuidv4} from 'uuid';
 					res.on('data', (chunk) => {
 						result+=chunk;
 					});
-					res.on('end', () => {
-						resolve(JSON.parse(result));
+                    res.on('end', () => {
+                        const rsp = JSON.parse(result) as { error: unknown, result: T }
+                        if (rsp.error) {
+                            reject(rsp.error)
+                        } else {
+    						resolve(rsp.result);
+
+                        }
 					});
 				});
 				req.write(postData);
 				req.end();
-			});
+			})
         }
         
+
+        /**
+         * Specific direct functions
+         */
+
+        getAvailableSerials(): Promise<PortInfo[]>{
+            return this.op<PortInfo[]>('getAvailableSerials')
+        }
 
 	}
 
