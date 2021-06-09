@@ -31,6 +31,8 @@ class Props {
   readonly icon = prop({ default: '' });
 }
 
-@Options({})
+@Options({
+  components: {}
+})
 export default class EssentialLink extends Vue.with(Props) {}
 </script>

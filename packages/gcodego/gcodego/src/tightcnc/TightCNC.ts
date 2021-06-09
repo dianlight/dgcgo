@@ -91,9 +91,14 @@ import {v4 as uuidv4} from 'uuid';
             return window.api.invoke('StopTightCNC')
         }
 
-        static saveConfig(config: Partial<TightCNCConfig>): void {
-            console.log('Save config!',JSON.stringify(config))
-            window.api.send('SaveTightCNCConfig', JSON.stringify(config));
+        static saveConfig(config: Partial<TightCNCConfig>, restart?: boolean): void {
+            const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>
+            console.log('Save config',cc)
+            window.api.send('SaveTightCNCConfig', cc);
+            if (restart) {
+                console.log(cc)
+                void this.stop().then( ()=> void this.start(cc))
+            }
         }
 
         static async loadConfig(): Promise<Partial<TightCNCConfig>> {

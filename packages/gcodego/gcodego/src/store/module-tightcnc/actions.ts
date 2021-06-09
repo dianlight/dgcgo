@@ -8,9 +8,9 @@ const actions: ActionTree<TightCNCStateInterface, StateInterface> = {
     context.commit('setClient', client);
     if (client) {
       setTimeout(() => {
-        client.op<{error:unknown,result:TightCNCClient}>('getStatus').then((result) => {
-          console.log(result.result,result.error)
-          context.commit('setLastStatus', result.result)
+        client.op<TightCNCClient>('getStatus').then((result) => {
+          console.log(result)
+          context.commit('setLastStatus', result)
           void context.dispatch('clientStatus', client)
         }).catch((err) => {
           console.error(err);

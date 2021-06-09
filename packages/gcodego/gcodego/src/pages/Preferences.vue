@@ -91,7 +91,7 @@ export default class Preferences extends Vue {
       portType = 'serial'
       isPwd = true
       config:Partial<TightCNCConfig> = {}
-      port = '/dev/ttyAMA0'
+      port = ''
       baudRate = 115200
       usedAxes = [ true, true, true ]
       homableAxes =  [ true, true, true ]
@@ -147,8 +147,8 @@ export default class Preferences extends Vue {
             }
           break;
         }
-        console.log('Saving:',this.config)
-        Client.saveConfig(this.config)
+        console.debug('Saving:',this.config)
+        Client.saveConfig(this.config,true)
        // void this.$store.dispatch('tightcnc/updateClientConfig', this.config)
       }
 
@@ -167,7 +167,7 @@ export default class Preferences extends Vue {
               this.remotePort = parseInt(porturl.port)
               break;
             case 'grblsim':
-              this.grblSimPath = porturl.href.substr(10)
+              this.grblSimPath = porturl.href.substr(8)
               break;
           }
         }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme,dialog } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
@@ -44,7 +44,8 @@ async function createWindow() {
         webPreferences: {
             contextIsolation: true,
             // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-            preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD as string)
+            preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD as string),
+            devTools: process.env.DEBUGGING?true:false
         }
     })
     winCfg.assign(mainWindow)
@@ -64,6 +65,30 @@ async function createWindow() {
     mainWindow.on('closed', () => {
         mainWindow = undefined
     })
+
+    mainWindow.webContents.on('destroyed', () => {
+        console.error('-------------------------- Gone Request!')
+        if (tightcnc && tightcnc.connected) {
+            console.error('Tight Server PID already ', tightcnc.pid);
+            tightcnc?.kill('SIGKILL');
+        }
+    })
+
+    mainWindow.webContents.on('will-prevent-unload', (event) => {
+        const choice = dialog.showMessageBoxSync(mainWindow as BrowserWindow, {
+            type: 'question',
+            buttons: ['Leave', 'Stay'],
+            title: 'Do you want to leave this site?',
+            message: 'Changes you made may not be saved.',
+            defaultId: 0,
+            cancelId: 1
+        })
+        const leave = (choice === 0)
+        if (leave) {
+            event.preventDefault()
+        }
+    })
+
 }
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -108,9 +133,11 @@ const tightcnc_env = Object.assign(process.env, {
 let tightcnc: ChildProcess | undefined = undefined;
 
 ipcMain.handle('StartTightCNC', async (event, ...args) => {
-   if (tightcnc) {
+   if (tightcnc && tightcnc.connected) {
        console.error('Tight Server PID already running ', tightcnc.pid);
-       tightcnc?.kill('SIGTERM');
+       // Send operation to close!
+       const killed = tightcnc?.kill();
+       console.error('Process killed:',killed,tightcnc?.killed)
    }
     const config: TightCNCConfig = args[0] as TightCNCConfig;
     if (config.serverPort) {
@@ -150,18 +177,19 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
 })
 
 ipcMain.handle('StopTightCNC', (_event, ..._args) => {
+    console.info('Killing TightCNC')
     tightcnc?.kill('SIGTERM');
-    return 
+    return
 })
 
 ipcMain.on('SaveTightCNCConfig', (_event, ...args) => {
     console.debug('Saving config',args[0])
-    electron_cfg.set('tightcnc.config', JSON.parse(args[0]))
+    electron_cfg.set('tightcnc.config', args[0])
 
     return 
 })
 
 ipcMain.handle('LoadTightCNCConfig', (_event, ..._args) => {
-    console.debug('Loadiing config...')
+    console.debug('Loading config...')
     return electron_cfg.get('tightcnc.config',{}) as Partial<TightCNCConfig>
 })

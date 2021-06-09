@@ -69,6 +69,10 @@
       bordered
       side="left"
     >
+      <status-widget/>
+      <control-widget/>
+
+<!--
       <q-list>
         <q-item-label
           header
@@ -82,6 +86,7 @@
           v-bind="link"
         />
       </q-list>
+-->        
     </q-drawer>
 
     <q-page-container>
@@ -104,6 +109,9 @@
 
 <script lang="ts">
 import EssentialLink from 'components/EssentialLink.vue'
+import StatusWidget from '../components/StatusWidget.vue'
+import ControlWidget from '../components/ControlWidget.vue'
+
 
 const linksList = [
   {
@@ -160,7 +168,7 @@ import { Vue, Options } from 'vue-class-component'
 import { useI18n } from 'vue-i18n'
 
 @Options({
-  components: { EssentialLink },
+  components: { EssentialLink, StatusWidget, ControlWidget },
 })
 export default class MainLayout extends Vue {
 
