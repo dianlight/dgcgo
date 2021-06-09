@@ -7809,6 +7809,7 @@ fsevents@~2.3.1:
     eslint-plugin-vue: ^7.10.0
     find-free-ports: ^2.0.3
     gcode-toolpath: ^2.2.0
+    json-rpc-2.0: ^0.2.16
     node-polyfill-webpack-plugin: ^1.1.2
     offline-github-changelog: ^2.3.0
     patch-package: ^6.4.7
@@ -9631,6 +9632,13 @@ fsevents@~2.3.1:
   version: 2.3.1
   resolution: "json-parse-even-better-errors@npm:2.3.1"
   checksum: d89fa7fe57957f3004cf0e786465a64183c0de861f6fda800d352956397c01b22f9feb141d0dce5b23f5dbe0aae74dd5b45fc0c3c1679b0942688efa5544e726
+  languageName: node
+  linkType: hard
+
+"json-rpc-2.0@npm:^0.2.16":
+  version: 0.2.16
+  resolution: "json-rpc-2.0@npm:0.2.16"
+  checksum: 967001c5e93c62d8d6ce3ed81036dc64a68a5804a66bcc3b83334194a02b1e52f917db135c509bc969b3e30d488f483df0d89dd40f852077762a5e42f07cc202
   languageName: node
   linkType: hard
 

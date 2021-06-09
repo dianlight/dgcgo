@@ -1,43 +1,11 @@
-import http from 'http';
-import { TightCNCConfig,PortInfo } from 'tightcnc'
-import {v4 as uuidv4} from 'uuid';
+//import http from 'http';
+import { TightCNCConfig,PortInfo, StatusObject } from 'tightcnc'
+import { v4 as uuidv4 } from 'uuid';
+import { JSONRPCClient } from 'json-rpc-2.0';
 
-    /*
-    export interface Status {
-        'controller': {
-            'ready': boolean,
-            'axisLabels': ['x', 'y', 'z'],
-            'usedAxes': [boolean, boolean, boolean],
-            'mpos': [number, number, number],
-            'pos': [number, number, number],
-            'mposOffset': [number, number, number],
-            'activeCoordSys': number,
-            'offset': [number, number, number],
-            'offsetEnabled': boolean,
-            'storedPositions': [[number, number, number], [number, number, number]],
-            'homed': [boolean, boolean, boolean],
-            'held': boolean,
-            'units': 'mm'|'in',
-            'feed': number,
-            'incremental': boolean,
-            'moving': boolean,
-            'coolant': boolean,
-            'spindle': boolean,
-            'line': number,
-            'error': boolean,
-            'errorData': typeof XError,
-            'programRunning': boolean,
-            'comms': {
-                'sendQueueLength': number,
-                'sendQueueIdxToSend': number,
-                'sendQueueIdxToReceive': number
-            }
-        },
-        'job': string | null
-    }
-	*/
-
-	export class Client {
+export class Client {
+        
+    jsonrpc: JSONRPCClient
 
         config: Partial<TightCNCConfig> = {
             enableServer: true,
@@ -60,7 +28,36 @@ import {v4 as uuidv4} from 'uuid';
         
 
 		constructor(config: Partial<TightCNCConfig>) {
-			Object.assign(this.config,config);
+            Object.assign(this.config, config);
+
+            const serverUrl = new URL(`${this.config.host as string}:${this.config.serverPort as number}/v1/jsonrpc`)
+            
+            console.log('Server URL:',serverUrl.toString())
+
+            this.jsonrpc = new JSONRPCClient(
+                // It can also take a custom parameter as the second parameter.
+                (jsonRPCRequest) => {
+             //       console.debug('-->Params:',jsonRPCRequest)
+                    return fetch(serverUrl.toString(), {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/json',
+                            authorization: `key ${this.config.authKey || ''}`,
+                        },
+                        body: JSON.stringify(jsonRPCRequest),
+                    }).then((response) => {
+                        if (response.status === 200) {
+                            // Use client.receive when you received a JSON-RPC response.
+                            return response
+                                .json()
+                                .then((jsonRPCResponse) => this.jsonrpc.receive(jsonRPCResponse));
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        } else if (jsonRPCRequest.id) {
+                            return Promise.reject(new Error(response.statusText));
+                        }
+                    })
+                }
+                );
         }
 
         public getConfig(): Partial<TightCNCConfig> {
@@ -105,7 +102,10 @@ import {v4 as uuidv4} from 'uuid';
            return window.api.invoke<undefined,Partial<TightCNCConfig>>('LoadTightCNCConfig')
         }
 
-		async op<T>(opname: string, params = {}): Promise<T> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async op<T>(opname: string, params?: any): Promise<T> {
+            return this.jsonrpc.request(opname,params||{})
+            /*
 			const requestData = {
 				method: opname,
 				params: params
@@ -141,12 +141,17 @@ import {v4 as uuidv4} from 'uuid';
 				req.write(postData);
 				req.end();
 			})
+            */
         }
         
 
         /**
          * Specific direct functions
          */
+    
+        getStatus(): Promise<Partial<StatusObject>> {
+            return   this.op<Partial<StatusObject>>('getStatus')
+        }
 
         getAvailableSerials(): Promise<PortInfo[]>{
             return this.op<PortInfo[]>('getAvailableSerials')

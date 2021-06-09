@@ -3,8 +3,8 @@ import { StateInterface } from '../index';
 import { TightCNCStateInterface } from './state';
 
 const getters: GetterTree<TightCNCStateInterface, StateInterface> = {
-  someAction (/* context */) {
-    // your code
+  example( /*context*/) {
+    // context....
   }
 };
 

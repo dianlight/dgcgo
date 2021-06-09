@@ -30,6 +30,7 @@
         "electron-updater": "^4.3.9",
         "find-free-ports": "^2.0.3",
         "gcode-toolpath": "^2.2.0",
+        "json-rpc-2.0": "^0.2.16",
         "quasar": "^2.0.0-rc.1",
         "three": "^0.129.0",
         "tightcnc": "link:../tightcnc",

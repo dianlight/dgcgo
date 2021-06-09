@@ -33,14 +33,14 @@
 
 
             <q-slider dense 
-            :label-value="incrementxy + lastStatus?.controller.units" 
+            :label-value="`${incrementxy} ${lastStatus?.controller?.units}`" 
             v-model="incrementxy" :min="0.001" :max="10" :step="0.001" label snap/>
 
           </div>
 
           <div class="q-pa-none q-gutter-xy-none col-1 _column _items-start">
             <q-slider dense vertical reverse 
-                :label-value="incrementz + lastStatus?.controller.units" 
+                :label-value="`${incrementz} ${lastStatus?.controller?.units}`" 
                 v-model="incrementz" 
                 :min="0.001" :max="10" :step="0.001" label snap
                 class="zslider" />
@@ -215,6 +215,8 @@ export default class ControlWidget extends Vue {
     incrementxy = 0.1
     mist = false
     flood = false
+
+    keyboardEvent?:(e:KeyboardEvent) => void;
   
   declare $refs:{
       front:QBtn,
@@ -226,7 +228,10 @@ export default class ControlWidget extends Vue {
   }
 
 
-  private keyboardEvent(e:KeyboardEvent):void{
+
+  mounted(){
+    this.keyboardEvent = (e:KeyboardEvent) => {
+         console.log(this)
          if(!this.$refs.front)return
           switch(e.code){
               case 'ArrowUp':
@@ -248,14 +253,15 @@ export default class ControlWidget extends Vue {
                   this.simulateClick(this.$refs.down,e)
                 break;
           }
-     }
-
-  mounted(){
-     document.addEventListener('keydown',this.keyboardEvent)
+    }
+    document.addEventListener('keydown',this.keyboardEvent)
   }
 
   unmounted(){
-      document.removeEventListener('keydown',this.keyboardEvent)
+   if(this.keyboardEvent){
+     document.removeEventListener('keydown',this.keyboardEvent)
+     delete this.keyboardEvent
+   }
   }
 
   private simulateClick(target:QBtn, evt:Event){
@@ -280,22 +286,22 @@ export default class ControlWidget extends Vue {
       console.log(button, event.target)
       switch(button){
         case 'front':
-            this.$store.state.tightcnc?.client?.jogMove(1,this.incrementxy)
+            void this.$tightcnc.jogMove(1,this.incrementxy)
             break;
         case 'back':
-            this.$store.state.tightcnc?.client?.jogMove(1,-this.incrementxy)
+            void this.$tightcnc.jogMove(1,-this.incrementxy)
             break;
         case 'left':
-            this.$store.state.tightcnc?.client?.jogMove(0,-this.incrementxy)
+            void this.$tightcnc.jogMove(0,-this.incrementxy)
             break;
         case 'right':
-            this.$store.state.tightcnc?.client?.jogMove(0,this.incrementxy)
+            void this.$tightcnc.jogMove(0,this.incrementxy)
             break;
         case 'up':
-            this.$store.state.tightcnc?.client?.jogMove(2,this.incrementz)
+            void this.$tightcnc.jogMove(2,this.incrementz)
             break;
         case 'down':
-            this.$store.state.tightcnc?.client?.jogMove(2,-this.incrementz)
+            void this.$tightcnc.jogMove(2,-this.incrementz)
             break;         
       }
   }

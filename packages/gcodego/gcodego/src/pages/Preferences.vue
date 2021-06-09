@@ -111,16 +111,14 @@ export default class Preferences extends Vue {
 
       mounted(){
         this.onReset()
-        if(this.$store.state.tightcnc.client){
-          void this.$store.state.tightcnc.client.getAvailableSerials().then( serials => {
+          void this.$tightcnc.getAvailableSerials().then( serials => {
             this.serials = serials.map( ss =>  {
              return {
               label:ss.path,
               value:ss.path,
               portInfo: ss}
               })
-          })
-        } 
+        }) 
       }
 
       changeControllerType(){
@@ -153,7 +151,7 @@ export default class Preferences extends Vue {
       }
 
       onReset(){
-        this.config = JSON.parse(JSON.stringify(this.$store.state.tightcnc.client?.config || {})) as Partial<TightCNCConfig>
+        this.config = JSON.parse(JSON.stringify(this.$tightcnc.config || {})) as Partial<TightCNCConfig>
         if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
           const acontrol = this.config.controllers[this.config.controller]
           const porturl = new URL(acontrol?.port ||'')

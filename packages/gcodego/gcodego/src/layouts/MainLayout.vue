@@ -47,7 +47,7 @@
           {{ lastStatus?.controller?.errorData/*.message*/ }}
           </q-tooltip>
         </q-badge> 
-        <q-badge rounded color="yellow" v-if="!lastStatus?.controller">
+        <q-badge rounded :color="clientExists?'yellow':'red'" v-if="!lastStatus?.controller">
           <q-tooltip>
             Missing Configuration! 
           </q-tooltip>
@@ -172,6 +172,8 @@ import { useI18n } from 'vue-i18n'
 })
 export default class MainLayout extends Vue {
 
+  clientExists = false
+
   locale = useI18n({useScope: 'global'}).locale
   get lastStatus(){
     return this.$store.state.tightcnc.lastStatus
@@ -187,6 +189,17 @@ export default class MainLayout extends Vue {
     { value: 'en', label: 'English'},
     { value: 'it', label: 'Italiano'}
   ]
+
+  mounted(){
+      const starter = setInterval(()=>{
+        if(this.$tightcnc){
+          void this.$store.dispatch('tightcnc/clientStatus', this.$tightcnc)
+          this.clientExists=true
+          clearInterval(starter)
+        }
+        this.clientExists=!this.clientExists
+      },1000)
+  }
 
 
 }

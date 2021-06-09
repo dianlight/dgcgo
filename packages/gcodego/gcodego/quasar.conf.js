@@ -32,7 +32,8 @@ module.exports = configure(function(ctx) {
         // https://v2.quasar.dev/quasar-cli/boot-files
         boot: [
             'i18n',
-            'axios',
+            // 'axios',
+            'tightcnc'
         ],
 
         // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
