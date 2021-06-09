@@ -2056,9 +2056,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/app@npm:^3.0.0-beta.28":
-  version: 3.0.0-beta.28
-  resolution: "@quasar/app@npm:3.0.0-beta.28"
+"@quasar/app@npm:^3.0.0-rc.1":
+  version: 3.0.0-rc.1
+  resolution: "@quasar/app@npm:3.0.0-rc.1"
   dependencies:
     "@quasar/babel-preset-app": 2.0.1
     "@quasar/fastclick": 1.1.4
@@ -2072,17 +2072,17 @@ __metadata:
     "@vue/compiler-sfc": 3.0.11
     "@vue/server-renderer": 3.0.11
     archiver: 5.3.0
-    autoprefixer: 10.2.5
+    autoprefixer: 10.2.6
     browserslist: ^4.12.0
     chalk: 4.1.1
     chokidar: 3.5.1
-    ci-info: 3.1.1
+    ci-info: 3.2.0
     compression-webpack-plugin: 8.0.0
     copy-webpack-plugin: 9.0.0
     cross-spawn: 7.0.3
     css-loader: 5.2.6
-    css-minimizer-webpack-plugin: 3.0.0
-    cssnano: 5.0.4
+    css-minimizer-webpack-plugin: 3.0.1
+    cssnano: 5.0.5
     dot-prop: 6.0.1
     elementtree: 0.1.7
     error-stack-parser: 2.0.6
@@ -2114,10 +2114,10 @@ __metadata:
     pretty-error: 3.0.3
     register-service-worker: 1.7.2
     sass: 1.32.12
-    sass-loader: 11.1.1
+    sass-loader: 12.0.0
     semver: 7.3.5
     table: 6.7.1
-    terser-webpack-plugin: 5.1.2
+    terser-webpack-plugin: 5.1.3
     ts-loader: 8.0.17
     typescript: 4.2.2
     url-loader: 4.1.1
@@ -2125,7 +2125,6 @@ __metadata:
     vue-loader: 16.2.0
     vue-router: 4.0.8
     vue-style-loader: 4.1.3
-    vuex: 4.0.1
     webpack: ^5.35.0
     webpack-bundle-analyzer: 4.4.2
     webpack-chain: 6.5.1
@@ -2135,7 +2134,7 @@ __metadata:
     zlib: 1.0.5
   bin:
     quasar: bin/quasar
-  checksum: 845f13cb5462c666a4e1726e768c795a302dcf07ca72f9277b796f787414e0bfda358691322f3f9a5dc4ca083913fb5852fa6fc3d6edda2cc767218f39ff4ecb
+  checksum: 98d81fedfa36a4d9009eddf35b1de76d262f69d7038d8242216b3699f478a866c132ad57c8c8fcc0934bde9d3134f9705c314571c81cb45a3cb8b93bde9849db
   languageName: node
   linkType: hard
 
@@ -2167,7 +2166,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/cli@npm:latest":
+"@quasar/cli@npm:^1.2.0":
   version: 1.2.0
   resolution: "@quasar/cli@npm:1.2.0"
   dependencies:
@@ -2204,7 +2203,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/extras@npm:latest":
+"@quasar/extras@npm:^1.10.6":
   version: 1.10.6
   resolution: "@quasar/extras@npm:1.10.6"
   checksum: 4488605fc57a740d0007927c566c51272a44a61dd75eb96bda272d2bceab0e01a9d542dd367caef287afd7537737fda694015655593634c2e9ebc130311d5aa4
@@ -3779,21 +3778,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.2.5":
-  version: 10.2.5
-  resolution: "autoprefixer@npm:10.2.5"
+"autoprefixer@npm:10.2.6":
+  version: 10.2.6
+  resolution: "autoprefixer@npm:10.2.6"
   dependencies:
-    browserslist: ^4.16.3
-    caniuse-lite: ^1.0.30001196
+    browserslist: ^4.16.6
+    caniuse-lite: ^1.0.30001230
     colorette: ^1.2.2
-    fraction.js: ^4.0.13
+    fraction.js: ^4.1.1
     normalize-range: ^0.1.2
     postcss-value-parser: ^4.1.0
   peerDependencies:
     postcss: ^8.1.0
   bin:
     autoprefixer: bin/autoprefixer
-  checksum: bd346dd75b7cb3bc8edca6e36edf1f4e0ae5bf0a51b2ac6d07523efd21d272d8932643f9a9410b4ee2ff36936531f7b6fa9d30d87b044579612f249fb96b9c78
+  checksum: 805414d4efe4f25c6162edc65ad999235ea28cf11b6a1ed838b055ef1f777368dd16c978b44d0b48bb96a3420948d26da27066d5caa4f81bcee1946e9a269532
   languageName: node
   linkType: hard
 
@@ -4237,7 +4236,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.0.0, browserslist@npm:^4.12.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.0, browserslist@npm:^4.16.3, browserslist@npm:^4.16.6":
+"browserslist@npm:^4.0.0, browserslist@npm:^4.12.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.0, browserslist@npm:^4.16.6":
   version: 4.16.6
   resolution: "browserslist@npm:4.16.6"
   dependencies:
@@ -4576,10 +4575,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001196, caniuse-lite@npm:^1.0.30001219":
+"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001219":
   version: 1.0.30001234
   resolution: "caniuse-lite@npm:1.0.30001234"
   checksum: 0c8e2b68e227eb47121ca0c93bda530bbe8475a3e2ab14138a3d751258817c1a16c8a86a0809637fb90d48f92b63e47740f863c806f3e6de012e417dc3cb54c4
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001230":
+  version: 1.0.30001236
+  resolution: "caniuse-lite@npm:1.0.30001236"
+  checksum: 2664f97f51c160b3e5ef74e8fb2e5cb189715855fb81bc9ab64f48e4c41cf5aaedb5c2f22277803851cab0aadb7cbf3e32a7afc631e6df2458d778791ff535bc
   languageName: node
   linkType: hard
 
@@ -4697,13 +4703,6 @@ __metadata:
   version: 0.2.0
   resolution: "chromium-pickle-js@npm:0.2.0"
   checksum: 9387c9d309d214b1123794cffba75bac76428287a0a768efa0c938e2ec465340c5a214a8564440bbab378eff7f799d0cf6ee6cbb924046a8286a552ed671a729
-  languageName: node
-  linkType: hard
-
-"ci-info@npm:3.1.1":
-  version: 3.1.1
-  resolution: "ci-info@npm:3.1.1"
-  checksum: 417d2bf17c320d477bc32997d3831bcc1b174d6b48616c2f0463765f042f073bfbfb15e06abdeea55b05ca9c8e054057eb9e0672e4e6031457e87216b2faddda
   languageName: node
   linkType: hard
 
@@ -5473,12 +5472,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-minimizer-webpack-plugin@npm:3.0.0":
-  version: 3.0.0
-  resolution: "css-minimizer-webpack-plugin@npm:3.0.0"
+"css-minimizer-webpack-plugin@npm:3.0.1":
+  version: 3.0.1
+  resolution: "css-minimizer-webpack-plugin@npm:3.0.1"
   dependencies:
     cssnano: ^5.0.0
-    jest-worker: ^26.3.0
+    jest-worker: ^27.0.2
     p-limit: ^3.0.2
     postcss: ^8.2.9
     schema-utils: ^3.0.0
@@ -5491,7 +5490,7 @@ __metadata:
       optional: true
     csso:
       optional: true
-  checksum: 9c5fa5e5c2047869367f7f8beeb9cdbb2aeb804a75edc582949103dc6908f9034bddbb99ccee99729f857c3803d2a428f3376e1dc8168785d257497b9e06eea3
+  checksum: f41255e4a1196f99ffe37784acbc0323e63c3009fc12cc22d7287c97d809eab999428f4d7282c8268c8bcda2eb40dda1f696a8b7cd044ea0180ec6080c52c302
   languageName: node
   linkType: hard
 
@@ -5570,7 +5569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cssnano-preset-default@npm:^5.1.1, cssnano-preset-default@npm:^5.1.2":
+"cssnano-preset-default@npm:^5.1.2":
   version: 5.1.2
   resolution: "cssnano-preset-default@npm:5.1.2"
   dependencies:
@@ -5618,20 +5617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cssnano@npm:5.0.4":
-  version: 5.0.4
-  resolution: "cssnano@npm:5.0.4"
-  dependencies:
-    cosmiconfig: ^7.0.0
-    cssnano-preset-default: ^5.1.1
-    is-resolvable: ^1.1.0
-  peerDependencies:
-    postcss: ^8.2.15
-  checksum: 95889c6e477058acb1da5b9ce9353d05a96803ca6f5283e7e00da17fe5a4bcda42f7f7528402ad8053f160afc078554d1e4811c55b7699ee992a2551a03f10c3
-  languageName: node
-  linkType: hard
-
-"cssnano@npm:^5.0.0":
+"cssnano@npm:5.0.5, cssnano@npm:^5.0.0":
   version: 5.0.5
   resolution: "cssnano@npm:5.0.5"
   dependencies:
@@ -7584,7 +7570,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fraction.js@npm:^4.0.13":
+"fraction.js@npm:^4.1.1":
   version: 4.1.1
   resolution: "fraction.js@npm:4.1.1"
   checksum: 3667dfc48804ba4623f43e8d284a30f9abcb546f59c44dbcb51722e114d77fb06f0fe9bf051db816db6b2679c55dfccb633c4841c3436b2239c5dffcef0a8ccf
@@ -7796,9 +7782,9 @@ fsevents@~2.3.1:
   dependencies:
     "@babel/eslint-parser": ^7.14.4
     "@intlify/vue-i18n-loader": ^2.1.0
-    "@quasar/app": ^3.0.0-beta.28
-    "@quasar/cli": latest
-    "@quasar/extras": latest
+    "@quasar/app": ^3.0.0-rc.1
+    "@quasar/cli": ^1.2.0
+    "@quasar/extras": ^1.10.6
     "@quasar/icongenie": ^2.3.3
     "@types/colornames": ^1.1.1
     "@types/node": ^15.12.2
@@ -9531,17 +9517,6 @@ fsevents@~2.3.1:
   version: 2.1.0
   resolution: "javascript-stringify@npm:2.1.0"
   checksum: 47aa3790b69d0674db1b289ecbb9c596e4b0575cc8a40a2857c8fc108fb65bd990a5bee5ecc2f0bc10501a680207dfcdaa286db322d45c50121f27f462f70703
-  languageName: node
-  linkType: hard
-
-"jest-worker@npm:^26.3.0, jest-worker@npm:^26.6.2":
-  version: 26.6.2
-  resolution: "jest-worker@npm:26.6.2"
-  dependencies:
-    "@types/node": "*"
-    merge-stream: ^2.0.0
-    supports-color: ^7.0.0
-  checksum: 5eb349833b5e9750ce8700388961dfd5d5e207c913122221e418e48b9cda3c17b0fb418f6a90f1614cfdc3ca836158b720c5dc1de82cb1e708266b4d76e31a38
   languageName: node
   linkType: hard
 
@@ -13521,9 +13496,9 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"sass-loader@npm:11.1.1":
-  version: 11.1.1
-  resolution: "sass-loader@npm:11.1.1"
+"sass-loader@npm:12.0.0":
+  version: 12.0.0
+  resolution: "sass-loader@npm:12.0.0"
   dependencies:
     klona: ^2.0.4
     neo-async: ^2.6.2
@@ -13539,7 +13514,7 @@ fsevents@~2.3.1:
       optional: true
     sass:
       optional: true
-  checksum: 6d8ded8e2a0742f6b62dddc577324b74a7a0781f5405574d3af4ee34c9a6189debff1b90e3acd65a62ebbf6dc52c47a9a2be6c1786ac2435bd39c91c2ebe7367
+  checksum: c873781a273c3cd068d5ecaa92f6bde8044c0e22e1294f63bce88b15d2256171903d9d728c2d95462a230e4abf8eecaaba7fa9826e7620314fc6c42d8b5f269e
   languageName: node
   linkType: hard
 
@@ -14502,7 +14477,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"supports-color@npm:^7.0.0, supports-color@npm:^7.1.0":
+"supports-color@npm:^7.1.0":
   version: 7.2.0
   resolution: "supports-color@npm:7.2.0"
   dependencies:
@@ -14691,23 +14666,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:5.1.2":
-  version: 5.1.2
-  resolution: "terser-webpack-plugin@npm:5.1.2"
-  dependencies:
-    jest-worker: ^26.6.2
-    p-limit: ^3.1.0
-    schema-utils: ^3.0.0
-    serialize-javascript: ^5.0.1
-    source-map: ^0.6.1
-    terser: ^5.7.0
-  peerDependencies:
-    webpack: ^5.1.0
-  checksum: f65229fc603a23b550283da3344adf23a81526e55c830ff437c8e8769fc64f4d48dbc6a7845b3aa85b5ce37eb00834829341d00cad9fa4a65186ebeda6ce61de
-  languageName: node
-  linkType: hard
-
-"terser-webpack-plugin@npm:^5.1.1":
+"terser-webpack-plugin@npm:5.1.3, terser-webpack-plugin@npm:^5.1.1":
   version: 5.1.3
   resolution: "terser-webpack-plugin@npm:5.1.3"
   dependencies:
@@ -15648,7 +15607,7 @@ typescript@^4.3.2:
   languageName: node
   linkType: hard
 
-"vuex@npm:4.0.1, vuex@npm:^4.0.1":
+"vuex@npm:^4.0.1":
   version: 4.0.1
   resolution: "vuex@npm:4.0.1"
   dependencies:

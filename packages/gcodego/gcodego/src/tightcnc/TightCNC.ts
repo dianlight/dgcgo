@@ -152,5 +152,9 @@ import {v4 as uuidv4} from 'uuid';
             return this.op<PortInfo[]>('getAvailableSerials')
         }
 
+        jogMove(axis:number,inc:number): Promise<void> {
+            return this.op('realTimeMove', { axis: axis, inc: inc });     
+        }
+
 	}
 

@@ -21,7 +21,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
-        "@quasar/extras": "latest",
+        "@quasar/extras": "^1.10.6",
         "axios": "^0.21.1",
         "colornames": "^1.1.1",
         "core-js": "^3.14.0",
@@ -43,8 +43,8 @@
     "devDependencies": {
         "@babel/eslint-parser": "^7.14.4",
         "@intlify/vue-i18n-loader": "^2.1.0",
-        "@quasar/app": "^3.0.0-beta.28",
-        "@quasar/cli": "latest",
+        "@quasar/app": "^3.0.0-rc.1",
+        "@quasar/cli": "^1.2.0",
         "@quasar/icongenie": "^2.3.3",
         "@types/colornames": "^1.1.1",
         "@types/node": "^15.12.2",

@@ -7,28 +7,28 @@
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
               <q-btn outline icon="north_west" @click="move"/>
-              <q-btn outline icon="north" ref="front" @click="move" @mousedown="move" @mauseup="move">
+              <q-btn outline icon="north" ref="front" @click="move($event,'front')">
                 <q-tooltip>Y+</q-tooltip>
               </q-btn>
-              <q-btn outline icon="north_east" @click="move"/>
+              <q-btn outline icon="north_east" />
             </q-btn-group>
             <q-btn-group>
-              <q-btn outline icon="west" ref="left" @click="move">
+              <q-btn outline icon="west" ref="left" @click="move($event,'left')">
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
-              <q-btn outline icon="home" @click="move">
+              <q-btn outline icon="home">
                 <q-tooltip>Home X/Y</q-tooltip>
               </q-btn>
-              <q-btn outline icon-right="east" ref="right" @click="move">
+              <q-btn outline icon-right="east" ref="right" @click="move($event,'right')">
                 <q-tooltip>X+</q-tooltip>
               </q-btn>
             </q-btn-group>
             <q-btn-group>
-              <q-btn outline icon="south_west" @click="move"/>
-              <q-btn outline icon="south" ref="back" @click="move">
+              <q-btn outline icon="south_west" />
+              <q-btn outline icon="south" ref="back" @click="move($event,'back')">
                 <q-tooltip>Y-</q-tooltip>
               </q-btn>
-              <q-btn outline icon="south_east" @click="move"/>
+              <q-btn outline icon="south_east" />
             </q-btn-group>
 
 
@@ -47,13 +47,13 @@
           </div> 
 
           <div class="q-pa-none q-gutter-y-none col _column _items-start">
-            <q-btn outline icon="north" ref="up" @click="move">
+            <q-btn outline icon="north" ref="up" @click="move($event,'up')">
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
             <q-btn outline icon="home">
               <q-tooltip>Home Z</q-tooltip>
             </q-btn>
-            <q-btn outline icon="south" ref="down" @click="move($refs.south)">
+            <q-btn outline icon="south" ref="down" @click="move($event,'down')">
               <q-tooltip>Z-</q-tooltip>
             </q-btn>
           </div>
@@ -226,40 +226,40 @@ export default class ControlWidget extends Vue {
   }
 
 
-  mounted(){
-     document.addEventListener('keydown',(e:KeyboardEvent)=>{
-//          console.log(e,this.$refs)
+  private keyboardEvent(e:KeyboardEvent):void{
+         if(!this.$refs.front)return
           switch(e.code){
               case 'ArrowUp':
                   this.simulateClick(this.$refs.front,e)
-//                  this.$refs.front.click(e)
                 break;
               case 'ArrowDown':
                   this.simulateClick(this.$refs.back,e)
-//                  this.$refs.back.click(e)
                 break;
               case 'ArrowLeft':
                   this.simulateClick(this.$refs.left,e)
-//                  this.$refs.left.click(e)
                 break;
               case 'ArrowRight':
                   this.simulateClick(this.$refs.right,e)
-//                  this.$refs.right.click(e)
                 break;
               case 'PageUp':
                   this.simulateClick(this.$refs.up,e)
-//                  this.$refs.up.click(e)
                 break;
               case 'PageDown':
                   this.simulateClick(this.$refs.down,e)
-//                  this.$refs.down.click(e)
                 break;
           }
-     })
-  }  
+     }
+
+  mounted(){
+     document.addEventListener('keydown',this.keyboardEvent)
+  }
+
+  unmounted(){
+      document.removeEventListener('keydown',this.keyboardEvent)
+  }
 
   private simulateClick(target:QBtn, evt:Event){
-  //    console.log(target.$el)
+      console.log('---TARGET-->',target)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       target.$el.dispatchEvent(new MouseEvent('mousedown'),evt)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -276,8 +276,28 @@ export default class ControlWidget extends Vue {
     return num.toFixed(3 /* Precision */);
   }
 
-  move(event:Event){
-      console.log(event.target)
+  move(event:Event,button:string){
+      console.log(button, event.target)
+      switch(button){
+        case 'front':
+            this.$store.state.tightcnc?.client?.jogMove(1,this.incrementxy)
+            break;
+        case 'back':
+            this.$store.state.tightcnc?.client?.jogMove(1,-this.incrementxy)
+            break;
+        case 'left':
+            this.$store.state.tightcnc?.client?.jogMove(0,-this.incrementxy)
+            break;
+        case 'right':
+            this.$store.state.tightcnc?.client?.jogMove(0,this.incrementxy)
+            break;
+        case 'up':
+            this.$store.state.tightcnc?.client?.jogMove(2,this.incrementz)
+            break;
+        case 'down':
+            this.$store.state.tightcnc?.client?.jogMove(2,-this.incrementz)
+            break;         
+      }
   }
 }
 </script>
