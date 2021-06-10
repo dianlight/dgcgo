@@ -1,9 +1,33 @@
 <template>
   <q-card>
     <q-card-section>
-      <div class="q-pa-none">
+      <div class="q-pa-xs">
+        <div class="row items-start">
+          <div class="q-pa-none q-pb-md q-gutter-y-xs col items-start">
+            <q-btn-group>
+              <q-btn dense outline icon="home" @click="home()">
+                  <q-tooltip>Home</q-tooltip>
+              </q-btn>
+              <q-btn dense outline icon="home" @click="home([true,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
+                  X/Y
+                  <q-tooltip>Home X/Y</q-tooltip>
+              </q-btn>
+              <q-btn dense outline icon="home" @click="home([false,false,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
+                  Z
+                  <q-tooltip>Home Z</q-tooltip>
+              </q-btn>
+            </q-btn-group>
+            <q-btn-group>    
+              <q-btn dense outline icon="upgrade" @click="home()">
+                  <q-tooltip>Probe</q-tooltip>
+              </q-btn>
+              <q-btn dense outline icon="settings_overscan" @click="home()">
+                  <q-tooltip>Outline</q-tooltip>
+              </q-btn>
+            </q-btn-group>
+          </div>
+        </div>  
         <div class="row">
-
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
               <q-btn outline icon="north_west" @click="move"/>
@@ -16,7 +40,7 @@
               <q-btn outline icon="west" ref="left" @click="move($event,'left')">
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
-              <q-btn outline icon="home">
+              <q-btn outline icon="hide_source" @click="home([true,true,false])">
                 <q-tooltip>Home X/Y</q-tooltip>
               </q-btn>
               <q-btn outline icon-right="east" ref="right" @click="move($event,'right')">
@@ -50,7 +74,7 @@
             <q-btn outline icon="north" ref="up" @click="move($event,'up')">
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
-            <q-btn outline icon="home">
+            <q-btn outline icon="hide_source" @click="home([false,false,true])">
               <q-tooltip>Home Z</q-tooltip>
             </q-btn>
             <q-btn outline icon="south" ref="down" @click="move($event,'down')">
@@ -59,7 +83,7 @@
           </div>
 
         </div>
-        <div class="row text-center items-center">
+        <div class="row text-center items-center" v-if="$store.getters['tightcnc/capabilities']?.mistCoolant || $store.getters['tightcnc/capabilities']?.mistCoolant.floodCoolant">
             <div class="col text-subtitle1 text-capitalize">
                 Coolant
             </div>
@@ -70,16 +94,21 @@
                     icon="cancel"
                     rounded
                     color="negative"
+                    @click="coolant(false,false)" 
                 />
                 <q-toggle
                     size="xs"
                     v-model="mist"
                     label="Mist"
+                    @click="coolant(mist,flood)"
+                    :disable="!$store.getters['tightcnc/capabilities']?.mistCoolant"
                 />                
                 <q-toggle
                     size="xs"
                     v-model="flood"
                     label="Flood"
+                    @click="coolant(mist,flood)"
+                    :disable="!$store.getters['tightcnc/capabilities']?.floodCoolant"
                 /> 
            </div>
         </div>
@@ -127,6 +156,7 @@
                 </q-knob>
             </div>
         </div>
+        <!--
         <div class="row text-center">
             <div class="col text-subtitle1 text-capitalize">
                 Feed
@@ -142,70 +172,33 @@
                     />                
             </div>
         </div>
-      </div>
-
-      <!--  
-        <div class='q-pa-none wtable'>
-            <div class="row text-center ">
-                <div class="col text-caption">
-                    Axis
-                </div>
-                <div class="col-5 text-caption">
-                    Machine Position
-                </div>
-                <div class="col-5 text-caption">
-                    Work Position
-                </div>
-            </div>
-            <!- - eslint-disable-next-line vue/require-v-for-key - ->
-            <div class="row text-center" v-for="(axe, index) in lastStatus?.controller.axisLabels">
-                <div class="col text-h5 text-uppercase">
-                    {{ axe }}
-                </div>
-                <div class="col-5 text-h6">
-                  {{format(lastStatus?.controller.mpos[index])}}<p class="text-caption text-weight-light">{{lastStatus?.controller.units}}</p>
-                </div>
-                <div class="col-5 text-h6">
-                   {{format(lastStatus?.controller.pos[index])}}<p class="text-caption text-weight-light">{{lastStatus?.controller.units}}</p>
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col text-h6 text-capitalize">
-                    Feed
-                </div>
-                <div class="col-8 text-h6">
-                  {{lastStatus?.controller.feed}}
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col text-h6 text-capitalize">
-                    Coolant
-                </div>
-                <div class="col-8 text-h6">
-                  {{lastStatus?.controller.coolant}}
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col text-h6 text-capitalize">
-                    Spindle
-                </div>
-                <div class="col-8 text-h6">
-                  {{lastStatus?.controller.spindle}}
-                </div>
-            </div>
-        </div>
         -->
+      </div>
     </q-card-section>
-    <!--       {{ lastStatus }}-->
   </q-card>
 </template>
 
 <script lang="ts">
+import { ControllerStatus } from 'app/../tightcnc/types/src';
 import { QBtn } from 'quasar';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({
   components: {},
+  watch: {
+    '$store.state.tightcnc.lastStatus.controller.coolant'(coolant:number) {
+          (this as ControlWidget).mist = (coolant == 1 || coolant == 3)?true:false;
+          (this as ControlWidget).flood = (coolant == 2 || coolant == 3)?true:false;
+    },
+//    '$store.state.tightcnc.lastStatus.controller.feed'(feed:number) {
+//          (this as ControlWidget).feed = feed;
+//    },
+    '$store.state.tightcnc.lastStatus.controller.spindle'(spindle:boolean) {
+          const controller = (this as ControlWidget).$store.state.tightcnc.lastStatus?.controller as ControllerStatus;
+          if(controller)
+            (this as ControlWidget).spindle = !spindle?'OFF':controller.spindleDirection > 0?'CW':'CWW';
+    },
+  }  
 })
 export default class ControlWidget extends Vue {
     feed = 0
@@ -230,6 +223,7 @@ export default class ControlWidget extends Vue {
 
 
   mounted(){
+   // console.log(this.$store.getters)
     this.keyboardEvent = (e:KeyboardEvent) => {
         // console.log(this)
          if(!this.$refs.front)return
@@ -304,6 +298,16 @@ export default class ControlWidget extends Vue {
             void this.$tightcnc.jogMove(2,-this.incrementz)
             break;         
       }
+  }
+
+  home(axes?:boolean[]){
+    void this.$tightcnc.home(axes)
+  }
+
+  coolant(mist:boolean, flood:boolean) {  //action:'M7'|'M8'|'M9'){
+    void this.$tightcnc.op('send',{line:'M9'}) // StopAll   
+    if(mist) void this.$tightcnc.op('send',{line:'M7'}) // On Mist
+    if(flood) void this.$tightcnc.op('send',{line:'M8'}) // On flood
   }
 }
 </script>

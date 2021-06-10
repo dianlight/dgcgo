@@ -69,8 +69,8 @@
       bordered
       side="left"
     >
-      <status-widget/>
       <control-widget/>
+      <status-widget/>
 
 <!--
       <q-list>
@@ -94,6 +94,8 @@
     </q-page-container>
 
     <q-footer elevated class="bg-secondary">
+      {{ lastStatus?.controller }}
+      <!--
       <q-toolbar>
         <q-toolbar-title>
           <q-avatar>
@@ -102,6 +104,7 @@
           <div>Title</div>
         </q-toolbar-title>
       </q-toolbar>
+      -->
     </q-footer>
 
   </q-layout>

@@ -30,12 +30,32 @@
                     Status
                 </div>
                 <div class="col-8 text-h6 items-center self-end">
-                    <q-icon v-if="lastStatus?.controller" color="positive" name="link"/> 
-                    <q-icon v-if="!lastStatus?.controller" color="warning" name="link_off"/> 
-                    <q-icon v-if="!lastStatus?.controller?.ready" color="warning" name="error"/> 
-                    <q-icon v-if="lastStatus?.controller?.moving" color="positive" name="run_circle"/> 
-                    <q-icon v-if="lastStatus?.controller?.held" color="info" name="pending"/> 
+                    <q-icon v-if="lastStatus?.controller" color="positive" name="link">
+                        <q-tooltip>Connected</q-tooltip>
+                    </q-icon> 
+                    <q-icon v-if="!lastStatus?.controller" color="warning" name="link_off">
+                        <q-tooltip>TightCNC not ready!</q-tooltip>
+                    </q-icon> 
+                    <q-icon v-if="!lastStatus?.controller?.ready" color="warning" name="error">
+                        <q-tooltip>CNC not ready!</q-tooltip>
+                    </q-icon> 
+                    <q-icon v-if="lastStatus?.controller?.moving" color="positive" name="run_circle">
+                        <q-tooltip>Ready</q-tooltip>
+                    </q-icon>     
+                    <q-icon v-if="lastStatus?.controller?.held" color="info" name="pending">
+                        <q-tooltip>Hold</q-tooltip>
+                    </q-icon> 
+                    <p class="text-caption" v-if="0 < (lastStatus?.controller?.feed || 0)" ><q-icon name="speed"/> {{lastStatus?.controller?.feed}} {{lastStatus?.controller?.units}}/min</p>
                     <q-linear-progress :value="progress" :buffer="buffer" class="q-mt-sm" />
+                </div>
+            </div>
+            <!--
+            <div class="row text-center">
+                <div class="col text-h6 text-capitalize">
+                    Feed
+                </div>
+                <div class="col-8 text-h6">
+                  {{lastStatus?.controller?.feed}} {{lastStatus?.controller?.units}}/min
                 </div>
             </div>
             <div class="row text-center">
@@ -54,6 +74,7 @@
                   {{lastStatus?.controller?.spindle}}
                 </div>
             </div>
+            -->
         </div>
       </q-card-section>
      <!--       {{ lastStatus }} -->

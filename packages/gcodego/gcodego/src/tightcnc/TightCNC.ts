@@ -173,8 +173,12 @@ export class Client {
         }
 
         jogMove(axis:number,inc:number): Promise<void> {
-            return this.op('realTimeMove', { axis: axis, inc: inc });     
+            return this.op('realTimeMove', { axis: axis, inc: inc })    
         }
-
+    
+        home(axes?: boolean[]): Promise<void> {
+            return this.op('home', { axes:axes })
+        }
+    
 	}
 
