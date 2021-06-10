@@ -87,17 +87,32 @@ export class Client {
         static async stop(): Promise<void> {       
             return window.api.invoke('StopTightCNC')
         }
-
-        static saveConfig(config: Partial<TightCNCConfig>, restart?: boolean): void {
-            const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>
-            console.log('Save config',cc)
-            window.api.send('SaveTightCNCConfig', cc);
-            if (restart) {
-                console.log(cc)
-                void this.stop().then( ()=> void this.start(cc))
-            }
+    
+        async restart(): Promise<void> {
+            return new Promise(resolve => {
+                void Client.stop().then(() => {
+                    console.debug('Restaring....')
+                    void Client.start(this.config).then(() => {
+                        resolve()
+                    })
+                })
+            })    
         }
 
+        static saveConfig(config: Partial<TightCNCConfig>) {
+            const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>
+            //console.log('Save config',cc)
+            window.api.send('SaveTightCNCConfig', cc);
+        }
+
+        updateConfig(config: Partial<TightCNCConfig>, restart?: boolean) {
+            const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>
+            this.config = cc;
+            //console.log('Save config',cc)
+            window.api.send('SaveTightCNCConfig', cc);
+            if (restart) void this.restart()
+        }
+    
         static async loadConfig(): Promise<Partial<TightCNCConfig>> {
            return window.api.invoke<undefined,Partial<TightCNCConfig>>('LoadTightCNCConfig')
         }

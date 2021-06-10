@@ -181,6 +181,7 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
 ipcMain.handle('StopTightCNC', (_event, ..._args) => {
     console.info('Killing TightCNC')
     tightcnc?.kill('SIGTERM');
+    tightcnc = undefined
     return
 })
 

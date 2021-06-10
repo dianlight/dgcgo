@@ -231,7 +231,7 @@ export default class ControlWidget extends Vue {
 
   mounted(){
     this.keyboardEvent = (e:KeyboardEvent) => {
-         console.log(this)
+        // console.log(this)
          if(!this.$refs.front)return
           switch(e.code){
               case 'ArrowUp':
@@ -265,7 +265,7 @@ export default class ControlWidget extends Vue {
   }
 
   private simulateClick(target:QBtn, evt:Event){
-      console.log('---TARGET-->',target)
+      //console.log('---TARGET-->',target)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       target.$el.dispatchEvent(new MouseEvent('mousedown'),evt)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -283,7 +283,7 @@ export default class ControlWidget extends Vue {
   }
 
   move(event:Event,button:string){
-      console.log(button, event.target)
+      //console.log(button, event.target)
       switch(button){
         case 'front':
             void this.$tightcnc.jogMove(1,this.incrementxy)

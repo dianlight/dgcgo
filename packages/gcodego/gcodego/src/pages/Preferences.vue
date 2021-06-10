@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
-import { Client } from '../tightcnc/TightCNC'
+//import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
 
 
@@ -146,7 +146,7 @@ export default class Preferences extends Vue {
           break;
         }
         console.debug('Saving:',this.config)
-        Client.saveConfig(this.config,true)
+        this.$tightcnc.updateConfig(this.config,true)
        // void this.$store.dispatch('tightcnc/updateClientConfig', this.config)
       }
 
@@ -158,9 +158,11 @@ export default class Preferences extends Vue {
           this.portType = porturl.protocol?porturl.protocol.slice(0,-1):'serial'
           switch(this.portType){
             case 'serial':
+              console.log(acontrol)
               this.port = acontrol?.port || ''
               break;
             case 'socket':
+              porturl.protocol = 'http:' // Fix to force parser of other parts
               this.remoteHost = porturl.hostname
               this.remotePort = parseInt(porturl.port)
               break;

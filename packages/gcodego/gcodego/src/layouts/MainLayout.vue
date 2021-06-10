@@ -49,7 +49,7 @@
         </q-badge> 
         <q-badge rounded :color="clientExists?'yellow':'red'" v-if="!lastStatus?.controller">
           <q-tooltip>
-            Missing Configuration! 
+            TightCNC Server connection error! 
           </q-tooltip>
         </q-badge>  
 
@@ -169,6 +169,16 @@ import { useI18n } from 'vue-i18n'
 
 @Options({
   components: { EssentialLink, StatusWidget, ControlWidget },
+  watch: {
+    '$store.state.tightcnc.lastStatus.controller'(value) {
+      if(!value){
+        console.log('Cambiato Controller Nullo!',this,value);
+        (this as MainLayout).clientExists=!(this as MainLayout).clientExists
+      } else if(!(this as MainLayout).clientExists){
+        (this as MainLayout).clientExists=true
+      }
+    }
+  }
 })
 export default class MainLayout extends Vue {
 
@@ -200,7 +210,5 @@ export default class MainLayout extends Vue {
         this.clientExists=!this.clientExists
       },1000)
   }
-
-
 }
 </script>
