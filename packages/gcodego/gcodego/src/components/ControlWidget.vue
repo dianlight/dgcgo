@@ -16,7 +16,7 @@
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
               <q-btn outline icon="hide_source" @click="setOrigin([true,true,false])">
-                <q-tooltip>Home X/Y</q-tooltip>
+                <q-tooltip>Work coordinate X/Y zero.</q-tooltip>
               </q-btn>
               <q-btn outline icon-right="east" ref="right" @click="move($event,'right')">
                 <q-tooltip>X+</q-tooltip>
@@ -50,7 +50,7 @@
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
             <q-btn outline icon="hide_source" @click="setOrigin([false,false,true])">
-              <q-tooltip>Home Z</q-tooltip>
+              <q-tooltip>Work coordinate Z zero.</q-tooltip>
             </q-btn>
             <q-btn outline icon="south" ref="down" @click="move($event,'down')">
               <q-tooltip>Z-</q-tooltip>
@@ -140,8 +140,9 @@
             <div class="col-9">
                 <q-slider
                     v-model="feed"
+                    :label-value="`${feed} ${lastStatus?.controller?.units}/min`" 
                     :min="0"
-                    :max="100"
+                    :max="Math.min(...lastStatus?.controller?.axisMaxFeeds||[500])"
                     :step="1"
                     label
                     label-always
