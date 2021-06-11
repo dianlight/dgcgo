@@ -124,7 +124,8 @@ module.exports = configure(function(ctx) {
                 loadingBar: {
                     position: 'bottom',
                     size: '15px'
-                }
+                },
+                notify: {}
             },
 
             // iconSet: 'material-icons', // Quasar icon set
@@ -139,7 +140,8 @@ module.exports = configure(function(ctx) {
 
             // Quasar plugins
             plugins: [
-                'LoadingBar'
+                'LoadingBar',
+                'Notify'
             ],
         },
 

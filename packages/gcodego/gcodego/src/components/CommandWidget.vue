@@ -18,6 +18,14 @@
               </q-btn>
             </q-btn-group>
             <q-btn-group>    
+              <q-btn dense outline icon="running_with_errors" @click="clearError()" :disable='$store.state.tightcnc.lastStatus?.controller?.ready'>
+                  <q-tooltip>Clear Error</q-tooltip>
+              </q-btn>
+              <q-btn dense outline icon="restart_alt" @click="reset()">
+                  <q-tooltip>Reset</q-tooltip>
+              </q-btn>
+            </q-btn-group>
+            <q-btn-group>    
               <q-btn dense outline icon="upgrade" @click="probe()" disable>
                   <q-tooltip>Probe</q-tooltip>
               </q-btn>
@@ -130,6 +138,14 @@ export default class CommandWidget extends Vue {
 //    void this.$tightcnc.op('send',{line:'M9'}) // StopAll   
 //    if(mist) void this.$tightcnc.op('send',{line:'M7'}) // On Mist
 //    if(flood) void this.$tightcnc.op('send',{line:'M8'}) // On flood
+  }
+
+  clearError() {
+    void this.$tightcnc.op('clearError',{})
+  }
+
+  reset(){
+    void this.$tightcnc.op('reset',{})
   }
 
 }

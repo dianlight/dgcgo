@@ -171,16 +171,54 @@ const linksList = [
 
 import { Vue, Options } from 'vue-class-component'
 import { useI18n } from 'vue-i18n'
+import { SerializedError } from 'new-error'
+//import { ERRORCODES } from 'tightcnc'
+
 
 @Options({
   components: { EssentialLink, StatusWidget, ControlWidget, CommandWidget },
   watch: {
     '$store.state.tightcnc.lastStatus.controller'(value) {
       if(!value){
-        console.log('Cambiato Controller Nullo!',this,value);
+        //console.log('Cambiato Controller Nullo!',this,value);
         (this as MainLayout).clientExists=!(this as MainLayout).clientExists
       } else if(!(this as MainLayout).clientExists){
         (this as MainLayout).clientExists=true
+      }
+    },
+    '$store.state.tightcnc.lastStatus.controller.errorData'(errorData?:SerializedError) {
+//      console.log(errorData)
+      if(errorData){
+          const color = errorData.logLevel === 'error'?'accent':'warning';
+//          console.error(errorData);
+
+
+//        switch(errorData.getSubCode()){
+//          case 'GG' /* ERRORCODES.LIMIT_HIT.subCode*/:
+            (this as MainLayout).$q.notify({
+              caption: errorData.name,
+              message: errorData.message,
+              color: color,
+              icon: 'announcement',
+              actions: [
+                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
+                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
+              ]          
+            })
+/*            break;
+          default:
+            (this as MainLayout).$q.notify({
+              message: errorData.toJSON().message,
+              color: 'accent',
+              icon: 'announcement',
+              actions: [
+                { label: 'Reply', color: 'yellow', handler: () => { / * ... * / } },
+                { label: 'Dismiss', color: 'white', handler: () => { / * ... * / } }
+              ]          
+            })
+            break;  
+        }
+        */
       }
     }
   }
