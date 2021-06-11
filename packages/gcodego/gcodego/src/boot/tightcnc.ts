@@ -14,7 +14,7 @@ export default boot(async ({ app,/* router, store*/ }) => {
   // ^ ^ ^ this will allow you to use this.$tightcnc (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
 
-  console.log('*!*!*!*!**!*!*!*!**!', app.config.globalProperties.$tightcnc )
+//  console.log('*!*!*!*!**!*!*!*!**!', app.config.globalProperties.$tightcnc )
 
 });
 

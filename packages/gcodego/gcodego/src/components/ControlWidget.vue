@@ -2,31 +2,6 @@
   <q-card>
     <q-card-section>
       <div class="q-pa-xs">
-        <div class="row items-start">
-          <div class="q-pa-none q-pb-md q-gutter-y-xs col items-start">
-            <q-btn-group>
-              <q-btn dense outline icon="home" @click="home()">
-                  <q-tooltip>Home</q-tooltip>
-              </q-btn>
-              <q-btn dense outline icon="home" @click="home([true,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
-                  X/Y
-                  <q-tooltip>Home X/Y</q-tooltip>
-              </q-btn>
-              <q-btn dense outline icon="home" @click="home([false,false,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
-                  Z
-                  <q-tooltip>Home Z</q-tooltip>
-              </q-btn>
-            </q-btn-group>
-            <q-btn-group>    
-              <q-btn dense outline icon="upgrade" @click="home()">
-                  <q-tooltip>Probe</q-tooltip>
-              </q-btn>
-              <q-btn dense outline icon="settings_overscan" @click="home()">
-                  <q-tooltip>Outline</q-tooltip>
-              </q-btn>
-            </q-btn-group>
-          </div>
-        </div>  
         <div class="row">
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
@@ -83,7 +58,7 @@
           </div>
 
         </div>
-        <div class="row text-center items-center" v-if="$store.getters['tightcnc/capabilities']?.mistCoolant || $store.getters['tightcnc/capabilities']?.mistCoolant.floodCoolant">
+        <div class="row text-center items-center" v-if="$store.getters['tightcnc/capabilities'] && ($store.getters['tightcnc/capabilities']?.mistCoolant || $store.getters['tightcnc/capabilities']?.floodCoolant)">
             <div class="col text-subtitle1 text-capitalize">
                 Coolant
             </div>
@@ -123,10 +98,11 @@
                 dense
                 outline
                 :options="[
-                    {value: 'CW', icon: 'rotate_right', slot: 'cw'},
-                    {value: 'OFF', icon: 'mode_standby', slot: 'off'},
-                    {value: 'CCW', icon: 'rotate_left', slot: 'ccw'},
+                    {value: 'M3', icon: 'rotate_right', slot: 'cw', disable: spindle_speed == 0},
+                    {value: 'M5', icon: 'mode_standby', slot: 'off'},
+                    {value: 'M4', icon: 'rotate_left', slot: 'ccw',disable: spindle_speed == 0},
                 ]"
+                @click="spindleControl"
                 >
                     <template v-slot:cw>
                         <q-tooltip>Start Spindle in CW direction</q-tooltip>
@@ -146,17 +122,17 @@
                 v-model="spindle_speed"
                 size="60px"
                 color="primary"
-                :min="0"
-                :max="10000"
-                :step="100"
+                :min="$store.state.tightcnc?.lastStatus?.controller?.spindleSpeedMin || 0"
+                :max="$store.state.tightcnc?.lastStatus?.controller?.spindleSpeedMax || 8000"
+                :step="10"
                 track-color="grey-3"
                 class="q-ma-md"
+                @change="spindleSpeed"
                 >
                 {{ spindle_speed }} rpm
                 </q-knob>
             </div>
         </div>
-        <!--
         <div class="row text-center">
             <div class="col text-subtitle1 text-capitalize">
                 Feed
@@ -169,10 +145,10 @@
                     :step="1"
                     label
                     label-always
+                    @change="feedRate"
                     />                
             </div>
         </div>
-        -->
       </div>
     </q-card-section>
   </q-card>
@@ -190,19 +166,22 @@ import { Options, Vue } from 'vue-class-component';
           (this as ControlWidget).mist = (coolant == 1 || coolant == 3)?true:false;
           (this as ControlWidget).flood = (coolant == 2 || coolant == 3)?true:false;
     },
-//    '$store.state.tightcnc.lastStatus.controller.feed'(feed:number) {
-//          (this as ControlWidget).feed = feed;
+//    '$store.state.tightcnc.lastStatus.controller.feed'(feed?:number) {
+//          (this as ControlWidget).feed = feed || 0;
 //    },
     '$store.state.tightcnc.lastStatus.controller.spindle'(spindle:boolean) {
           const controller = (this as ControlWidget).$store.state.tightcnc.lastStatus?.controller as ControllerStatus;
           if(controller)
-            (this as ControlWidget).spindle = !spindle?'OFF':controller.spindleDirection > 0?'CW':'CWW';
+            (this as ControlWidget).spindle = !spindle?'M5':controller.spindleDirection > 0?'M3':'M4';
     },
+//    '$store.state.tightcnc.lastStatus.controller.spindleSpeed'(speed?:number) {
+//          (this as ControlWidget).spindle_speed = speed || 0;
+//    },
   }  
 })
 export default class ControlWidget extends Vue {
     feed = 0
-    spindle = 'OFF'
+    spindle:'M3'|'M4'|'M5' = 'M5'
     spindle_speed = 0
     incrementz = 0.1
     incrementxy = 0.1
@@ -223,7 +202,7 @@ export default class ControlWidget extends Vue {
 
 
   mounted(){
-   // console.log(this.$store.getters)
+    //console.log(this.$store.getters)
     this.keyboardEvent = (e:KeyboardEvent) => {
         // console.log(this)
          if(!this.$refs.front)return
@@ -309,6 +288,27 @@ export default class ControlWidget extends Vue {
     if(mist) void this.$tightcnc.op('send',{line:'M7'}) // On Mist
     if(flood) void this.$tightcnc.op('send',{line:'M8'}) // On flood
   }
+
+  spindleSpeed(){
+    console.log('New Speed:',this.spindle_speed)
+    if(this.feed == 0){
+      this.feed = 1
+      this.feedRate()
+    }
+    void this.$tightcnc.op('send',{line:`G1 S${this.spindle_speed}`,wait:true})  
+  }
+
+  spindleControl(){
+    console.log('New Spidle:',this.spindle,this.spindle_speed)
+  void this.$tightcnc.op('send',{line:`${this.spindle} S${this.spindle_speed}`,wait:true})
+  }
+
+  feedRate(){
+    console.log('New Feed:',this.feed)
+    if(this.feed == 0)this.feed = 1
+    void this.$tightcnc.op('send',{line:`G1 F${this.feed}`,wait:true})
+  }
+
 }
 </script>
 

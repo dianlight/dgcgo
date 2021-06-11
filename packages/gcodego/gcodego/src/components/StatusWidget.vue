@@ -45,7 +45,10 @@
                     <q-icon v-if="lastStatus?.controller?.held" color="info" name="pending">
                         <q-tooltip>Hold</q-tooltip>
                     </q-icon> 
-                    <p class="text-caption" v-if="0 < (lastStatus?.controller?.feed || 0)" ><q-icon name="speed"/> {{lastStatus?.controller?.feed}} {{lastStatus?.controller?.units}}/min</p>
+                    <div class="row text-caption q-gutter-xs">
+                        <div v-if="0 < (lastStatus?.controller?.feed || 0)" class='col documentq-pa-none q-ma-none q-mt-sm'><q-icon  name="speed"/> {{lastStatus?.controller?.feed || '0'}}<span class='mini'> {{lastStatus?.controller?.units}}/min</span></div>
+                        <div v-if="0 < (lastStatus?.controller?.spindleSpeed || 0)" class='col q-pa-none q-ma-none q-mt-sm'><q-icon  name="sync"/> {{lastStatus?.controller?.spindleSpeed}}<span class='mini'> rpm</span></div>
+                    </div>
                     <q-linear-progress :value="progress" :buffer="buffer" class="q-mt-sm" />
                 </div>
             </div>
@@ -133,5 +136,9 @@ export default class StatusWidget extends Vue{
     border-style: solid;
     border-left-style: none;
     border-top-style: none;
+}
+
+.mini {
+    font-size: smaller;
 }
 </style>

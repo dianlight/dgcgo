@@ -69,8 +69,9 @@
       bordered
       side="left"
     >
-      <control-widget/>
+      <command-widget/>
       <status-widget/>
+      <control-widget/>
 
 <!--
       <q-list>
@@ -114,6 +115,7 @@
 import EssentialLink from 'components/EssentialLink.vue'
 import StatusWidget from '../components/StatusWidget.vue'
 import ControlWidget from '../components/ControlWidget.vue'
+import CommandWidget from '../components/CommandWidget.vue'
 
 
 const linksList = [
@@ -171,7 +173,7 @@ import { Vue, Options } from 'vue-class-component'
 import { useI18n } from 'vue-i18n'
 
 @Options({
-  components: { EssentialLink, StatusWidget, ControlWidget },
+  components: { EssentialLink, StatusWidget, ControlWidget, CommandWidget },
   watch: {
     '$store.state.tightcnc.lastStatus.controller'(value) {
       if(!value){
