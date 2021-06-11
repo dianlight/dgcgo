@@ -5,17 +5,17 @@
         <div class="row">
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
-              <q-btn outline icon="north_west" @click="move"/>
+              <q-btn outline icon="north_west" @click="move($event,'front-left')"/>
               <q-btn outline icon="north" ref="front" @click="move($event,'front')">
                 <q-tooltip>Y+</q-tooltip>
               </q-btn>
-              <q-btn outline icon="north_east" />
+              <q-btn outline icon="north_east"  @click="move($event,'front-right')"/>
             </q-btn-group>
             <q-btn-group>
               <q-btn outline icon="west" ref="left" @click="move($event,'left')">
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
-              <q-btn outline icon="hide_source" @click="home([true,true,false])">
+              <q-btn outline icon="hide_source" @click="setOrigin([true,true,false])">
                 <q-tooltip>Home X/Y</q-tooltip>
               </q-btn>
               <q-btn outline icon-right="east" ref="right" @click="move($event,'right')">
@@ -23,11 +23,11 @@
               </q-btn>
             </q-btn-group>
             <q-btn-group>
-              <q-btn outline icon="south_west" />
+              <q-btn outline icon="south_west" @click="move($event,'back-left')"/>
               <q-btn outline icon="south" ref="back" @click="move($event,'back')">
                 <q-tooltip>Y-</q-tooltip>
               </q-btn>
-              <q-btn outline icon="south_east" />
+              <q-btn outline icon="south_east" @click="move($event,'back-right')" />
             </q-btn-group>
 
 
@@ -49,7 +49,7 @@
             <q-btn outline icon="north" ref="up" @click="move($event,'up')">
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
-            <q-btn outline icon="hide_source" @click="home([false,false,true])">
+            <q-btn outline icon="hide_source" @click="setOrigin([false,false,true])">
               <q-tooltip>Home Z</q-tooltip>
             </q-btn>
             <q-btn outline icon="south" ref="down" @click="move($event,'down')">
@@ -275,11 +275,27 @@ export default class ControlWidget extends Vue {
             break;
         case 'down':
             void this.$tightcnc.jogMove(2,-this.incrementz)
-            break;         
+            break;  
+        case 'front-left':
+            void this.$tightcnc.jogMove(1,this.incrementxy)
+            void this.$tightcnc.jogMove(0,-this.incrementxy)
+            break;  
+        case 'front-right':
+            void this.$tightcnc.jogMove(1,this.incrementxy)
+            void this.$tightcnc.jogMove(0,this.incrementxy)
+            break;  
+        case 'back-left':
+            void this.$tightcnc.jogMove(1,-this.incrementxy)
+            void this.$tightcnc.jogMove(0,-this.incrementxy)
+            break;  
+        case 'back-right':               
+            void this.$tightcnc.jogMove(1,-this.incrementxy)
+            void this.$tightcnc.jogMove(0,this.incrementxy)
+            break;  
       }
   }
 
-  home(axes?:boolean[]){
+  private home(axes?:boolean[]){
     void this.$tightcnc.home(axes)
   }
 
@@ -307,6 +323,10 @@ export default class ControlWidget extends Vue {
     console.log('New Feed:',this.feed)
     if(this.feed == 0)this.feed = 1
     void this.$tightcnc.op('send',{line:`G1 F${this.feed}`,wait:true})
+  }
+
+  setOrigin(pos:boolean[]){
+    void this.$tightcnc.op('setOrigin',{pos:pos})
   }
 
 }
