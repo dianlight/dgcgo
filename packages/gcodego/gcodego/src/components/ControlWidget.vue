@@ -6,25 +6,25 @@
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
               <q-btn outline icon="north_west" @click="move($event,'front-left')"/>
-              <q-btn outline icon="north" ref="front" @click="move($event,'front')">
+              <q-btn outline icon="north" v-shortkey="['arrowup']" @shortkey="simulateClickNg" ref="front" @click="move($event,'front')">
                 <q-tooltip>Y+</q-tooltip>
               </q-btn>
               <q-btn outline icon="north_east"  @click="move($event,'front-right')"/>
             </q-btn-group>
             <q-btn-group>
-              <q-btn outline icon="west" ref="left" @click="move($event,'left')">
+              <q-btn outline icon="west" v-shortkey="['arrowleft']" @shortkey="simulateClickNg" ref="left" @click="move($event,'left')">
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
               <q-btn outline icon="hide_source" @click="setOrigin([true,true,false])">
                 <q-tooltip>Work coordinate X/Y zero.</q-tooltip>
               </q-btn>
-              <q-btn outline icon-right="east" ref="right" @click="move($event,'right')">
+              <q-btn outline icon-right="east" v-shortkey="['arrowright']" @shortkey="simulateClickNg" ref="right" @click="move($event,'right')">
                 <q-tooltip>X+</q-tooltip>
               </q-btn>
             </q-btn-group>
             <q-btn-group>
               <q-btn outline icon="south_west" @click="move($event,'back-left')"/>
-              <q-btn outline icon="south" ref="back" @click="move($event,'back')">
+              <q-btn outline icon="south" v-shortkey="['arrowdown']" @shortkey="simulateClickNg" ref="back" @click="move($event,'back')">
                 <q-tooltip>Y-</q-tooltip>
               </q-btn>
               <q-btn outline icon="south_east" @click="move($event,'back-right')" />
@@ -46,13 +46,13 @@
           </div> 
 
           <div class="q-pa-none q-gutter-y-none col _column _items-start">
-            <q-btn outline icon="north" ref="up" @click="move($event,'up')">
+            <q-btn outline v-shortkey="['pageup']" @shortkey="simulateClickNg" icon="north" ref="up"  @click="move($event,'up')">
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
             <q-btn outline icon="hide_source" @click="setOrigin([false,false,true])">
               <q-tooltip>Work coordinate Z zero.</q-tooltip>
             </q-btn>
-            <q-btn outline icon="south" ref="down" @click="move($event,'down')">
+            <q-btn outline v-shortkey="['pagedown']" @shortkey="simulateClickNg" icon="south" ref="down"  @click="move($event,'down')">
               <q-tooltip>Z-</q-tooltip>
             </q-btn>
           </div>
@@ -204,6 +204,7 @@ export default class ControlWidget extends Vue {
 
   mounted(){
     //console.log(this.$store.getters)
+    /*
     this.keyboardEvent = (e:KeyboardEvent) => {
         // console.log(this)
          if(!this.$refs.front)return
@@ -221,24 +222,41 @@ export default class ControlWidget extends Vue {
                   this.simulateClick(this.$refs.right,e)
                 break;
               case 'PageUp':
-                  this.simulateClick(this.$refs.up,e)
+//                  this.simulateClick(this.$refs.up,e)
                 break;
               case 'PageDown':
-                  this.simulateClick(this.$refs.down,e)
+//                  this.simulateClick(this.$refs.down,e)
                 break;
           }
     }
-    document.addEventListener('keydown',this.keyboardEvent)
+    */
+    //document.addEventListener('keydown',this.keyboardEvent)
   }
 
   unmounted(){
-   if(this.keyboardEvent){
-     document.removeEventListener('keydown',this.keyboardEvent)
-     delete this.keyboardEvent
-   }
+   //if(this.keyboardEvent){
+   //  document.removeEventListener('keydown',this.keyboardEvent)
+   //  delete this.keyboardEvent
+   //}
   }
 
+  private simulateClickNg(evt:Event){
+      //console.log('---TARGET-->',target)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      evt.currentTarget?.dispatchEvent(new MouseEvent('mousedown'))
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      evt.currentTarget?.dispatchEvent(new MouseEvent('mouseup'))
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      evt.currentTarget?.dispatchEvent(new MouseEvent('click'))
+  }
+
+/*
   private simulateClick(target:QBtn, evt:Event){
+      if(target.$el === evt.currentTarget){
+        console.log('Stesso oggetto!')
+      } else {
+        console.log(target.$el, evt.currentTarget)
+      }
       //console.log('---TARGET-->',target)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       target.$el.dispatchEvent(new MouseEvent('mousedown'),evt)
@@ -247,6 +265,7 @@ export default class ControlWidget extends Vue {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       target.$el.dispatchEvent(new MouseEvent('click'),evt)
   }
+  */
 
   get lastStatus() {
     return this.$store.state.tightcnc.lastStatus;

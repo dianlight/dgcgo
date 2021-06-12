@@ -5648,6 +5648,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"custom-event-polyfill@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "custom-event-polyfill@npm:1.0.7"
+  checksum: ea0355e332d8e4e03fe6c9b44a8ea8cce7986f83f23c17d21fa0b8b390c557a55285660aa142ab73dd6463a2fa49923a4ff9c06c3323a8b435ac86b8e93e5d3b
+  languageName: node
+  linkType: hard
+
 "dashdash@npm:^1.12.0":
   version: 1.14.1
   resolution: "dashdash@npm:1.14.1"
@@ -6476,6 +6483,13 @@ __metadata:
   bin:
     electron: cli.js
   checksum: ba2e295593f68ae0a4f4eb3bb6a59befe80b0f69490aa9ee7f9ccd2863569feb0d3b9f6df884656465fd68f1985d08ad6e46859fb2a3c6e08d8e7e989955fc53
+  languageName: node
+  linkType: hard
+
+"element-matches@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "element-matches@npm:0.1.2"
+  checksum: 724047de19df4e6eb435fc4fcb35901c429d3a3e0a4797d8042b1e1a00e9ec5b52d1df64c5455aa6c085be9696e9a4e1c490945f6030dbe7761ad01379a25135
   languageName: node
   linkType: hard
 
@@ -7813,6 +7827,7 @@ fsevents@~2.3.1:
     typescript: ^4.3.2
     vue-class-component: ^8.0.0-rc.1
     vue-i18n: ^9.1.6
+    vue3-shortkey: ^4.0.0
     vuex: ^4.0.1
     xerror: ^2.0.0
     yaml: ^1.10.2
@@ -15594,6 +15609,16 @@ typescript@^4.3.2:
     hash-sum: ^1.0.2
     loader-utils: ^1.0.2
   checksum: 6c5e914011903c65acb5642987da6590b743a1f484d79fec2e10f1406fb5beca0c152cd4f10f8eae32412349bd09cad7f1ede00b18fd74481de78e8402a8c7c0
+  languageName: node
+  linkType: hard
+
+"vue3-shortkey@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "vue3-shortkey@npm:4.0.0"
+  dependencies:
+    custom-event-polyfill: ^1.0.7
+    element-matches: ^0.1.2
+  checksum: 8f70dee4d88eefb4c93fdc2ba1d5a528b2ec803161909f2d6dc6fe937354f683ab17681a3be1e144e5ecb0b8e2bbc55b23b7947859ef7d417a1167f9cb64abe2
   languageName: node
   linkType: hard
 
