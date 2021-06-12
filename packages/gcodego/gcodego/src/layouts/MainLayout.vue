@@ -1,6 +1,7 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header elevated>
+
       <q-toolbar>
         <q-btn
           flat
@@ -21,26 +22,7 @@
         
         <q-separator vertical inset />
 
-        <q-tabs align="center">
-          <q-route-tab to="/" label="Home" />
-          <q-route-tab to="/workbench" label="Workbanch" />
-          <q-route-tab to="/terminal" label="Terminal" />
-          <q-route-tab to="/preferences" label="Preferences" />
-        </q-tabs>
-
-        <q-separator vertical inset />
-
-        <q-select
-          v-model="locale"
-          :options="localeOptions"
-          label="Quasar Language"
-          dense
-          borderless
-          emit-value
-          map-options
-          options-dense
-          style="min-width: 150px"
-        />
+        <menu-widget/>
 
         <q-separator vertical inset />
 
@@ -122,6 +104,7 @@ import EssentialLink from 'components/EssentialLink.vue'
 import StatusWidget from '../components/StatusWidget.vue'
 import ControlWidget from '../components/ControlWidget.vue'
 import CommandWidget from '../components/CommandWidget.vue'
+import MenuWidget from '../components/MenuWidget.vue'
 
 
 const linksList = [
@@ -176,13 +159,13 @@ const linksList = [
 ];
 
 import { Vue, Options } from 'vue-class-component'
-import { useI18n } from 'vue-i18n'
+//import { useI18n } from 'vue-i18n'
 import { SerializedError } from 'new-error'
 //import { ERRORCODES } from 'tightcnc'
 
 
 @Options({
-  components: { EssentialLink, StatusWidget, ControlWidget, CommandWidget },
+  components: { MenuWidget, EssentialLink, StatusWidget, ControlWidget, CommandWidget },
   watch: {
     '$store.state.tightcnc.lastStatus.controller'(value) {
       if(!value){
@@ -233,10 +216,10 @@ export default class MainLayout extends Vue {
 
   clientExists = false
 
-  locale = useI18n({useScope: 'global'}).locale
-  get lastStatus(){
-    return this.$store.state.tightcnc.lastStatus
-  }
+//  locale = useI18n({useScope: 'global'}).locale
+   get lastStatus(){
+     return this.$store.state.tightcnc.lastStatus
+   }
 
   leftDrawerOpen = true;
   essentialLinks = linksList;
@@ -244,10 +227,10 @@ export default class MainLayout extends Vue {
     this.leftDrawerOpen = !this.leftDrawerOpen
   }
 
-  localeOptions = [
-    { value: 'en', label: 'English'},
-    { value: 'it', label: 'Italiano'}
-  ]
+  //localeOptions = [
+  //  { value: 'en', label: 'English'},
+  //  { value: 'it', label: 'Italiano'}
+  //]
 
   mounted(){
       const starter = setInterval(()=>{

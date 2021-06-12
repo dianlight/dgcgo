@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme,dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme,dialog, shell, Menu, MenuItem } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
@@ -9,6 +9,8 @@ import yaml from 'yaml'
 import { ChildProcess, fork } from 'child_process';
 import findFreePorts from 'find-free-ports'
 import { TightCNCConfig } from 'app/../tightcnc/types/src'
+import defaultMenu from 'electron-default-menu'
+import { MenuItemConstructorOptions } from 'electron/main'
 
 
 try {
@@ -26,6 +28,84 @@ console.log(process.env)
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let mainWindow: BrowserWindow | undefined
+
+interface JsonLocale {
+  [key:string]: string | JsonLocale
+}
+
+function createMenu(i18n:(path:string)=>string) {
+    const menu = defaultMenu(app, shell)
+
+    const isMac = process.platform === 'darwin'
+
+    // Preferencies on Mac
+    if (isMac) {
+        (menu[0]?.submenu as Electron.MenuItemConstructorOptions[]).splice(2, 0, {
+            label: i18n('preferences'),
+//            label: 'Preferencies',
+            click: () => mainWindow?.webContents.send('MenuEvent', { link:'/preferences' })
+        }, {
+            type: 'separator'
+        }
+        )
+    }
+
+    // Add File menu
+    menu.splice(1, 0, {
+        role: 'fileMenu',
+        submenu: [
+        {
+            label: i18n('file.newProject'), /*click: () => store.dispatch('new')*/
+        },
+        { label: i18n('file.newProjectFrom'), 
+            submenu:[
+            { label: i18n('file.gerberFolder'),enabled:false},
+                {
+                    label: i18n('file.gerberZip'), /* click:()=>store.dispatch('openGerberZip')*/
+                },
+            ]},
+        { type: 'separator' },  
+        { label: i18n('file.openProject'), /*click:()=>store.dispatch('open')*/ },
+        ...(isMac ? [
+        {
+            role: 'recentDocuments',
+            submenu:[
+                { type: 'separator' },
+                { role: 'clearRecentDocuments'},
+            ]
+        } as MenuItemConstructorOptions]:[]),
+        { type: 'separator' },  
+        { id:'save', label: i18n('menu.file.save'),/* click:()=>store.dispatch('save'),*/ enabled:false},
+        { label: i18n('menu.file.saveAs'),/* click:()=>store.dispatch('saveAs')*/},
+        { type: 'separator' },  
+        { id:'import', label: i18n('menu.file.import'), /*click:()=>store.dispatch('importGerber'),*/ enabled:false }, 
+        { type: 'separator' }, 
+        { id:'close', label: i18n('menu.file.closeProject'),/* click:()=>store.dispatch('close'),*/ enabled:false},
+        ...(isMac ? [                   
+        ]:[
+            { type: 'separator' } as MenuItemConstructorOptions,  
+            { label: i18n('menu.app.preferencies'), /*click: () => router.push('/preferencies'),*/ } as MenuItemConstructorOptions
+        ]),
+        { type: 'separator' },  
+        isMac ? { role: 'close' } : { role: 'quit' }
+        ]        
+    })
+
+    // Add custom menu
+    menu.splice(4, 0, {
+        label: 'Custom',
+        submenu: [
+        {
+            label: 'Do something',
+            click: (item, focusedWindow) => {
+            void dialog.showMessageBox({message: 'Do something', buttons: ['OK'] });
+            }
+        }
+        ]
+    });
+
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menu))
+}
 
 async function createWindow() {
     const winCfg = electron_cfg.window({
@@ -119,6 +199,17 @@ app.on('activate', () => {
     if (mainWindow === null) {
         void createWindow()
     }
+})
+
+/** Application Menu */
+ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
+    console.debug('Popupating Menu', args[0])
+    createMenu((path: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const tr = args[0][path] as string
+        if (tr) return tr
+        else return path
+    })
 })
 
 /** Tight CNC Server */

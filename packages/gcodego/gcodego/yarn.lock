@@ -6367,6 +6367,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-default-menu@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "electron-default-menu@npm:1.0.2"
+  checksum: 70dd52f663c98cf2be9f2f964e7d790177372053cc2faa2fcadadda2a2047d3249b0e89b8237ef15d9258990b03005e2e689a0bf517de7fe5544ca6902e5ef2a
+  languageName: node
+  linkType: hard
+
 "electron-devtools-installer@npm:^3.2.0":
   version: 3.2.0
   resolution: "electron-devtools-installer@npm:3.2.0"
@@ -7805,6 +7812,7 @@ fsevents@~2.3.1:
     electron: ^13.1.2
     electron-builder: ^22.11.7
     electron-cfg: ^1.2.6
+    electron-default-menu: ^1.0.2
     electron-devtools-installer: ^3.2.0
     electron-log: ^4.3.5
     electron-rebuild: ^2.3.5

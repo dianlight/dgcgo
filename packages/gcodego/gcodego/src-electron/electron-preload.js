@@ -24,13 +24,13 @@ contextBridge.exposeInMainWorld(
         },
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ['SaveTightCNCConfig'];
+            let validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = [''];
+            let validChannels = ['MenuEvent'];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
                 console.log('mount listener for', channel);

@@ -1,5 +1,12 @@
 {
     "failed": "Action failed",
     "success": "Action was successful",
-    "count": "Count"
+    "count": "Count",
+    "menu": {
+        "preferences": "Preferences...",
+        "about": "about",
+        "submenu": {
+            "submenu1": "Questo!"
+        }
+    }
 }

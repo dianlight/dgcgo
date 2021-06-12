@@ -21,6 +21,7 @@ function loadLocaleMessages(): LocaleMessages<VueMessageType> {
       console.log('Found locale:',locale)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       messages[locale] = locales(key).default
+//      console.log(messages[locale])
     }
   })
   return messages

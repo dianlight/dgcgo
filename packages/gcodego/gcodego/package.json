@@ -26,6 +26,7 @@
         "colornames": "^1.1.1",
         "core-js": "^3.14.0",
         "electron-cfg": "^1.2.6",
+        "electron-default-menu": "^1.0.2",
         "electron-log": "^4.3.5",
         "electron-updater": "^4.3.10",
         "find-free-ports": "^2.0.3",

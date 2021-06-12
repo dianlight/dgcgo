@@ -1,5 +1,12 @@
 {
     "failed": "Azione fallita",
     "success": "Azione conclusa con successo",
-    "count": "Conteggio"
+    "count": "Conteggio",
+    "menu": {
+        "preferences": "Preferenze...",
+        "about": "about",
+        "submenu": {
+            "submenu1": "Questo!"
+        }
+    }
 }
