@@ -16,8 +16,19 @@
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
           </q-avatar>
-          Quasar App
+        <!--  Quasar App -->
         </q-toolbar-title>
+        
+        <q-separator vertical inset />
+
+        <q-tabs align="center">
+          <q-route-tab to="/" label="Home" />
+          <q-route-tab to="/workbench" label="Workbanch" />
+          <q-route-tab to="/terminal" label="Terminal" />
+          <q-route-tab to="/preferences" label="Preferences" />
+        </q-tabs>
+
+        <q-separator vertical inset />
 
         <q-select
           v-model="locale"
@@ -34,6 +45,7 @@
         <q-separator vertical inset />
 
         <div>Quasar <q-badge>v{{ $q.version }}</q-badge></div>
+
 
         <q-separator vertical inset />
 
@@ -55,12 +67,6 @@
 
       </q-toolbar>
 
-      <q-tabs align="center">
-        <q-route-tab to="/" label="Home" />
-        <q-route-tab to="/workbench" label="Workbanch" />
-        <q-route-tab to="/terminal" label="Terminal" />
-        <q-route-tab to="/preferences" label="Preferences" />
-      </q-tabs>
     </q-header>
 
     <q-drawer
