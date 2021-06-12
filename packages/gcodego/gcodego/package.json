@@ -21,7 +21,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
-        "@quasar/extras": "^1.10.6",
+        "@quasar/extras": "^1.10.7",
         "axios": "^0.21.1",
         "colornames": "^1.1.1",
         "core-js": "^3.14.0",
@@ -35,7 +35,6 @@
         "quasar": "^2.0.0-rc.1",
         "three": "^0.129.0",
         "tightcnc": "link:../tightcnc",
-        "uuid": "^8.3.2",
         "vue-class-component": "^8.0.0-rc.1",
         "vue-i18n": "^9.1.6",
         "vuex": "^4.0.1",
@@ -51,7 +50,6 @@
         "@types/colornames": "^1.1.1",
         "@types/node": "^15.12.2",
         "@types/three": "^0.129.1",
-        "@types/uuid": "^8.3.0",
         "@types/webpack-env": "^1.16.0",
         "@typescript-eslint/eslint-plugin": "^4.26.1",
         "@typescript-eslint/parser": "^4.26.1",

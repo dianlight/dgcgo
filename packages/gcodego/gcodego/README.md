@@ -69,14 +69,14 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [ ] Import/Export configuration
       - [ ] Import/Eport for Electron
   - [ ] Base Layout
-    - [ ] Keyboard support
+    - [x] Keyboard support
     - [ ] Remote Joystic / Joypad support
       - [ ] grbl offline controller
       - [ ] PS4 Joypad support
-  - [ ] Status Widget
-    - Machine / Work switch
+  - [x] Status Widget
+    - [x] Machine / Work switch
   - [ ] Control Widget
-    - [ ] Work 0 setting
+    - [x] Work 0 setting
     - [ ] Jog support
       - [ ] Web Remote control ( Mobile Phones on the same network? )
         - [ ] QrCode based link
@@ -87,6 +87,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [ ] Z-Probe
     - [ ] Auto Zero Camera
   - [ ] Work control Widget
+    - [x] Reset alarm
     - [ ] Suspend/Resume
     - [ ] Area scan/check
     - [ ] Tool change
@@ -120,6 +121,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] UI DOCUMENTATION
   - [ ] ISSUE TEMPLATE
   - [ ] UI
+  - [ ] generate github pages
 
 ## Install the dependencies
 

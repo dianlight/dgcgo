@@ -2203,10 +2203,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/extras@npm:^1.10.6":
-  version: 1.10.6
-  resolution: "@quasar/extras@npm:1.10.6"
-  checksum: 4488605fc57a740d0007927c566c51272a44a61dd75eb96bda272d2bceab0e01a9d542dd367caef287afd7537737fda694015655593634c2e9ebc130311d5aa4
+"@quasar/extras@npm:^1.10.7":
+  version: 1.10.7
+  resolution: "@quasar/extras@npm:1.10.7"
+  checksum: f6c6567dce2c8db2566ff62f98ed8ff1f855efbd2b633f2675405e0c6893f45231f5f36fc48e87a2af8aa8b78853d9bdb7b2da50944338ca9a44e07578c5afa9
   languageName: node
   linkType: hard
 
@@ -2715,13 +2715,6 @@ __metadata:
   dependencies:
     source-map: ^0.6.1
   checksum: 1815a3628aeed41212ae411728267a29e99a309f0cff4d84f90bc7188125be0996d81ca4e7c747751f598749edad426a4c1fe9d78df2110022ca24455d45ca43
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^8.3.0":
-  version: 8.3.0
-  resolution: "@types/uuid@npm:8.3.0"
-  checksum: 620985aed8fdb4aed153daca5235f4303457a67a4d181efac0021712eabd9edd7e88895f79730c0e651effde7633b1b61e49a81519ac8d4e75019d2ac9b6412f
   languageName: node
   linkType: hard
 
@@ -7784,12 +7777,11 @@ fsevents@~2.3.1:
     "@intlify/vue-i18n-loader": ^2.1.0
     "@quasar/app": ^3.0.0-rc.1
     "@quasar/cli": ^1.2.1
-    "@quasar/extras": ^1.10.6
+    "@quasar/extras": ^1.10.7
     "@quasar/icongenie": ^2.3.3
     "@types/colornames": ^1.1.1
     "@types/node": ^15.12.2
     "@types/three": ^0.129.1
-    "@types/uuid": ^8.3.0
     "@types/webpack-env": ^1.16.0
     "@typescript-eslint/eslint-plugin": ^4.26.1
     "@typescript-eslint/parser": ^4.26.1
@@ -7819,7 +7811,6 @@ fsevents@~2.3.1:
     three: ^0.129.0
     tightcnc: "link:../tightcnc"
     typescript: ^4.3.2
-    uuid: ^8.3.2
     vue-class-component: ^8.0.0-rc.1
     vue-i18n: ^9.1.6
     vuex: ^4.0.1
@@ -15474,15 +15465,6 @@ typescript@^4.3.2:
   bin:
     uuid: ./bin/uuid
   checksum: 1ce3f37e214d6d0dc94a6a9663a0365013ace66bc3fd5b203e6f5d2eeb978aaee1192367222386345d30b4c6a447928c501121aa84c637724bf105ef57284949
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: aed2bcef341f95635f308fea8831fb9038b18c485fe7e71feb89d2e05602dfecad0cb6f2246fae096d4da425cca6e8a71056f28abd97ad98cf770a2018853248
   languageName: node
   linkType: hard
 

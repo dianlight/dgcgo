@@ -1,6 +1,6 @@
 //import http from 'http';
 import { TightCNCConfig,PortInfo, StatusObject } from 'tightcnc'
-import { v4 as uuidv4 } from 'uuid';
+import { uid } from 'quasar'
 import { JSONRPCClient } from 'json-rpc-2.0';
 
 export class Client {
@@ -67,7 +67,7 @@ export class Client {
         static async start(config: Partial<TightCNCConfig>): Promise<Client> {
             console.log(config)
             if (!config.authKey) {
-                config.authKey = uuidv4()
+                config.authKey = uid()
                 console.log('Generated AuthKey:',config.authKey)
             }
             return new Promise((resolve, reject) => {
