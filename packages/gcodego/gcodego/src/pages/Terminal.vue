@@ -108,9 +108,12 @@ export default class Terminal extends Vue {
 
   
   readLog = (self:Terminal)=>{
-    void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:this.start,limit:100}).then( 
+    if(!self.$refs.terminal)return // Terminal not visible!
+    void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:this.start,limit:20}).then( 
        (lines)=>{
          self.start+=lines.length
+ //        console.log('>Before:',self.logs)
+         //console.log('Ricevute:',lines.length,lines)
          self.logs.push(...lines
            .map( l => { 
               // Basic Log Mapping 
@@ -123,27 +126,52 @@ export default class Terminal extends Vue {
           .filter( this.markStatusGcode() )
           .reduce<LogLine[]>( (previousValue: LogLine[], currentValue: LogLine, currentIndex: number, all: LogLine[])=>{
               if(this.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
-                console.log('Response!',currentValue,currentIndex)
+              //  console.log('Response!',currentValue,currentIndex)
                 let match = false;
-                for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                  // Search in previus 100 lines
+                for( let value of this.logs.slice(this.logs.length-100).filter( dv=>dv.direction === '>')){
                   if(!value.result){
-                    console.log('Setting on line:',value,currentValue.data)
+                   // console.log('Setting on line:',value,currentValue.data)
                     value.result = currentValue.data 
                     match=true
                     break
                   }
                 }
-                if(!match)previousValue.push(currentValue)
+                if(!match){
+                  for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                    if(!value.result){
+                    //  console.log('Setting on line:',value,currentValue.data)
+                      value.result = currentValue.data 
+                      match=true
+                      break
+                    }
+                  }
+                  if(!match){
+                    previousValue.push(currentValue)
+                  }
+                }
               } else if(this.matchStatus && currentValue.direction == '@'){
                 let match=false
-                for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                // Search in previus 100 lines
+                for( let value of this.logs.slice(this.logs.length-100).filter( dv=>dv.direction === '>')){
                   if(value.result?.startsWith('error:')){
                     value.error = currentValue.data 
                     match=true
                     break
                   }
                 }
-                if(!match)previousValue.push(currentValue)
+                if(!match){
+                  for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                    if(value.result?.startsWith('error:')){
+                      value.error = currentValue.data 
+                      match=true
+                      break
+                    }
+                  }
+                  if(!match){
+                    previousValue.push(currentValue)
+                  }
+                }
               } else {
                 previousValue.push(currentValue)
               }
@@ -153,9 +181,11 @@ export default class Terminal extends Vue {
           .map( this.colorGcode())
          );
 
+//         console.log('After:',self.logs)
+
 //         self.$refs.terminal.refresh(self.autoScroll?self.logs.length-1:undefined)
-         self.$refs.terminal.refresh()
-         if(lines.length < 100){
+         if(lines.length > 0)self.$refs.terminal.refresh()
+         if(lines.length < 20){
            setTimeout(this.readLog,1000,self);
          } else {
            this.readLog(self)
@@ -192,11 +222,18 @@ export default class Terminal extends Vue {
   }
 
   mounted(){
+    this.logs=[]
+    this.$refs.terminal.reset()
     setTimeout(this.readLog,1000,this)
-    void this.$nextTick(()=>{
-      this.autoScroll()
-      }
-    )
+   // void this.$nextTick(()=>{
+   //   this.autoScroll()
+   //   }
+   // )
+  }
+
+  unmounted(){
+    console.log('unount');
+    this.logs=[]
   }
 
   viewPortHight():number{
