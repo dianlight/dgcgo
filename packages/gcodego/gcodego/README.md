@@ -58,7 +58,6 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [x] Dynamic loader
     - [x] Language switcher
   - [x] Vue3-gcode-viewer
-  - [x] Dynamic Form ( temp solution )
 - [ ] UI
   - [x] Multi language
     - [ ] English

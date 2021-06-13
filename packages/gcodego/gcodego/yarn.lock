@@ -2217,9 +2217,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/icongenie@npm:^2.3.3":
-  version: 2.3.3
-  resolution: "@quasar/icongenie@npm:2.3.3"
+"@quasar/icongenie@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@quasar/icongenie@npm:2.4.0"
   dependencies:
     "@hapi/joi": ^17.1.1
     chalk: ^4.0.0
@@ -2235,13 +2235,13 @@ __metadata:
     png2icons: ^2.0.1
     potrace: ^2.1.5
     read-chunk: ^3.2.0
-    sharp: ^0.25.2
+    sharp: ^0.28.3
     svgo: ^1.3.2
     untildify: ^4.0.0
     update-notifier: ^4.1.0
   bin:
-    icongenie: ./bin/icongenie
-  checksum: 936907eb69ce8bde109ab6af8e68bf423154a02807dd746afa09ab6c5a638b6abbc02ac75be909a796fa741c402fdd01bf3c3402c50248b45f3e3cca729eed07
+    icongenie: bin/icongenie
+  checksum: bb9a818d614c4cdb9d443c908b5307454c050425fd5e9a54d364ef3eb47dabdc0bd93dabf68eec6279498ec6b0c4cb1457286b5347227a6705bd8845b1a03698
   languageName: node
   linkType: hard
 
@@ -4921,7 +4921,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color@npm:^3.1.2":
+"color@npm:^3.1.3":
   version: 3.1.3
   resolution: "color@npm:3.1.3"
   dependencies:
@@ -7799,7 +7799,7 @@ fsevents@~2.3.1:
     "@quasar/app": ^3.0.0-rc.1
     "@quasar/cli": ^1.2.1
     "@quasar/extras": ^1.10.7
-    "@quasar/icongenie": ^2.3.3
+    "@quasar/icongenie": ^2.4.0
     "@types/colornames": ^1.1.1
     "@types/node": ^15.12.2
     "@types/three": ^0.129.1
@@ -7823,6 +7823,7 @@ fsevents@~2.3.1:
     eslint-plugin-vue: ^7.11.0
     find-free-ports: ^2.0.3
     gcode-toolpath: ^2.2.0
+    highlight.js: ^11.0.1
     json-rpc-2.0: ^0.2.16
     new-error: ^2.1.10
     node-polyfill-webpack-plugin: ^1.1.2
@@ -7833,6 +7834,7 @@ fsevents@~2.3.1:
     three: ^0.129.0
     tightcnc: "link:../tightcnc"
     typescript: ^4.3.2
+    vue: 3.0.11
     vue-class-component: ^8.0.0-rc.1
     vue-i18n: ^9.1.6
     vue3-shortkey: ^4.0.0
@@ -8417,6 +8419,13 @@ fsevents@~2.3.1:
   version: 1.1.0
   resolution: "hex-color-regex@npm:1.1.0"
   checksum: 89899f5f74cdef884e352fe8791018f2f112c338b97f3b486f7d5f4760a9c58181f688eb147937f9f2dd69c976a7296b53d1509c9a0871903eeb26a8382e486c
+  languageName: node
+  linkType: hard
+
+"highlight.js@npm:^11.0.1":
+  version: 11.0.1
+  resolution: "highlight.js@npm:11.0.1"
+  checksum: 1c9f474ab83cb9bbb7df581f5a0c10058ca62358171753c2f5be604b6188363d9af8975b0527c354091660224fac5d3b73b1a4fad9590d066e601e63715a694b
   languageName: node
   linkType: hard
 
@@ -11006,7 +11015,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"node-abi@npm:^2.19.2, node-abi@npm:^2.7.0":
+"node-abi@npm:^2.19.2, node-abi@npm:^2.21.0":
   version: 2.30.0
   resolution: "node-abi@npm:2.30.0"
   dependencies:
@@ -11024,7 +11033,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"node-addon-api@npm:^3.0.0":
+"node-addon-api@npm:^3.2.0":
   version: 3.2.1
   resolution: "node-addon-api@npm:3.2.1"
   dependencies:
@@ -11149,13 +11158,6 @@ fsevents@~2.3.1:
   version: 1.1.72
   resolution: "node-releases@npm:1.1.72"
   checksum: a9ded860baa3c90fa6fde2e1be597959b238940cda1e5bbeceb5de6a16faa1db81982b629429fd6ebbec98f7dd241378cda5918a57c9baf68cb6a6e002b4fc15
-  languageName: node
-  linkType: hard
-
-"noop-logger@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "noop-logger@npm:0.1.1"
-  checksum: 353d31cd08698c797af21069df593772a081b694d0edbb3f1d9aca526ddc414bb0992e3deb9aaf69ad197ddee3a5e3be6dd09043023d3abe385d2872a863829c
   languageName: node
   linkType: hard
 
@@ -12640,9 +12642,9 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"prebuild-install@npm:^5.3.4":
-  version: 5.3.6
-  resolution: "prebuild-install@npm:5.3.6"
+"prebuild-install@npm:^6.1.2":
+  version: 6.1.3
+  resolution: "prebuild-install@npm:6.1.3"
   dependencies:
     detect-libc: ^1.0.3
     expand-template: ^2.0.3
@@ -12650,18 +12652,16 @@ fsevents@~2.3.1:
     minimist: ^1.2.3
     mkdirp-classic: ^0.5.3
     napi-build-utils: ^1.0.1
-    node-abi: ^2.7.0
-    noop-logger: ^0.1.1
+    node-abi: ^2.21.0
     npmlog: ^4.0.1
     pump: ^3.0.0
     rc: ^1.2.7
     simple-get: ^3.0.3
     tar-fs: ^2.0.0
     tunnel-agent: ^0.6.0
-    which-pm-runs: ^1.0.0
   bin:
     prebuild-install: bin.js
-  checksum: 81ff157668dc26349e1f8076fce0ba990f45481e39a64645efad60c9ae2d61e73e3c420d56f5f38fbe6dc3275e8e27067d2613d941c778f41658a6110e544130
+  checksum: 4b9a6f4b9000648a3e38b96938b22bfa1fa4ced1f14fb290891d5ad182c621ccbfb14eb7e7d588448536c02a08c4727a19e42197d56308c3ff2ed1f18b4f1605
   languageName: node
   linkType: hard
 
@@ -13829,21 +13829,20 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"sharp@npm:^0.25.2":
-  version: 0.25.4
-  resolution: "sharp@npm:0.25.4"
+"sharp@npm:^0.28.3":
+  version: 0.28.3
+  resolution: "sharp@npm:0.28.3"
   dependencies:
-    color: ^3.1.2
+    color: ^3.1.3
     detect-libc: ^1.0.3
-    node-addon-api: ^3.0.0
+    node-addon-api: ^3.2.0
     node-gyp: latest
-    npmlog: ^4.1.2
-    prebuild-install: ^5.3.4
-    semver: ^7.3.2
-    simple-get: ^4.0.0
-    tar: ^6.0.2
+    prebuild-install: ^6.1.2
+    semver: ^7.3.5
+    simple-get: ^3.1.0
+    tar-fs: ^2.1.1
     tunnel-agent: ^0.6.0
-  checksum: 1ae163a0e6095808b80f05e679c96be46552ee83b4105399c72d80c3ddb9e117946c5b3aebfd59372e346d0a509b49fa3a875691c654841f2f1e0e5a04266cde
+  checksum: 7490ab4afbb7a1987c011a5eb40be15873841d5dd92a66d47ec424f618daed616ed597533bb985dfabc2e186b5d8476a06003c84a618b749ae6f3de413cad736
   languageName: node
   linkType: hard
 
@@ -13900,7 +13899,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"simple-get@npm:^3.0.3":
+"simple-get@npm:^3.0.3, simple-get@npm:^3.1.0":
   version: 3.1.0
   resolution: "simple-get@npm:3.1.0"
   dependencies:
@@ -13908,17 +13907,6 @@ fsevents@~2.3.1:
     once: ^1.3.1
     simple-concat: ^1.0.0
   checksum: f56f08765eafde034b379d38d3dd1eb9b9ffb41d090d8216e71dce6ea3936499ee34b20942773a2605b08e8abce940691bd06e110ac12d08f83917493078831e
-  languageName: node
-  linkType: hard
-
-"simple-get@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "simple-get@npm:4.0.0"
-  dependencies:
-    decompress-response: ^6.0.0
-    once: ^1.3.1
-    simple-concat: ^1.0.0
-  checksum: 91c007260dd92480b8dcd78b4310561967532e1ef9b4ec332a1aac6990c9a71d7477a8d05c84bb0165e4eb0e205fa620e37f42652dceea46c713084ae935e873
   languageName: node
   linkType: hard
 
@@ -14596,7 +14584,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"tar-fs@npm:^2.0.0":
+"tar-fs@npm:^2.0.0, tar-fs@npm:^2.1.1":
   version: 2.1.1
   resolution: "tar-fs@npm:2.1.1"
   dependencies:
@@ -15877,13 +15865,6 @@ typescript@^4.3.2:
     is-string: ^1.0.5
     is-symbol: ^1.0.3
   checksum: 771ef43357afbba9febf2da4867b2971ada0a5126227f9b7926751525e3721f7f5f3722f8c60af67881714d9a82a98ed686f1768490cfb2cd40518df5f2e056e
-  languageName: node
-  linkType: hard
-
-"which-pm-runs@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "which-pm-runs@npm:1.0.0"
-  checksum: 0bb79a782e98955afec8f35a3ae95c4711fdd3d0743772ee98211da67c2421fdd4c92c95c93532cc0b4dcc085d8e27f3ad2f8a9173cb632692379bd3d2818821
   languageName: node
   linkType: hard
 
