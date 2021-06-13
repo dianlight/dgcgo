@@ -2056,9 +2056,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@quasar/app@npm:^3.0.0-rc.1":
-  version: 3.0.0-rc.1
-  resolution: "@quasar/app@npm:3.0.0-rc.1"
+"@quasar/app@npm:^3.0.0-rc.2":
+  version: 3.0.0-rc.2
+  resolution: "@quasar/app@npm:3.0.0-rc.2"
   dependencies:
     "@quasar/babel-preset-app": 2.0.1
     "@quasar/fastclick": 1.1.4
@@ -2134,7 +2134,7 @@ __metadata:
     zlib: 1.0.5
   bin:
     quasar: bin/quasar
-  checksum: 98d81fedfa36a4d9009eddf35b1de76d262f69d7038d8242216b3699f478a866c132ad57c8c8fcc0934bde9d3134f9705c314571c81cb45a3cb8b93bde9849db
+  checksum: bad7fee9718d8a2d4103749e2d6a79d603d5eea0875ebf32941134f5e996e2884696a384d05e2d0beb4bfb8e85398a6e05a0b2a4d37737c66620a83f2cbce394
   languageName: node
   linkType: hard
 
@@ -6781,9 +6781,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-vue@npm:^7.11.0":
-  version: 7.11.0
-  resolution: "eslint-plugin-vue@npm:7.11.0"
+"eslint-plugin-vue@npm:^7.11.1":
+  version: 7.11.1
+  resolution: "eslint-plugin-vue@npm:7.11.1"
   dependencies:
     eslint-utils: ^2.1.0
     natural-compare: ^1.4.0
@@ -6791,7 +6791,7 @@ __metadata:
     vue-eslint-parser: ^7.6.0
   peerDependencies:
     eslint: ^6.2.0 || ^7.0.0
-  checksum: 8215a2ea5aa72bf2943df7862fe7c306bc0d98afe3ac35bfd1517d7af47eb267f79a1a6099096ca536d5e38f5717c7f8ef80c8274f7a2fc0f299a4f54c7f897e
+  checksum: e4ae6feb50ff8ed66711cebf234264d9ae52593153dc81560168942a84edadec76ecfad7e2bcae4139887214a534f689b881e74ad7d8a6afd87b75735c9355c9
   languageName: node
   linkType: hard
 
@@ -7796,7 +7796,7 @@ fsevents@~2.3.1:
   dependencies:
     "@babel/eslint-parser": ^7.14.5
     "@intlify/vue-i18n-loader": ^2.1.0
-    "@quasar/app": ^3.0.0-rc.1
+    "@quasar/app": ^3.0.0-rc.2
     "@quasar/cli": ^1.2.1
     "@quasar/extras": ^1.10.7
     "@quasar/icongenie": ^2.4.0
@@ -7820,7 +7820,7 @@ fsevents@~2.3.1:
     eslint: ^7.28.0
     eslint-config-prettier: ^8.3.0
     eslint-plugin-jest: ^24.3.6
-    eslint-plugin-vue: ^7.11.0
+    eslint-plugin-vue: ^7.11.1
     find-free-ports: ^2.0.3
     gcode-toolpath: ^2.2.0
     highlight.js: ^11.0.1
@@ -7829,7 +7829,7 @@ fsevents@~2.3.1:
     node-polyfill-webpack-plugin: ^1.1.2
     offline-github-changelog: ^2.3.0
     patch-package: ^6.4.7
-    quasar: ^2.0.0-rc.1
+    quasar: ^2.0.0-rc.2
     rimraf: ^3.0.2
     three: ^0.129.0
     tightcnc: "link:../tightcnc"
@@ -12859,10 +12859,10 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"quasar@npm:^2.0.0-rc.1":
-  version: 2.0.0-rc.1
-  resolution: "quasar@npm:2.0.0-rc.1"
-  checksum: 25b4a3a6bc32aa336c5d77878fb22b6360fdad5035a6405c24f2bc3f87241645c11f291429070cce8c79d3b13d33ad81a2c6f6eb6cac4a7b4b61676e508ed84a
+"quasar@npm:^2.0.0-rc.2":
+  version: 2.0.0-rc.2
+  resolution: "quasar@npm:2.0.0-rc.2"
+  checksum: 3e962b92b0ccdee88c09ab98dd344c5c6f0a63185a61e9b89ceb3f580438c089ae6e9216732922fb28ecee39becd41d3e14b03dbe5b39dfaf11f913928d099d4
   languageName: node
   linkType: hard
 

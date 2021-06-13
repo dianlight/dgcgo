@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme,dialog, shell, Menu, MenuItem } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme,dialog, shell, Menu } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
@@ -28,10 +28,6 @@ console.log(process.env)
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let mainWindow: BrowserWindow | undefined
-
-interface JsonLocale {
-  [key:string]: string | JsonLocale
-}
 
 function createMenu(i18n:(path:string)=>string) {
     const menu = defaultMenu(app, shell)
@@ -105,6 +101,7 @@ function createMenu(i18n:(path:string)=>string) {
         submenu: [
         {
             label: 'Do something',
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             click: (item, focusedWindow) => {
             void dialog.showMessageBox({message: 'Do something', buttons: ['OK'] });
             }
@@ -277,6 +274,7 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
     return { pid: tightcnc.pid, serverPort: serverPort };
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 ipcMain.handle('StopTightCNC', (_event, ..._args) => {
     console.info('Killing TightCNC')
     tightcnc?.kill('SIGTERM');
@@ -291,6 +289,7 @@ ipcMain.on('SaveTightCNCConfig', (_event, ...args) => {
     return 
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 ipcMain.handle('LoadTightCNCConfig', (_event, ..._args) => {
     console.debug('Loading config...')
     return electron_cfg.get('tightcnc.config',{}) as Partial<TightCNCConfig>

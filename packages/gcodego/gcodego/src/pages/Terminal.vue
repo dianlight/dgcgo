@@ -5,7 +5,7 @@
         ref="terminal"
         style="height:70vh;width:100%"
         :items="logs"
-        @scroll="handleScroll"
+        _@scroll="handleScroll"
         >
           <template v-slot="{item}">
             <q-item :key="item.line" dense class='row q-gutter-xs q-pa-none'>
@@ -124,6 +124,7 @@ export default class Terminal extends Vue {
               } as LogLine
             })
           .filter( this.markStatusGcode() )
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .reduce<LogLine[]>( (previousValue: LogLine[], currentValue: LogLine, currentIndex: number, all: LogLine[])=>{
               if(this.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
               //  console.log('Response!',currentValue,currentIndex)
@@ -250,22 +251,22 @@ export default class Terminal extends Vue {
   
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleScroll(...args:any[]){
+//  handleScroll(...args:any[]){
 //    console.log('Scroll',args)
 //    this.autoScroll = false;
 //    if(pixel < this.logs.length)this.autoScroll=false
-  }
+//  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleStartReached(pixel:number){
+//  handleStartReached(pixel:number){
 //    console.log('Start scroll',pixel)
-  }
+//  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleEndReached(pixel:number){
+//  handleEndReached(pixel:number){
 //    console.log('Stop scroll',pixel)
 //    this.autoScroll = true;
-  }
+//  }
 
   sendCommand(event: KeyboardEvent){
     if(event.key && event.key !== 'Enter')return
