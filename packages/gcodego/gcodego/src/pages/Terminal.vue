@@ -1,9 +1,9 @@
 <template>
 <q-page padding ref="page"> 
-  <div class="fit row wrap justify-start items-start content-start">
+  <div class="fit row wrap justify-start items-start content-start" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
       <q-virtual-scroll
         ref="terminal"
-        style="max-height: 300px;width:100%"
+        style="height:70vh;width:100%"
         :items="logs"
         @scroll="handleScroll"
         >
