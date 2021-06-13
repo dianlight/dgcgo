@@ -23,7 +23,8 @@
 
 <script lang="ts">
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from '@three-ts/orbit-controls';
 import { defineComponent, Prop, ref } from 'vue';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
@@ -42,7 +43,7 @@ class MotionColor {
 
     set darkMode(value: boolean){
       this._darkMode = value;
-      console.log('Darkmode is',this._darkMode)
+      //console.log('Darkmode is',this._darkMode)
       if(this._darkMode){
         this.G0 = new THREE.Color(colornames('lightgreen'))
         this.G1 = new THREE.Color(colornames('lightblue'))

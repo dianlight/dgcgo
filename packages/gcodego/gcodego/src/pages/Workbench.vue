@@ -5,7 +5,6 @@
         :gcode="gcode"
         :gcgrid="true"
         :dark-mode="$q.dark.isActive"
-        style="height:70vh;width:100%"
         @onprogress='progress'
       />
     </div>

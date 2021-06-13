@@ -5,7 +5,6 @@
         ref="terminal"
         style="height:70vh;width:100%"
         :items="logs"
-        _@scroll="handleScroll"
         >
           <template v-slot="{item}">
             <q-item :key="item.line" dense class='row q-gutter-xs q-pa-none'>
