@@ -16,7 +16,8 @@
                 {{' '+item.direction}}
               </q-item-section>
               <q-item-section>
-                  <code v-html="item.data"></code>
+                  <code :class="item.result?.startsWith('error')?'error':''" v-html="item.data"></code>
+                  <q-item-label v-if="item.result !== undefined" :class="item.result?.startsWith('error')?'error-message':''" caption>{{item.result}} {{item.error}}</q-item-label>
               </q-item-section>
             </q-item>
           </template>
@@ -59,6 +60,11 @@
         v-model="filterStatus"
         label="Filter Status Lines"
     />
+    <q-toggle
+        size="sx"
+        v-model="matchStatus"
+        label="Inline response (*alpha)"
+    />
   </div>
 </q-page>  
 </template>
@@ -72,21 +78,26 @@ import { dom } from 'quasar'
 
 hljs.registerLanguage('gcode',gcode);
 
+interface LogLine {
+    line: number,
+    direction: '<'|'>'|'@'|'%',
+    data: string,
+    result?:string
+    error?:string
+  }
+
 @Options({
   components: {},
 })
 export default class Terminal extends Vue {
 
   filterStatus = true
+  matchStatus = true
 
   command = ''
   sendingCommand = false
   start = 0
-  logs:{
-    line: number,
-    direction: '<'|'>',
-    data: string
-  }[] = []
+  logs:LogLine[] = []
 
   declare $refs: {
     terminal:QVirtualScroll,
@@ -94,6 +105,7 @@ export default class Terminal extends Vue {
     commandbar: HTMLDivElement,
     toggles: HTMLDivElement
   }
+
   
   readLog = (self:Terminal)=>{
     void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:this.start,limit:100}).then( 
@@ -101,24 +113,46 @@ export default class Terminal extends Vue {
          self.start+=lines.length
          self.logs.push(...lines
            .map( l => { 
-            return {
-              line:l[0],
-              direction: l[1].substr(0,1) as '<'|'>',
-              data: l[1].substr(2)
-            }
-          }).filter( (log)=>{
-            if(!self.filterStatus)return true
-            if(log.direction === '>'){
-              if(log.data === '?') return false
-            } else {
-              if(log.data.startsWith('<'))return false
-            }
-            return true
-          }).map( l => {
-            l.data = hljs.highlight(l.data ,{language: 'gcode'}).value
-            return l
-          })
+              // Basic Log Mapping 
+              return {
+                line:l[0],
+                direction: l[1].substr(0,1) as '<'|'>',
+                data: l[1].substr(2)
+              } as LogLine
+            })
+          .filter( this.markStatusGcode() )
+          .reduce<LogLine[]>( (previousValue: LogLine[], currentValue: LogLine, currentIndex: number, all: LogLine[])=>{
+              if(this.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
+                console.log('Response!',currentValue,currentIndex)
+                let match = false;
+                for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                  if(!value.result){
+                    console.log('Setting on line:',value,currentValue.data)
+                    value.result = currentValue.data 
+                    match=true
+                    break
+                  }
+                }
+                if(!match)previousValue.push(currentValue)
+              } else if(this.matchStatus && currentValue.direction == '@'){
+                let match=false
+                for(let value of previousValue.filter( dv=>dv.direction === '>')){
+                  if(value.result?.startsWith('error:')){
+                    value.error = currentValue.data 
+                    match=true
+                    break
+                  }
+                }
+                if(!match)previousValue.push(currentValue)
+              } else {
+                previousValue.push(currentValue)
+              }
+              return previousValue;
+          },[] as LogLine[]) 
+          .filter( this.filterStatusGcode())
+          .map( this.colorGcode())
          );
+
 //         self.$refs.terminal.refresh(self.autoScroll?self.logs.length-1:undefined)
          self.$refs.terminal.refresh()
          if(lines.length < 100){
@@ -127,6 +161,34 @@ export default class Terminal extends Vue {
            this.readLog(self)
          }
        } )
+  }
+
+  private colorGcode(): (value: LogLine, index: number, array: LogLine[]) => LogLine {
+    return l => {
+      // Highligt GCODE
+      l.data=hljs.highlight(l.data, { language: 'gcode' }).value;
+      return l;
+    };
+  }
+
+  private markStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => LogLine {
+    return (log) => {
+      if(log.direction==='>') {
+        if(log.data==='?')
+          log.direction='%'
+      } else {
+        if(log.data.startsWith('<'))
+          log.direction='%'
+      }
+      return log;
+    };
+  }
+
+  private filterStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => unknown {
+    return (log) => {
+      if(this.filterStatus)return log.direction !== '%'
+      else return true;
+    };
   }
 
   mounted(){
@@ -171,7 +233,7 @@ export default class Terminal extends Vue {
   sendCommand(event: KeyboardEvent){
     if(event.key && event.key !== 'Enter')return
     this.sendingCommand = true
-    void this.$tightcnc.op('send',{line:this.command, wait: true}).then( ()=> {
+    void this.$tightcnc.op('send',{line:this.command, wait: false}).then( ()=> {
       this.sendingCommand = false
       this.command = ''
       this.autoScroll()
@@ -201,6 +263,14 @@ label {
   background-color: $dark;
   padding-right: 0px;
   margin-left: 0px;
+}
+
+.error {
+  background-color: $red-2;
+}
+
+.error-message {
+  color: $negative;
 }
 
 </style>
