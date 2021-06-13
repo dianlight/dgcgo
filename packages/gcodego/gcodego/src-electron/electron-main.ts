@@ -54,42 +54,50 @@ function createMenu(i18n:(path:string)=>string) {
     menu.splice(1, 0, {
         role: 'fileMenu',
         submenu: [
-        {
-            label: i18n('file.newProject'), /*click: () => store.dispatch('new')*/
-        },
-        { label: i18n('file.newProjectFrom'), 
-            submenu:[
-            { label: i18n('file.gerberFolder'),enabled:false},
+            {
+                label: i18n('file.newProject'), /*click: () => store.dispatch('new')*/
+            },
+            {
+                label: i18n('file.newProjectFrom'),
+                submenu: [
+                    { label: i18n('file.gerberFolder'), enabled: false },
+                    {
+                        label: i18n('file.gerberZip'), /* click:()=>store.dispatch('openGerberZip')*/
+                    },
+                ]
+            },
+            { type: 'separator' },
+            { label: i18n('file.openProject'), /*click:()=>store.dispatch('open')*/ },
+            ...(isMac ? [
                 {
-                    label: i18n('file.gerberZip'), /* click:()=>store.dispatch('openGerberZip')*/
-                },
-            ]},
-        { type: 'separator' },  
-        { label: i18n('file.openProject'), /*click:()=>store.dispatch('open')*/ },
-        ...(isMac ? [
-        {
-            role: 'recentDocuments',
-            submenu:[
-                { type: 'separator' },
-                { role: 'clearRecentDocuments'},
-            ]
-        } as MenuItemConstructorOptions]:[]),
-        { type: 'separator' },  
-        { id:'save', label: i18n('menu.file.save'),/* click:()=>store.dispatch('save'),*/ enabled:false},
-        { label: i18n('menu.file.saveAs'),/* click:()=>store.dispatch('saveAs')*/},
-        { type: 'separator' },  
-        { id:'import', label: i18n('menu.file.import'), /*click:()=>store.dispatch('importGerber'),*/ enabled:false }, 
-        { type: 'separator' }, 
-        { id:'close', label: i18n('menu.file.closeProject'),/* click:()=>store.dispatch('close'),*/ enabled:false},
-        ...(isMac ? [                   
-        ]:[
-            { type: 'separator' } as MenuItemConstructorOptions,  
-            { label: i18n('menu.app.preferencies'), /*click: () => router.push('/preferencies'),*/ } as MenuItemConstructorOptions
-        ]),
-        { type: 'separator' },  
-        isMac ? { role: 'close' } : { role: 'quit' }
-        ]        
-    })
+                    role: 'recentDocuments',
+                    submenu: [
+                        { type: 'separator' },
+                        { role: 'clearRecentDocuments' },
+                    ]
+                } as MenuItemConstructorOptions] : []),
+            { type: 'separator' },
+            { id: 'save', label: i18n('menu.file.save'),/* click:()=>store.dispatch('save'),*/ enabled: false },
+            { label: i18n('menu.file.saveAs'),/* click:()=>store.dispatch('saveAs')*/ },
+            { type: 'separator' },
+            { id: 'import', label: i18n('menu.file.import'), /*click:()=>store.dispatch('importGerber'),*/ enabled: false },
+            { type: 'separator' },
+            { id: 'close', label: i18n('menu.file.closeProject'),/* click:()=>store.dispatch('close'),*/ enabled: false },
+            ...(isMac ? [
+            ] : [
+                { type: 'separator' } as MenuItemConstructorOptions,
+                { label: i18n('menu.app.preferencies'), /*click: () => router.push('/preferencies'),*/ } as MenuItemConstructorOptions
+            ]),
+            { type: 'separator' },
+            isMac ? { role: 'close' } : { role: 'quit' }
+        ]
+    });
+
+    // Custom View menu
+    (menu[3]?.submenu as Electron.MenuItemConstructorOptions[]).push(
+        { type: 'separator' },
+        { label: i18n('menu.view.terminal'), click: () => mainWindow?.webContents.send('MenuEvent', { link: '/terminal' }) }
+    )
 
     // Add custom menu
     menu.splice(4, 0, {

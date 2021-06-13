@@ -2,7 +2,7 @@
         <q-tabs align="center">
           <q-route-tab to="/" label="Home" />
           <q-route-tab to="/workbench" label="Workbanch" />
-          <q-route-tab to="/terminal" label="Terminal" />
+          <q-route-tab v-if="!$q.platform.is.electron" to="/terminal" label="Terminal" />
           <q-route-tab to="/pippo" label="404" />
           <q-route-tab v-if="!$q.platform.is.electron" to="/preferences" label="Preferences" />
         </q-tabs>
