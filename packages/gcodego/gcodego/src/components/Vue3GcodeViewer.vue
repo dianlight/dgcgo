@@ -1,10 +1,14 @@
 <template>
-  <p class="infobox"> {{ camera.matrix }} </p>
   <div
     id="container"
     ref="container"
   />
-  <span class="p-buttonset control">
+  <div class="row control">
+    <q-btn-group outline>
+      <q-btn outline label="Center" @click="center"/>
+      <q-btn outline label="Origin" disable/>
+    </q-btn-group>
+    <p _class="infobox"> {{ camera.matrix }} </p>
     <!--Button 
       label="Center" 
       icon="pi pi-table" 
@@ -13,7 +17,7 @@
     /-->
     <!--Button label="Delete" icon="pi pi-trash" class="p-button-sm p-button-rounded"/>
     <Button label="Cancel" icon="pi pi-times" class="p-button-sm p-button-rounded"/-->
-  </span>
+  </div>
   <!--ProgressBar class="progress" mode="indeterminate"/-->
 </template>
 

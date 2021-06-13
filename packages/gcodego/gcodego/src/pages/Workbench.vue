@@ -1,24 +1,21 @@
-<!--route>
-{
-  "props": true
-}
-</route-->
-
 <template>
-  <!--h1 v-if="$props.url">File: {{ $props.url }}</h1-->
-  <vue-3-gcode-viewer
-    :gcode="gcode"
-    :gcgrid="true"
-    :dark-mode="$q.dark.isActive"
-    @onprogress='progress'
-  />
+  <q-page padding ref="page"> 
+    <div class="row wrap justify-start items-start content-start" style="height:80vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
+      <vue-3-gcode-viewer
+        :gcode="gcode"
+        :gcgrid="true"
+        :dark-mode="$q.dark.isActive"
+        style="height:70vh;width:100%"
+        @onprogress='progress'
+      />
+    </div>
+  </q-page>    
 </template>
 
 <script lang="ts">
-//import i18n, { setI18nLanguage } from "@/i18n";
+
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
-//import { useQuasar } from 'quasar'
 
 class Props {
   url = '';
