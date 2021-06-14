@@ -18,7 +18,8 @@ import { Options, Vue } from 'vue-class-component';
 
 export interface WorkBenchSessionData {
     id:string,
-    name:string,
+    name:string, // Tab Name
+    fileName: string,
     fullPath: string,
     gcode?:string
 }
@@ -37,9 +38,10 @@ class Props {
   },
   watch:{
     '$route.params.id'(id:string){
+      console.log('File Opened:',(this as WorkBench).$route.params.id);
       (this as WorkBench).wdata = (this as WorkBench).$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === id)|| {};
       (this as WorkBench).gcode = (this as WorkBench).wdata.gcode || ''
-      console.log((this as WorkBench).wdata,(this as WorkBench).gcode)
+      //console.log((this as WorkBench).wdata,(this as WorkBench).gcode)
     }
   }
 })
@@ -54,7 +56,7 @@ export default class WorkBench extends Vue.with(Props) {
 
    mounted(): void {
      console.log('File Opened:',this.$route.params.id)
-     console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
+     //console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
      this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}
      this.gcode = this.wdata.gcode || ''
      console.log(this.wdata,this.gcode)

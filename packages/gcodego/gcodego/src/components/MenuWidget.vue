@@ -1,7 +1,16 @@
 <template>
-        <q-tabs dense outside-arrows mobile-arrows align="center">
+        <q-tabs dense  shrink stretch outside-arrows mobile-arrows>
           <q-route-tab to="/" label="Home" />
-          <q-route-tab v-for="tab in wbTabs" :to="`/workbench/${tab.id}`" :label="tab.name" :key="tab.id" v-bind="tab" />
+          <q-route-tab v-for="(tab,index) in wbTabs" :to="`/workbench/${tab.id}`" :key="tab.id" v-bind="tab">
+            <q-field dense stack-label>
+              <template v-slot:append>
+                  <q-btn class='t-element' dense flat size="xs" icon="highlight_off" @click="close(index,tab.id)"/>
+              </template>
+              <template v-slot:control>
+                  <span class="t-element">{{tab.fileName}}</span>
+              </template>
+            </q-field>
+          </q-route-tab>
           <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')">
             <q-tooltip>{{ $t('menu.file.open')}}</q-tooltip>
           </q-btn>
@@ -121,14 +130,23 @@ export default class ManuWidget extends Vue {
   }
 
   private open(filename:string, gcode:string){
+    const id = uid()
     this.wbTabs.push({
       fullPath:filename,
-      name: path.basename(filename),
-      id: uid(),
+      name: id,
+      fileName: path.basename(filename), 
+      id,
       gcode
     })
     this.$q.sessionStorage.set('openFiles',this.wbTabs)
+    void this.$router.push(`/workbench/${id}`)
+  }
 
+  close(index:number,id:string){
+    console.log('Remove:',index,id)
+    this.wbTabs.splice(index,1);
+    this.$q.sessionStorage.set('openFiles',this.wbTabs)
+    if(this.$route.params.id === id)void this.$router.push('/')
   }
 
 }
@@ -149,5 +167,10 @@ export default class ManuWidget extends Vue {
   border-style: solid;
   border-left-style: none;
   border-top-style: none;
+}
+
+.t-element {
+  color: white;
+  text-transform: none;
 }
 </style>
