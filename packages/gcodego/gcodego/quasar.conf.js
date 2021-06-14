@@ -11,6 +11,7 @@
 const { configure } = require('quasar/wrappers');
 const path = require('path')
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = configure(function(ctx) {
     return {
@@ -250,12 +251,35 @@ module.exports = configure(function(ctx) {
 
             builder: {
                 // https://www.electron.build/configuration/configuration
+                appId: 'org.dianlight.gcodego',
+                fileAssociations: [{
+                    ext: ['gcode', 'nc', 'ncc'],
+                    name: 'Gcode files',
+                    role: 'Viewer',
+                }],
+                extraResources: [{
+                    from: 'node_modules/tightcnc',
+                    to: 'node_modules/tightcnc',
+                    filter: ['!.git']
+                }]
 
-                appId: 'gcodego'
             },
 
             // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
             chainWebpack( /* chain */ ) {
+                /*
+                chain.plugin('copy-webpack-plugin').use(CopyPlugin, {
+                        patterns: [{
+                            from: 'node_modules/tightcnc/ ** / *',
+                            to: 'node_modules/tightcnc',
+                            globOptions: {
+                                gitignore: true,
+                                follow: true,
+                                followSymbolicLinks: true
+                            }
+                        }],
+        })
+                    */
                 // do something with the Electron main process Webpack cfg
                 // extendWebpackMain also available besides this chainWebpackMain
             },

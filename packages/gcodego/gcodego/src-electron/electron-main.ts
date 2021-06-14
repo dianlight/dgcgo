@@ -11,19 +11,24 @@ import findFreePorts from 'find-free-ports'
 import { TightCNCConfig } from 'app/../tightcnc/types/src'
 import defaultMenu from 'electron-default-menu'
 import { MenuItemConstructorOptions } from 'electron/main'
+//import 'tightcnc'
+import resolvePackagePath from 'resolve-package-path'
 
 
 try {
     if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
         fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
     }
-} catch (_) {}
+} catch (_) { }
+
 
 
 Object.assign(console, log.functions);
 electron_cfg.logger(log)
 
-console.log(process.env)
+//console.log(process.env)
+
+
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -218,6 +223,7 @@ ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
 })
 
 /** Tight CNC Server */
+console.log(resolvePackagePath('tightcnc',__dirname))
 const tight_path = path.join(__dirname,'..', 'node_modules', 'tightcnc', 'bin', 'tightcnc-server.js');
 
 const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');

@@ -33,6 +33,8 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] Automatic release (github)
 - [ ] Quasar
   - [ ] integrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)
+  - [ ] integrate JSON-form ( alternative to blazier)
+    - [ ] JSONForm quasar rendering
 - [ ] Unit test
   - [ ] @quasar/testing ( not yet compatible )
     - [ ] spectrong integration
@@ -40,10 +42,10 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Electron-log
   - [x] Electron-cfg
   - [x] Electron-updater
-  - [ ] Electron-default-Menu
+  - [x] Electron-default-Menu
     - [ ] Open gcode file dialog
       - [ ] Recent files / Dropin open file
-    - [ ] Reexpose WebMenu functionalities
+    - [x] Reexpose WebMenu functionalities
   - [x] ~~electron-icon-builder~~ ( Used Quasar icongeine)
   - [ ] electron-process-type
 - [ ] WebServer version
@@ -62,7 +64,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Multi language
     - [ ] English
     - [ ] Italian
-  - [ ] Web Menu for non electron view (autohide?)
+  - [x] Web Menu for non electron view (autohide?)
     - [ ] GCode upload
       - [ ] Gcode open for Electron based
     - [ ] Import/Export configuration
@@ -97,14 +99,14 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
       - [x] G2/G3 Arch support
       - [ ] Spindle position
       - [ ] UI view control
-        - [ ] Reset/Center
+        - [x] Reset/Center
         - [ ] Timeline visulaizer
           - [ ] Sync with work
 - [ ] GCode Sender
   - [x] ~~TightCNC vanilla integration~~ _Use my fork_
     - [x] ~~Start / Stop external process~~ _Use my fork_
   - [x] Use TightCNC Fork/Extending [dianlight/tightcnc](https://github.com/dianlight/tightcnc/tree/ts-migrate)
-    - [ ] Electron packaged
+    - [x] Electron packaged
     - [ ] Support for new API
       - [ ] Reload Config
       - [ ] Is Alive
