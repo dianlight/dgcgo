@@ -1,14 +1,17 @@
 import { RouteRecordRaw } from 'vue-router';
+import Layout from 'layouts/MainLayout.vue'
+import Home from 'pages/Index.vue'
+import WorkBench from '../pages/Workbench.vue'
+import Terminal from 'pages/Terminal.vue'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: Layout,
     children: [
-      { path: '', component: () => import('pages/Index.vue') },
-      { name: 'workbench', path: 'workbench', component: () => import('pages/Workbench.vue'), props: true},
-      { name: 'preferences', path: 'preferences', component: () => import('pages/Preferences.vue') },
-      { name: 'terminal', path: 'terminal', component: ()=> import('pages/Terminal.vue') }
+      { path: '', component: Home },
+      { name: 'workbench', path: 'workbench', component: WorkBench , props: true},
+      { name: 'terminal', path: 'terminal', component: Terminal }
     ],
   },
 

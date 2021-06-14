@@ -60,23 +60,12 @@
       <command-widget/>
       <status-widget/>
       <control-widget/>
-
-<!--
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
--->        
+ 
     </q-drawer>
+
+    <!-- Dialogs -->
+    <preferences/>
+    <!-- /Dialogs -->
 
     <q-page-container>
       <router-view />
@@ -100,72 +89,21 @@
 </template>
 
 <script lang="ts">
-import EssentialLink from 'components/EssentialLink.vue'
+import Preferences from '../dialogs/Preferences.vue'
 import StatusWidget from '../components/StatusWidget.vue'
 import ControlWidget from '../components/ControlWidget.vue'
 import CommandWidget from '../components/CommandWidget.vue'
 import MenuWidget from '../components/MenuWidget.vue'
 
 
-const linksList = [
-  {
-    title: 'Home',
-    caption: 'home',
-    icon: 'home',
-    link: '/'
-  },
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
+
 
 import { Vue, Options } from 'vue-class-component'
-//import { useI18n } from 'vue-i18n'
 import { SerializedError } from 'new-error'
-//import { ERRORCODES } from 'tightcnc'
 
 
 @Options({
-  components: { MenuWidget, EssentialLink, StatusWidget, ControlWidget, CommandWidget },
+  components: { MenuWidget, StatusWidget, ControlWidget, CommandWidget, Preferences },
   watch: {
     '$store.state.tightcnc.lastStatus.controller'(value) {
       if(!value){
@@ -222,15 +160,9 @@ export default class MainLayout extends Vue {
    }
 
   leftDrawerOpen = true;
-  essentialLinks = linksList;
   toggleLeftDrawer () {
     this.leftDrawerOpen = !this.leftDrawerOpen
   }
-
-  //localeOptions = [
-  //  { value: 'en', label: 'English'},
-  //  { value: 'it', label: 'Italiano'}
-  //]
 
   mounted(){
       const starter = setInterval(()=>{

@@ -82,9 +82,10 @@ export default class ManuWidget extends Vue {
  //     }
       //console.log('------->',this.i18nToJson('menu'))
       window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
-      window.api.receive('MenuEvent',(params:{link:string})=>{       
+      window.api.receive('MenuEvent',(params:{link?:string,dialog?:string})=>{       
         console.log(params)
-        void this.$router.push(params.link)
+        if(params.link)void this.$router.push(params.link)
+        if(params.dialog)void this.$store.commit('dialogs/showDialog',params.dialog)
       })
     }
   }

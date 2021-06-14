@@ -6,9 +6,9 @@ import { Vue } from 'vue-class-component'
 
 export default class App extends Vue {
 
-    mounted(){
-      console.debug('Client=>',this.$tightcnc);
-    }
+//    mounted(){
+//      console.debug('Client=>',this.$tightcnc);
+//    }
 
 }
 </script>

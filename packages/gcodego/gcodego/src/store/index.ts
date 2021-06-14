@@ -7,7 +7,9 @@ import {
 } from 'vuex'
 
 import tightcnc from './module-tightcnc'
+import dialogs from './module-dialogs'
 import { TightCNCStateInterface } from './module-tightcnc/state';
+import { DialogsStateInterface } from './module-dialogs/state'
 
 /*
  * If not building with SSR mode, you can
@@ -24,6 +26,7 @@ export interface StateInterface {
   // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
   //example: unknown
   tightcnc: TightCNCStateInterface
+  dialogs: DialogsStateInterface
 }
 
 // provide typings for `this.$store`
@@ -39,8 +42,8 @@ export const storeKey: InjectionKey<VuexStore<StateInterface>> = Symbol('vuex-ke
 export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
-      tightcnc
-      // example
+      tightcnc,
+      dialogs
     },
 
     // enable strict mode (adds overhead!)

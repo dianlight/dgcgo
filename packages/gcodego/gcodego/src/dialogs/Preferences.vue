@@ -1,4 +1,6 @@
 <template>
+<q-dialog auto-close v-model="show">
+  <q-card>
   <h5>TightCNC Preferences</h5>
   <q-form @submit="onSubmit" @reset="onReset" autofocus>
     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
@@ -75,6 +77,8 @@
          </q-btn-group> 
     </div>
   </q-form>
+  </q-card>
+</q-dialog>  
 </template>
 
 <script lang="ts">
@@ -87,6 +91,13 @@ import { Options, Vue } from 'vue-class-component';
   components: {}
 })
 export default class Preferences extends Vue {
+
+      get show(){
+        return this.$store.state.dialogs.preferences
+      }
+      set show(value:boolean){
+        this.$store.commit(`dialogs/${value?'show':'hide'}Dialog`,'preferences');
+      }
 
       portType = 'serial'
       isPwd = true
