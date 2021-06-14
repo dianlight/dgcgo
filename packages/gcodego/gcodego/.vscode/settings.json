@@ -71,5 +71,6 @@
     "**/*.vue"
   ],
   "workbench.iconTheme": "vscode-icons",
-  "editor.linkedEditing": true
+  "editor.linkedEditing": true,
+  "i18n-ally.keystyle": "nested"
 }

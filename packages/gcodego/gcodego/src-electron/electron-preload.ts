@@ -7,7 +7,7 @@ import log from 'electron-log';
 contextBridge.exposeInMainWorld('log', {
     ...log.functions,
     //    runOne(member: Exclude<keyof ElectronLog.LogFunctions, 'runOne'>, ...params:any) {
-    run(member, ...params) {
+    run(member: keyof log.LogFunctions, ...params:never[]) {
         log.functions[member](...params);
     }
 });
@@ -16,25 +16,27 @@ contextBridge.exposeInMainWorld('log', {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
-        invoke: (channel, data) => {
-            let validChannels = ['StartTightCNC', 'StopTightCNC', 'LoadTightCNCConfig'];
+        invoke: (channel:string, data:never) => {
+            const validChannels = ['StartTightCNC', 'StopTightCNC', 'LoadTightCNCConfig'];
             if (validChannels.includes(channel)) {
                 return ipcRenderer.invoke(channel, data);
             }
         },
-        send: (channel, data) => {
+        send: (channel:string, data:never) => {
             // whitelist channels
-            let validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
+            const validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
-        receive: (channel, func) => {
-            let validChannels = ['MenuEvent'];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        receive: (channel:string, func:(...args:any[])=>void) => {
+            const validChannels = ['MenuEvent', 'OpenEvent'];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
                 console.log('mount listener for', channel);
-                ipcRenderer.on(channel, (event, ...args) => func(...args));
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ipcRenderer.on(channel, (event, ...args:any[]) => func(...args));
             }
         }
     }

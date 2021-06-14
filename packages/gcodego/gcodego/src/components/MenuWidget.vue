@@ -1,13 +1,24 @@
 <template>
-        <q-tabs align="center">
+        <q-tabs dense outside-arrows mobile-arrows align="center">
           <q-route-tab to="/" label="Home" />
-          <q-route-tab to="/workbench" label="Workbanch" />
-          <q-route-tab v-if="!$q.platform.is.electron" to="/terminal" label="Terminal" />
+          <q-route-tab v-for="tab in wbTabs" :to="`/workbench/${tab.id}`" :label="tab.name" :key="tab.id" v-bind="tab" />
+          <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')">
+            <q-tooltip>{{ $t('menu.file.open')}}</q-tooltip>
+          </q-btn>
+          <q-route-tab to="/terminal" label="Terminal" />
           <q-route-tab to="/pippo" label="404" />
-          <q-route-tab v-if="!$q.platform.is.electron" to="/preferences" label="Preferences" />
         </q-tabs>
 
         <q-separator vertical inset />
+
+          <q-btn-group outline>
+            <q-btn v-if="!$q.platform.is.electron" dense icon="settings" @click="$store.commit('dialogs/showDialog','preferences')">
+              <q-tooltip>{{ $t('menu.preferences')}}</q-tooltip>
+            </q-btn>
+          </q-btn-group>
+
+        <q-separator vertical inset />
+
 
         <q-select
           v-model="locale"
@@ -23,11 +34,11 @@
 </template>
 
 <script lang="ts">
-//import { QBtn } from 'quasar';
-//import { ipcRenderer } from 'electron';
-//import { i18n } from '../boot/i18n' 
 import { Options, Vue } from 'vue-class-component';
 import { useI18n  } from 'vue-i18n'
+import path from 'path'
+import { uid } from 'quasar'
+import { WorkBenchSessionData } from 'pages/Workbench.vue';
 
 interface JsonLocale {
   [key:string]: string | JsonLocale
@@ -48,6 +59,8 @@ interface JsonLocale {
   }  
 })
 export default class ManuWidget extends Vue {
+
+  wbTabs:WorkBenchSessionData[] = []
 
   locale = useI18n({useScope: 'global'}).locale
   get lastStatus(){
@@ -87,7 +100,13 @@ export default class ManuWidget extends Vue {
         if(params.link)void this.$router.push(params.link)
         if(params.dialog)void this.$store.commit('dialogs/showDialog',params.dialog)
       })
+      window.api.receive('OpenEvent',(param:{filaname:string, gcode:string})=>{
+          console.log('Open filename:',param.filaname);
+          console.log(param.gcode)
+          this.open(param.filaname,param.gcode)
+      })
     }
+    this.wbTabs = this.$q.sessionStorage.getItem('openFiles') || []
   }
 
   updated(){
@@ -99,6 +118,17 @@ export default class ManuWidget extends Vue {
 
   format(num: number) {
     return num.toFixed(3 /* Precision */);
+  }
+
+  private open(filename:string, gcode:string){
+    this.wbTabs.push({
+      fullPath:filename,
+      name: path.basename(filename),
+      id: uid(),
+      gcode
+    })
+    this.$q.sessionStorage.set('openFiles',this.wbTabs)
+
   }
 
 }

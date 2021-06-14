@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     component: Layout,
     children: [
       { path: '', component: Home },
-      { name: 'workbench', path: 'workbench', component: WorkBench , props: true},
+      { name: 'workbench', path: 'workbench/:id?', component: WorkBench , props: true},
       { name: 'terminal', path: 'terminal', component: Terminal }
     ],
   },

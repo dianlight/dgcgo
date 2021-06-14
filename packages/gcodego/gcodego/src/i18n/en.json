@@ -1,12 +1,15 @@
 {
-    "failed": "Action failed",
-    "success": "Action was successful",
-    "count": "Count",
-    "menu": {
-        "preferences": "Preferences...",
-        "about": "about",
-        "submenu": {
-            "submenu1": "Questo!"
-        }
+  "failed": "Action failed",
+  "success": "Action was successful",
+  "count": "Count",
+  "menu": {
+    "preferences": "Preferences...",
+    "about": "about",
+    "submenu": {
+      "submenu1": "Questo!"
+    },
+    "file": {
+      "open": "Open..."
     }
+  }
 }

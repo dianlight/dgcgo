@@ -106,7 +106,10 @@ function createMenu(i18n: (path: string) => string) {
                 value.filePaths.forEach((path) => {
                   mainWindow?.webContents.send(
                     'OpenEvent',
-                    fs.readFileSync(path)
+                    {
+                      filaname: path,
+                      gcode: fs.readFileSync(path).toLocaleString()
+                    }
                   );
                 });
               }
@@ -228,7 +231,7 @@ async function createWindow() {
   });
 
   mainWindow.webContents.on('destroyed', () => {
-    console.error('-------------------------- Gone Request!');
+    //console.error('-------------------------- Gone Request!');
     if (tightcnc && tightcnc.connected) {
       console.error('Tight Server PID ', tightcnc.pid);
       tightcnc?.kill();
@@ -301,9 +304,16 @@ app.on('will-finish-launching', (/*event:any*/) => {
 ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
   console.debug('Popupating Menu', args[0]);
   createMenu((path: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const tr = args[0][path] as string;
-    if (tr) return tr;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    const tr = path.split('.').reduce<any>((prev, curr) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      if (prev === undefined) return prev;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const elem = prev[curr];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return elem 
+    }, args[0]);
+    if (tr) return tr as string;
     else return path;
   });
 });

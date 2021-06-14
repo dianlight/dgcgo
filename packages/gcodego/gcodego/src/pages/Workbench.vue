@@ -16,8 +16,15 @@
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
 
+export interface WorkBenchSessionData {
+    id:string,
+    name:string,
+    fullPath: string,
+    gcode?:string
+}
+
 class Props {
-  url = '';
+  xid = '';
 }
 
 @Options({
@@ -27,15 +34,31 @@ class Props {
     props: {
       title: 'Ciao Bello'
     }
+  },
+  watch:{
+    '$route.params.id'(id:string){
+      (this as WorkBench).wdata = (this as WorkBench).$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === id)|| {};
+      (this as WorkBench).gcode = (this as WorkBench).wdata.gcode || ''
+      console.log((this as WorkBench).wdata,(this as WorkBench).gcode)
+    }
   }
 })
 export default class WorkBench extends Vue.with(Props) {
 
   //$q = useQuasar()
+  id=''
+
+  wdata:Partial<WorkBenchSessionData> = {}
 
   gcode = ''
 
    mounted(): void {
+     console.log('File Opened:',this.$route.params.id)
+     console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
+     this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}
+     this.gcode = this.wdata.gcode || ''
+     console.log(this.wdata,this.gcode)
+  /*
         void fetch('/demo/Gerber_TopLayer.GTL_iso_combined_cnc.nc')
     //   fetch('/demo/boomerangv4.ncc') // ARCH Commands
     //    fetch('/demo/Griffin Relief.ncc')
@@ -50,6 +73,7 @@ export default class WorkBench extends Vue.with(Props) {
           console.log('Letto GCODE!', this.gcode.length);
         });
     // console.log(this.gcode);
+    */
   }
 
   progress(progress:number){
