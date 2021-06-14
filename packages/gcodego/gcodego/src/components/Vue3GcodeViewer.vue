@@ -232,6 +232,7 @@ export default defineComponent({
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
+            this.scene.clear()
             const workpiece = new THREE.Line(
                 new THREE.BufferGeometry(),
                 new THREE.LineBasicMaterial({

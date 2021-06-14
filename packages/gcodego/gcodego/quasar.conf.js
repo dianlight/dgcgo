@@ -11,7 +11,6 @@
 const { configure } = require('quasar/wrappers');
 const path = require('path')
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
-    //const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = configure(function(ctx) {
     return {
