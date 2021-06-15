@@ -43,7 +43,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Electron-cfg
   - [x] Electron-updater
   - [x] Electron-default-Menu
-    - [ ] Open gcode file dialog
+    - [x] Open gcode file dialog
       - [ ] Recent files / Dropin open file
     - [x] Reexpose WebMenu functionalities
   - [x] ~~electron-icon-builder~~ ( Used Quasar icongeine)
@@ -62,11 +62,11 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Vue3-gcode-viewer
 - [ ] UI
   - [x] Multi language
-    - [ ] English
-    - [ ] Italian
+    - [ ] English complete translation
+    - [ ] Italian complete translation
   - [x] Web Menu for non electron view (autohide?)
     - [ ] GCode upload
-      - [ ] Gcode open for Electron based
+    - [ ] Gcode open for Electron based
     - [ ] Import/Export configuration
       - [ ] Import/Eport for Electron
   - [ ] Base Layout
@@ -84,24 +84,39 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] Autolever Widget
   - [ ] Change tool Widget
   - [ ] Probe Widget
-    - [ ] Home
     - [ ] Z-Probe
     - [ ] Auto Zero Camera
   - [ ] Work control Widget
+    - [x] Home
     - [x] Reset alarm
+    - [ ] Laser Mode switch
     - [ ] Suspend/Resume
     - [ ] Area scan/check
     - [ ] Tool change
       - [ ] M6 intercetp
       - [ ] Tool change Workflow
   - [ ] GCode viewer
-    - [x] Basic Viewer
+    - [x] Initial Viewer
+      - [ ] Machine plane view
+        - [ ] Graduate grid with dimension
+          - [ ] Add detail on zoom-in
       - [x] G2/G3 Arch support
       - [ ] Spindle position
       - [ ] UI view control
         - [x] Reset/Center
+        - [ ] Remember position on rab switch.
         - [ ] Timeline visulaizer
           - [ ] Sync with work
+    - [ ] Job running v
+      - [ ] Start/Pause/Resume/Stop job control
+      - [ ] Timeframe vision
+      - [ ] Job status indicator
+    - [ ] Gcode Editor
+      - [ ] Selectable path
+        - [ ] Remove selected path
+        - [ ] Modify Z ( only for same Z path)
+  - [ ] Webcam support
+    - [ ] Autocenter with webcam (AI)
 - [ ] GCode Sender
   - [x] ~~TightCNC vanilla integration~~ _Use my fork_
     - [x] ~~Start / Stop external process~~ _Use my fork_

@@ -36,7 +36,6 @@
         "json-rpc-2.0": "^0.2.16",
         "new-error": "^2.1.10",
         "quasar": "^2.0.0-rc.2",
-        "resolve-package-path": "^4.0.1",
         "three": "^0.129.0",
         "tightcnc": "link:../tightcnc",
         "vue": "3.0.11",
