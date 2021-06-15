@@ -52,6 +52,8 @@ class MotionColor {
     G1 = new THREE.Color(colornames('blue'))
     G2 = new THREE.Color(colornames('deepskyblue'))
     G3 = new THREE.Color(colornames('deepskyblue'))
+    CURRENT = new THREE.Color(colornames('yellow'))
+    NEXT = new THREE.Color(colornames('grey'))
 
     constructor(private _darkMode:boolean){
     }
@@ -213,18 +215,9 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
         },
       });
     
-
-//      const frames: {
-//        data: string,
-//        vertexIndex: number // remember current vertex index
-//      } [] = []
-
-      toolPath.loadFromString(this.gcode, (err: unknown, data: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      toolPath.loadFromString(this.gcode, (err: unknown, _data: string) => {
             if(err)console.error(err)
-//            frames.push({
-//                data: data,
-//                vertexIndex: vertices.length // remember current vertex index
-//            });
             this.totalframes = vertices.length
       })
         .on('data',(event: { line: string, words: Array<string|number>})=>{
@@ -246,14 +239,13 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                 })
             );
 
-            workpiece.geometry.setFromPoints(vertices.slice(0,this.currentframe));
-            workpiece.geometry.setAttribute( 'color', new THREE.BufferAttribute(
+            this.scene?.add(workpiece);
+
+            workpiece.geometry.setFromPoints(vertices.slice());
+            workpiece.geometry.setAttribute( 'org_color', new THREE.BufferAttribute(
               new Float32Array(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
-
-            this.scene?.add(workpiece);
 
             workpiece.geometry.computeBoundingBox()
             if(workpiece.geometry.boundingBox){
@@ -263,7 +255,8 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
               if (this.gcgrid) {
                 const axesHelper = new THREE.AxesHelper(5);
-                this.scene?.add(axesHelper);                const gridHelper = new THREE.GridHelper(
+                this.scene?.add(axesHelper);                
+                const gridHelper = new THREE.GridHelper(
                   Math.max(this.width, this.height),
                   Math.max(this.width, this.height) / 10
                 );
@@ -287,6 +280,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
               }
             }
 
+            this.changeFrame()
             this.render3d()
             this.$emit('onprogress',100)
 
@@ -359,8 +353,22 @@ this.scene.add( helper );
     }
 
     changeFrame(){
-      this.reload=true;
-      this.$forceUpdate();
+      const workpiece = (this.scene?.children[0] as THREE.Line)
+      const colorArray = workpiece.geometry.getAttribute('org_color').array as Float32Array
+      const newColorArray = Float32Array.from(colorArray.slice().reduce( (prev,cur,index,org)=>{
+        if(index % 3 == 0){
+          if(index < this.currentframe*3){
+            prev.push(org[index],org[index+1],org[index+2])
+          } else if (index === this.currentframe*3){
+            prev.push(...this.motionColor.CURRENT.toArray())
+          } else {
+            prev.push(...this.motionColor.NEXT.toArray())
+          }
+        }
+        return prev
+      },[] as number[]))
+      workpiece.geometry.setAttribute( 'color',new THREE.BufferAttribute(newColorArray,3)) 
+      this.render3d()
     }
 };
 </script>
