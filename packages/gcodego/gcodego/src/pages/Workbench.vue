@@ -83,7 +83,7 @@ export default class WorkBench extends Vue.with(Props) {
      //console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
      this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}
      this.gcode = this.wdata.gcode || ''
-     console.log(this.wdata,this.gcode)
+     //console.log(this.wdata,this.gcode)
   }
 
   progress(progress:number){

@@ -18,10 +18,10 @@
       </q-input>
     </div>
     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
-      <q-select dense outlined emit-value v-model="config.controller" :options="controllers" @change="changeControllerType" label="Controller Type" />
+      <q-select dense outlined emit-value v-model="config.controller" :options="controllers" @click="changeControllerType" label="Controller Type" />
 
       <template v-if="config.controller === 'grbl'">
-        <q-select dense outlined  v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
+        <q-select dense outlined  v-model="portType" @click="changePortType" :options="['serial','socket','grblsim']" label="Port Type" />
 
         <template v-if="portType ==='serial'">
           <q-select dense outlined v-model="port" clearable :options="serials" label="Port" emit-value>
@@ -97,6 +97,7 @@ export default class Preferences extends Vue {
       }
       set show(value:boolean){
         this.$store.commit(`dialogs/${value?'show':'hide'}Dialog`,'preferences');
+        this.refreshSerialList()
       }
 
       portType = 'serial'
@@ -122,18 +123,31 @@ export default class Preferences extends Vue {
 
       mounted(){
         this.onReset()
-          void this.$tightcnc.getAvailableSerials().then( serials => {
-            this.serials = serials.map( ss =>  {
-             return {
+        this.refreshSerialList()  
+      }
+
+      changeControllerType(){
+        this.refreshSerialList()
+      }
+
+      changePortType(){
+        this.refreshSerialList()
+      }
+
+  
+
+      private refreshSerialList(){
+        console.log('-->Serial List!')
+        void this.$tightcnc.getAvailableSerials().then( serials => {
+          console.log('-->Serial List Return', serials)
+          this.serials = serials.map( ss =>  {
+            console.log(ss)
+            return {
               label:ss.path,
               value:ss.path,
               portInfo: ss}
               })
-        }) 
-      }
-
-      changeControllerType(){
-        //
+        })
       }
 
       onSubmit(){
