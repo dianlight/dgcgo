@@ -1,5 +1,5 @@
 <template>
-<q-dialog auto-close v-model="show">
+<q-dialog v-model="show">
   <q-card>
   <h5>TightCNC Preferences</h5>
   <q-form @submit="onSubmit" @reset="onReset" autofocus>

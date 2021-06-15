@@ -11,8 +11,8 @@
               </template>
             </q-field>
           </q-route-tab>
-          <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')">
-            <q-tooltip>{{ $t('menu.file.open')}}</q-tooltip>
+          <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')" disable>
+            <q-tooltip>{{ $t('menu.file.open')}} **not yet implemented**</q-tooltip>
           </q-btn>
           <q-route-tab to="/terminal" label="Terminal" />
           <q-route-tab to="/pippo" label="404" />

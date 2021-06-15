@@ -6,7 +6,29 @@
         :gcgrid="true"
         :dark-mode="$q.dark.isActive"
         @onprogress='progress'
-      />
+      >
+          <q-btn-group outline>
+            <q-btn outline dense icon='play_arrow' @click="startJob" v-if="!$store.state.tightcnc.lastStatus?.controller?.programRunning">
+              <q-tooltip>Start Job</q-tooltip>
+            </q-btn> 
+            <q-btn outline dense icon='restart_alt' v-if="$store.state.tightcnc.lastStatus?.controller?.programRunning">
+              <q-tooltip>Restart</q-tooltip>
+            </q-btn> 
+            <q-btn outline dense icon='pause' v-if="$store.state.tightcnc.lastStatus?.controller?.programRunning">
+              <q-tooltip>Pause</q-tooltip>
+            </q-btn> 
+            <q-btn outline dense icon='arrow_right' v-if="$store.state.tightcnc.lastStatus?.controller?.held">
+              <q-tooltip>Continue</q-tooltip>
+            </q-btn> 
+            <q-btn outline dense icon='contact_support' v-if="$store.state.tightcnc.lastStatus?.controller?.held">
+              <q-tooltip>Action required</q-tooltip>
+            </q-btn> 
+            <q-btn outline dense icon='stop' disable v-if="$store.state.tightcnc.lastStatus?.controller?.programRunning">
+              <q-tooltip>Stop</q-tooltip>
+            </q-btn> 
+          </q-btn-group>
+
+      </vue-3-gcode-viewer>
     </div>
   </q-page>    
 </template>
@@ -15,13 +37,15 @@
 
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
+import { uid } from 'quasar'
 
 export interface WorkBenchSessionData {
     id:string,
     name:string, // Tab Name
     fileName: string,
     fullPath: string,
-    gcode?:string
+    gcode?:string,
+    tmpFileName?:string
 }
 
 class Props {
@@ -60,22 +84,6 @@ export default class WorkBench extends Vue.with(Props) {
      this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}
      this.gcode = this.wdata.gcode || ''
      console.log(this.wdata,this.gcode)
-  /*
-        void fetch('/demo/Gerber_TopLayer.GTL_iso_combined_cnc.nc')
-    //   fetch('/demo/boomerangv4.ncc') // ARCH Commands
-    //    fetch('/demo/Griffin Relief.ncc')
-    //    fetch('/demo/HomeSwitchRearPanelEngrave.NCC')  // ARCH Commands - White
-    //    fetch('/demo/SupportLogo.NCC')  // ARCH Commands  - White
-    //    fetch('/demo/gcode-5-40.gcode')  // ARCH Commands - Too BIG - Error
-    //    fetch('/demo/arch.ncc')  // ARCH Commands
-    //    fetch('/demo/simpletest.nc')
-        .then(res => res.blob())
-        .then( async blob => {
-          this.gcode = await blob.text()
-          console.log('Letto GCODE!', this.gcode.length);
-        });
-    // console.log(this.gcode);
-    */
   }
 
   progress(progress:number){
@@ -84,17 +92,19 @@ export default class WorkBench extends Vue.with(Props) {
     else this.$q.loadingBar.increment(progress)
   }
 
-  //changeLanguage(lang: string): void {
-  //  setI18nLanguage(i18n, lang);
-  //}
+  // Job control
+  async startJob(){
+    if(!this.wdata.tmpFileName){
+      this.wdata.tmpFileName = uid()
+      await this.$tightcnc.uploadFile(this.wdata.tmpFileName,this.wdata.gcode as string,true)
+    }
+    return this.$tightcnc.startJob({
+      filename: this.wdata.tmpFileName,    
+    }).then( (jobstatus)=>{
+      this.$store.commit('tightcnc/setJobStatus',jobstatus)
+    })
+  }
 
-  //done(): void {
-  //  //    this.progress.visible = false;
-  //}
-
-  //update(progress: number): void {
-  //  //    this.progress.value = progress;
-  //}
 }
 </script>
 

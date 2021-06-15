@@ -1,7 +1,7 @@
 //import http from 'http';
-import { TightCNCConfig,PortInfo, StatusObject } from 'tightcnc'
+import { TightCNCConfig,PortInfo, StatusObject,JobSourceOptions,JobStatus } from 'tightcnc'
 import { uid } from 'quasar'
-import { JSONRPCClient } from 'json-rpc-2.0';
+import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
 
 export class Client {
         
@@ -117,48 +117,9 @@ export class Client {
            return window.api.invoke<undefined,Partial<TightCNCConfig>>('LoadTightCNCConfig')
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async op<T>(opname: string, params?: any): Promise<T> {
+        async op<T>(opname: string, params?: JSONRPCParams): Promise<T> {
             return this.jsonrpc.request(opname,params||{})
-            /*
-			const requestData = {
-				method: opname,
-				params: params
-			};
-			const postData = JSON.stringify(requestData);
-			return new Promise((resolve,reject) => {
-				const req = http.request({
-					hostname: new URL(this.config.host as string).hostname,
-					port: this.config.serverPort,
-					path: '/v1/jsonrpc',
-					method: 'POST',
-					headers: {
-						Authorization: 'Key ' + (this.config.authKey || ''),
-						'Content-type': 'application/json',
-						'Content-Length': Buffer.byteLength(postData)
-					}
-				}, (res) => {
-					res.setEncoding('utf8');
-					let result = '';
-					res.on('data', (chunk) => {
-						result+=chunk;
-					});
-                    res.on('end', () => {
-                        const rsp = JSON.parse(result) as { error: unknown, result: T }
-                        if (rsp.error) {
-                            reject(rsp.error)
-                        } else {
-    						resolve(rsp.result);
-
-                        }
-					});
-				});
-				req.write(postData);
-				req.end();
-			})
-            */
-        }
-        
+        } 
 
         /**
          * Specific direct functions
@@ -179,6 +140,16 @@ export class Client {
         home(axes?: boolean[]): Promise<void> {
             return this.op('home', { axes:axes })
         }
+    
+        uploadFile(filename:string, data: string, makeTmp:boolean):Promise<string> {
+            return this.op<string>('uploadFile',{filename,data,makeTmp})
+        }
+    
+        startJob(jobOptions: JobSourceOptions): Promise<JobStatus> {
+            return this.op<JobStatus>('startJob',jobOptions)
+        }
+    
+    
     
 	}
 

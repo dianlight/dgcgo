@@ -8,6 +8,7 @@
       <q-btn outline label="Center" @click="center"/>
       <q-btn outline label="Origin" disable/>
     </q-btn-group>
+    <slot></slot>    
     <p _class="infobox"> {{ camera.matrix }} </p>
     <!--Button 
       label="Center" 

@@ -184,7 +184,7 @@ export default class Terminal extends Vue {
 //         console.log('After:',self.logs)
 
 //         self.$refs.terminal.refresh(self.autoScroll?self.logs.length-1:undefined)
-         if(lines.length > 0)self.$refs.terminal.refresh()
+         if(lines.length > 0 && self.$refs.terminal)self.$refs.terminal.refresh()
          if(lines.length < 20){
            setTimeout(this.readLog,1000,self);
          } else {

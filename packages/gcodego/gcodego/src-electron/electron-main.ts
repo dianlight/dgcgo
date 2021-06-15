@@ -22,8 +22,6 @@ import {
   MenuItemConstructorOptions,
   OpenDialogReturnValue,
 } from 'electron/main';
-//import 'tightcnc'
-import resolvePackagePath from 'resolve-package-path';
 
 try {
   if (
@@ -319,7 +317,6 @@ ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
 });
 
 /** Tight CNC Server */
-console.log(resolvePackagePath('tightcnc', __dirname));
 const tight_path = path.join(
   __dirname,
   '..',
@@ -351,8 +348,11 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
     }
 
     console.log(tightcnc_env['TIGHTCNC_CONFIG']);
-    //  console.log("0",typeof args[0], yaml.stringify(args[0]));
-    //  console.log("1",typeof args[1], args[1]);
+
+    // Setting basedit to AppData
+    (args[0] as TightCNCConfig).baseDir = app.getPath('userData')
+    console.log('TightCNC BaseDir:',(args[0] as TightCNCConfig).baseDir)
+
     fs.writeFileSync(tightcnc_conf, yaml.stringify(args[0]));
     //  const tightcnc = spawn(process.argv[0], [tight_path], {
     tightcnc = fork(tight_path, {
