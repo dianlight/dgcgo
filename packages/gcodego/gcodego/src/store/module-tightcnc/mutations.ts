@@ -12,9 +12,9 @@ const mutation: MutationTree<TightCNCStateInterface> = {
   setLastStatus(state: TightCNCStateInterface, status: StatusObject) {
     state.lastStatus = status
   },
-  setJobStatus(state: TightCNCStateInterface, status: Partial<JobStatus>) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    state.jobStatus = status
+  setJobStatus(state: TightCNCStateInterface, status: JobStatus) {
+    if(state.lastStatus)
+        state.lastStatus.job = status
   },
 
 };

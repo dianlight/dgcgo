@@ -73,7 +73,7 @@
     <div class="q-gutter-md q-mt-sm q-pr-md column items-end">
          <q-btn-group>
             <q-btn label="Reset" type="reset" color="negative"/>
-            <q-btn label="Save" type="submit" color="positive"/>
+            <q-btn label="Save" type="submit" color="positive" v-close-popup="1"/>
          </q-btn-group> 
     </div>
   </q-form>
@@ -85,6 +85,7 @@
 import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
 //import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
+import URL from 'url-parse'
 
 
 @Options({
@@ -179,7 +180,8 @@ export default class Preferences extends Vue {
         this.config = JSON.parse(JSON.stringify(this.$tightcnc.config || {})) as Partial<TightCNCConfig>
         if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
           const acontrol = this.config.controllers[this.config.controller]
-          const porturl = new URL(acontrol?.port ||'')
+          console.log(acontrol)
+          const porturl =  new URL(acontrol?.port ||'')
           this.portType = porturl.protocol?porturl.protocol.slice(0,-1):'serial'
           switch(this.portType){
             case 'serial':
@@ -187,7 +189,7 @@ export default class Preferences extends Vue {
               this.port = acontrol?.port || ''
               break;
             case 'socket':
-              porturl.protocol = 'http:' // Fix to force parser of other parts
+              //porturl.protocol = 'http:' // Fix to force parser of other parts
               this.remoteHost = porturl.hostname
               this.remotePort = parseInt(porturl.port)
               break;

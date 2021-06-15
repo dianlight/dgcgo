@@ -1,15 +1,13 @@
-import { StatusObject,JobStatus } from 'tightcnc'
+import { StatusObject } from 'tightcnc'
 
 
 export interface TightCNCStateInterface {
   lastStatus?: StatusObject
-  jobStatus:Partial<JobStatus>
 }
 
 function state(): TightCNCStateInterface {
   return {
     lastStatus: undefined,
-    jobStatus: {}
   }
 };
 

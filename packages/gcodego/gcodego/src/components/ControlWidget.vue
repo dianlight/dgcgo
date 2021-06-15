@@ -152,6 +152,9 @@
         </div>
       </div>
     </q-card-section>
+    <q-inner-loading :showing="$store.state.tightcnc?.lastStatus?.job?.state === 'running'">
+      <q-spinner-hourglass size="sm"/>
+    </q-inner-loading>
   </q-card>
 </template>
 

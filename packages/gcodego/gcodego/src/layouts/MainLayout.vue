@@ -72,7 +72,7 @@
     </q-page-container>
 
     <q-footer elevated class="bg-secondary">
-      {{ lastStatus?.controller }}
+      <code class='mini text-white'>{{ $store.state.tightcnc?.lastStatus}}</code>
       <!--
       <q-toolbar>
         <q-toolbar-title>
@@ -147,6 +147,21 @@ import { SerializedError } from 'new-error'
         }
         */
       }
+    }, 
+    '$store.state.tightcnc.lastStatus.job.error'(error?:string) {
+//      console.log(errorData)
+      if(error){
+            (this as MainLayout).$q.notify({
+              caption: 'Job Error',
+              message: error,
+              color: 'accent',
+              icon: 'announcement',
+              actions: [
+                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
+                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
+              ]          
+            })
+      }
     }
   }
 })
@@ -176,3 +191,10 @@ export default class MainLayout extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.mini {
+    font-size: small;
+    font-family: ui-monospace;
+}
+</style>
