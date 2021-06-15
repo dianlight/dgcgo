@@ -1,37 +1,51 @@
 <template>
-  <div
-    id="container"
-    ref="container"
-  />
-  <div class="row control">
-    <q-btn-group outline>
-      <q-btn outline label="Center" @click="center"/>
-      <q-btn outline label="Origin" disable/>
-    </q-btn-group>
-    <slot></slot>    
-    <p _class="infobox"> {{ camera.matrix }} </p>
-    <!--Button 
-      label="Center" 
-      icon="pi pi-table" 
-      class="p-button-sm p-button-rounded" 
-      @click="center()" 
-    /-->
-    <!--Button label="Delete" icon="pi pi-trash" class="p-button-sm p-button-rounded"/>
-    <Button label="Cancel" icon="pi pi-times" class="p-button-sm p-button-rounded"/-->
-  </div>
-  <!--ProgressBar class="progress" mode="indeterminate"/-->
+    <div class='col-10'
+      id="container"
+      ref="container"
+    />
+    <div class='col self-start' style="margin-left:-3em;">
+      <q-slider :style="`height:${chight}px`"
+          v-model="currentframe"
+          :min="0"
+          :max="totalframes"
+          :step="1"
+          color="green"
+          vertical
+          reverse
+          snap
+          dense
+          markers
+          label-always
+          @change="changeFrame"
+      />
+    </div>
+    <div class="row control">
+      <q-btn-group outline>
+        <q-btn outline label="Center" @click="center"/>
+        <q-btn outline label="Origin" disable/>
+      </q-btn-group>
+      <slot></slot>    
+      <p _class="infobox"> {{ camera?.matrix }} </p>
+    </div> 
 </template>
 
 <script lang="ts">
+
 import * as THREE from 'three';
-//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OrbitControls } from '@three-ts/orbit-controls';
-import { defineComponent, Prop, ref } from 'vue';
+//import { defineComponent, Prop, ref } from 'vue';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
+import { dom } from 'quasar'
+import { Options, Vue } from 'vue-class-component';
 
+class Props {
+    gcgrid?:boolean
+    darkMode?:boolean
+    gcode?:string
+    displayFrame?:number
+}
 
-const defaultColor = new THREE.Color(colornames('lightgrey'));
 class MotionColor {
 
     G0 = new THREE.Color(colornames('green'))
@@ -66,85 +80,71 @@ class MotionColor {
      'G80' = undefined
 }
 
-export default defineComponent({
-  name: 'Vue3GcodeViewer',
-  components: {
-//    ProgressBar
+@Options({
+  components: {},
+  watch: {
+    gcode(newData: string, oldData: string) {
+     if (newData != oldData) {
+        (this as Vue3GcodeViewer).reload = true;
+      }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    darkMode(newData:boolean, _oldData:boolean){
+        console.log('Dark mode change to:',newData);
+        (this as Vue3GcodeViewer).render3d()
+    }
   },
-  props: {
-    gcgrid: {
-      type: Boolean,
-      required: true,
-      default: new Boolean('true'),
-    } as Prop<boolean>,
-    darkMode: {
-      type: Boolean,
-      required: false,
-      default: new Boolean('false')
-    } as Prop<boolean>,
-    gcode: {
-      type: String,
-      required: false,
-      default: undefined,
-    } as Prop<string>,
-  },
-  setup() {
-    let renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
-    let scene: THREE.Scene = new THREE.Scene();
-    let camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(
+  emits: {
+    onprogress: null
+  }
+})
+export default class Vue3GcodeViewer extends Vue.with(Props) {
+
+  declare $refs: {
+    container: HTMLDivElement
+  }
+
+  defaultColor = new THREE.Color(colornames('lightgrey'));
+
+  currentframe = 0;
+  totalframes = 0;
+  renderer?: THREE.WebGLRenderer;
+  scene?: THREE.Scene;
+  camera?: THREE.PerspectiveCamera;
+  controls?: OrbitControls;
+  width = 0
+  height = 0
+
+  motionColor = new MotionColor(false)
+
+  reload = true
+  space ={ start: { x: 0, y: 0 }, stop: { x: 0, y: 0 } }
+  chight = 10
+
+
+  created(){
+    this.scene = new THREE.Scene();
+    this.renderer = new THREE.WebGLRenderer();
+    this.camera = new THREE.PerspectiveCamera(
       50,
       1,
       0.1,
       1000
     );
-    let controls: OrbitControls = new OrbitControls(
-      camera,
-      renderer.domElement
+    this.controls = new OrbitControls(
+      this.camera,
+      this.renderer?.domElement
     );
-    // controls.addEventListener("change",(event)=>console.log("Camera:",event));
-    const container = ref<HTMLElement>();
-    let width = 0
-    let height = 0
-
-    const motionColor = new MotionColor(false)
-
-    return {
-      renderer,
-      scene,
-      camera,
-      controls,
-      container,
-      width,
-      height,
-      motionColor
-    };
-  },
-  data() {
-    return {
-      reload: true,
-      space: { start: { x: 0, y: 0 }, stop: { x: 0, y: 0 } },
-    };
-  },
- emits: {
-   onprogress: null
- },
- watch: {
-    gcode(newData: string, oldData: string) {
-     if (newData != oldData) {
-        this.reload = true;
-      }
-    },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    darkMode(newData:boolean, _oldData:boolean){
-        console.log('Dark mode change to:',newData)
-        this.render3d()
-    }
-  },
+    this.currentframe = this.$props.displayFrame || Number.MAX_VALUE
+  }
+  
 
   mounted() {
     this.init();
+    this.chight = dom.height(this.$refs.container) 
+    console.log(dom.height(this.$refs.container))
     //this.animate();
-  },
+  }
 
   updated(): void {
     this.motionColor.darkMode = this.darkMode || false
@@ -166,7 +166,7 @@ export default defineComponent({
           p1: Position,
           p2: Position
         ) => {
-          const color = modal.motion? this.motionColor[modal.motion] || defaultColor: defaultColor;
+          const color = modal.motion? this.motionColor[modal.motion] || this.defaultColor: this.defaultColor;
           vertices.push(new THREE.Vector3(p2.x, p2.y, p2.z));
           colors.push(color);
         },
@@ -195,7 +195,7 @@ export default defineComponent({
                 );
                 const divisions = 30;
                 const points = arcCurve.getPoints(divisions);
-                const color = motion? this.motionColor[motion] || defaultColor : defaultColor;
+                const color = motion? this.motionColor[motion] || this.defaultColor : this.defaultColor;
 
                 for (let i = 0; i < points.length; ++i) {
                     const point = points[i];
@@ -214,17 +214,18 @@ export default defineComponent({
       });
     
 
-      const frames: {
-        data: string,
-        vertexIndex: number // remember current vertex index
-      } [] = []
+//      const frames: {
+//        data: string,
+//        vertexIndex: number // remember current vertex index
+//      } [] = []
 
       toolPath.loadFromString(this.gcode, (err: unknown, data: string) => {
             if(err)console.error(err)
-            frames.push({
-                data: data,
-                vertexIndex: vertices.length // remember current vertex index
-            });
+//            frames.push({
+//                data: data,
+//                vertexIndex: vertices.length // remember current vertex index
+//            });
+            this.totalframes = vertices.length
       })
         .on('data',(event: { line: string, words: Array<string|number>})=>{
         //  console.log("Data:",event)
@@ -233,25 +234,26 @@ export default defineComponent({
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
-            this.scene.clear()
+            this.scene?.clear()
             const workpiece = new THREE.Line(
                 new THREE.BufferGeometry(),
                 new THREE.LineBasicMaterial({
-                    color: defaultColor,
+                    color: this.defaultColor,
                     linewidth: 1,
                     vertexColors: true, // THREE.VertexColors,
                     opacity: 0.5,
                     transparent: true
                 })
             );
-            workpiece.geometry.setFromPoints(vertices.slice());
+
+            workpiece.geometry.setFromPoints(vertices.slice(0,this.currentframe));
             workpiece.geometry.setAttribute( 'color', new THREE.BufferAttribute(
               new Float32Array(
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
 
-            this.scene.add(workpiece);
+            this.scene?.add(workpiece);
 
             workpiece.geometry.computeBoundingBox()
             if(workpiece.geometry.boundingBox){
@@ -261,7 +263,7 @@ export default defineComponent({
 
               if (this.gcgrid) {
                 const axesHelper = new THREE.AxesHelper(5);
-                this.scene.add(axesHelper);                const gridHelper = new THREE.GridHelper(
+                this.scene?.add(axesHelper);                const gridHelper = new THREE.GridHelper(
                   Math.max(this.width, this.height),
                   Math.max(this.width, this.height) / 10
                 );
@@ -270,17 +272,19 @@ export default defineComponent({
                 gridHelper.position.y = (this.height - 10) / 2;
                 gridHelper.position.x = (this.width - 10) / 2;
                 gridHelper.position.z = 0;
-                this.scene.add(gridHelper);
+                this.scene?.add(gridHelper);
               }
 
-              this.controls.target.y = (this.height) / 2;
-              this.controls.target.x = (this.width) / 2;
-              this.camera.position.x = (this.width) / 2;
-              this.camera.position.y = (this.height) / 2;
-              this.camera.position.z = (this.width) * 1.3;
-              this.camera.updateProjectionMatrix();
+              if(this.controls && this.camera){
+                this.controls.target.y = (this.height) / 2;
+                this.controls.target.x = (this.width) / 2;
+                this.camera.position.x = (this.width) / 2;
+                this.camera.position.y = (this.height) / 2;
+                this.camera.position.z = (this.width) * 1.3;
+                this.camera.updateProjectionMatrix();
 
-              this.controls.update();
+                this.controls.update();
+              }
             }
 
             this.render3d()
@@ -289,62 +293,76 @@ export default defineComponent({
 
         })
     }
-  },
-  methods: {
-    center(){
-      this.controls.target.y = (this.height) / 2;
-      this.controls.target.x = (this.width) / 2;
-      this.camera.position.x = (this.width) / 2;
-      this.camera.position.y = (this.height) / 2;
-      this.camera.position.z = (this.width) * 1.3;
-      this.camera.updateProjectionMatrix();
+  }
 
-      this.controls.update();
+  
+    center(){
+      if(this.controls && this.camera){
+        this.controls.target.y = (this.height) / 2;
+        this.controls.target.x = (this.width) / 2;
+        this.camera.position.x = (this.width) / 2;
+        this.camera.position.y = (this.height) / 2;
+        this.camera.position.z = (this.width) * 1.3;
+        this.camera.updateProjectionMatrix();
+
+        this.controls.update();
+      }
       this.render3d();
-    },
+    }
+
     init(): void {
-      this.scene.background = new THREE.Color(!this.darkMode?'white':'black');
+      if(this.scene)this.scene.background = new THREE.Color(!this.darkMode?'white':'black');
       /*
 const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 0 ), 0 );
 const helper = new THREE.PlaneHelper( plane, this.width > this.height?this.width*1.2:this.height*1.2, 0xffff00 );
 this.scene.add( helper );     
 */
-      this.renderer.setPixelRatio(window.devicePixelRatio);
-      this.container?.appendChild(this.renderer.domElement);
+      this.renderer?.setPixelRatio(window.devicePixelRatio);
+      this.$refs.container?.appendChild(this.renderer?.domElement as Node);
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      this.controls.addEventListener('change', this.render3d ); // use if there is no animation loop
-      this.controls.minDistance = -500;
-      this.controls.maxDistance = 500;
-      this.controls.enablePan = true;
-      this.controls.target.z = 0.0;
+      this.controls?.addEventListener('change', this.render3d ); // use if there is no animation loop
+      if(this.controls){
+        this.controls.minDistance = -500;
+        this.controls.maxDistance = 500;
+        this.controls.enablePan = true;
+        this.controls.target.z = 0.0;
+      }
       //window.addEventListener("resize", this.resize, false);
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      this.container?.parentElement?.addEventListener('resize', this.resize, false);
+      this.$refs.container?.parentElement?.addEventListener('resize', this.resize, false);
       this.resize();
-    },
+    }
+
     resize(event?: Event): void {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-      if(this.container)console.log('State',event?.target,(this.container as any).value);
-      if (this.container) {
-        const clientWidth = this.container?.clientWidth || 0;
-        const clientHeight = this.container?.clientHeight || 0;
+      if(this.$refs.container)console.log('State',event?.target,(this.$refs.container as any).value);
+      if (this.$refs.container) {
+        const clientWidth = this.$refs.container?.clientWidth || 0;
+        const clientHeight = this.$refs.container?.clientHeight || 0;
         //console.log(clientWidth, clientHeight);
-        this.camera.aspect = clientWidth / clientHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(clientWidth, clientHeight);
-        this.controls.update();
+        if(this.controls && this.camera){
+          this.camera.aspect = clientWidth / clientHeight;
+          this.camera.updateProjectionMatrix();
+          this.renderer?.setSize(clientWidth, clientHeight);
+          this.controls.update();
+          }
         this.render3d();
       }
-    },
+    }
+
     render3d(): void {
       if (this.scene && this.camera){
         this.scene.background = new THREE.Color(!this.darkMode?'white':'black');
-        this.renderer.render(this.scene, this.camera);
+        this.renderer?.render(this.scene, this.camera);
       }
       this.$forceUpdate();
-    },
-  },
-});
+    }
+
+    changeFrame(){
+      this.reload=true;
+      this.$forceUpdate();
+    }
+};
 </script>
 
 <style scoped>
