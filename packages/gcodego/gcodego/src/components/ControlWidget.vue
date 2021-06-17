@@ -175,7 +175,7 @@ import { Options, Vue } from 'vue-class-component';
 //    },
     '$store.state.tightcnc.lastStatus.controller.spindle'(spindle:boolean) {
           const controller = (this as ControlWidget).$store.state.tightcnc.lastStatus?.controller as ControllerStatus;
-          if(controller)
+          if(controller && controller.spindleDirection)
             (this as ControlWidget).spindle = !spindle?'M5':controller.spindleDirection > 0?'M3':'M4';
     },
 //    '$store.state.tightcnc.lastStatus.controller.spindleSpeed'(speed?:number) {

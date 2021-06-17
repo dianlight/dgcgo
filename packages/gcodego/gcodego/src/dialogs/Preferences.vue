@@ -18,13 +18,13 @@
       </q-input>
     </div>
     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
-      <q-select dense outlined emit-value v-model="config.controller" :options="controllers" @click="changeControllerType" label="Controller Type" />
+      <q-select dense outlined emit-value v-model="config.controller" :options="controllers"  label="Controller Type" />
 
       <template v-if="config.controller === 'grbl'">
-        <q-select dense outlined  v-model="portType" @click="changePortType" :options="['serial','socket','grblsim']" label="Port Type" />
+        <q-select dense outlined  v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
 
         <template v-if="portType ==='serial'">
-          <q-select dense outlined v-model="port" clearable :options="serials" label="Port" emit-value>
+          <q-select dense outlined v-model="port" @popup-show="refreshSerialList"  clearable :options="serials" label="Port" emit-value>
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
               <!--
@@ -85,7 +85,7 @@
 import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
 //import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
-import URL from 'url-parse'
+import URLParse from 'url-parse'
 
 
 @Options({
@@ -125,14 +125,6 @@ export default class Preferences extends Vue {
       mounted(){
         this.onReset()
         this.refreshSerialList()  
-      }
-
-      changeControllerType(){
-        this.refreshSerialList()
-      }
-
-      changePortType(){
-        this.refreshSerialList()
       }
 
   
@@ -181,9 +173,14 @@ export default class Preferences extends Vue {
         if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
           const acontrol = this.config.controllers[this.config.controller]
           console.log(acontrol)
-          const porturl =  new URL(acontrol?.port ||'')
+          const porturl =  new URLParse(acontrol?.port ||'')
           this.portType = porturl.protocol?porturl.protocol.slice(0,-1):'serial'
+          console.log('->',this.portType,porturl)
           switch(this.portType){
+            case 'http': // Special case for save without protocol
+              this.portType = 'serial'
+              this.port = porturl.pathname
+              break;
             case 'serial':
               console.log(acontrol)
               this.port = acontrol?.port || ''
