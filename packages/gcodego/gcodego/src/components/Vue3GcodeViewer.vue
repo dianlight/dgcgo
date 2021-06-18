@@ -9,6 +9,7 @@
           :min="0"
           :max="totalframes"
           :step="1"
+          _label-value="`${currentline} <br\> ${currentframe}`"
           color="green"
           vertical
           reverse
@@ -43,7 +44,7 @@ class Props {
     gcgrid?:boolean
     darkMode?:boolean
     gcode?:string
-    displayFrame?:number
+    currentLine?:number
 }
 
 class MotionColor {
@@ -52,7 +53,7 @@ class MotionColor {
     G1 = new THREE.Color(colornames('blue'))
     G2 = new THREE.Color(colornames('deepskyblue'))
     G3 = new THREE.Color(colornames('deepskyblue'))
-    CURRENT = new THREE.Color(colornames('yellow'))
+    CURRENT = new THREE.Color(colornames('red'))
     NEXT = new THREE.Color(colornames('grey'))
 
     constructor(private _darkMode:boolean){
@@ -94,7 +95,12 @@ class MotionColor {
     darkMode(newData:boolean, _oldData:boolean){
         console.log('Dark mode change to:',newData);
         (this as Vue3GcodeViewer).render3d()
-    }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    currentLine(newData:number, _oldData:number){
+ //       console.log('current-line change to:',newData);
+        (this as Vue3GcodeViewer).changeLine(newData)
+    },
   },
   emits: {
     onprogress: null
@@ -108,7 +114,8 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
   defaultColor = new THREE.Color(colornames('lightgrey'));
 
-  currentframe = 0;
+  currentframe = Number.MAX_VALUE;
+//  currentline = 0;
   totalframes = 0;
   renderer?: THREE.WebGLRenderer;
   scene?: THREE.Scene;
@@ -137,7 +144,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
       this.camera,
       this.renderer?.domElement
     );
-    this.currentframe = this.$props.displayFrame || Number.MAX_VALUE
+//    this.currentline = this.$props.currentLine || Number.MAX_VALUE
   }
   
 
@@ -157,7 +164,10 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
       const vertices:Array<THREE.Vector3> = [] 
       const colors:Array<THREE.Color> = []
-      
+      const realLine:Array<number> = []
+
+      let currentLine = 0;
+
       const toolPath = new Toolpath({
         position: [0, 0, 0],
         modal: {
@@ -171,6 +181,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
           const color = modal.motion? this.motionColor[modal.motion] || this.defaultColor: this.defaultColor;
           vertices.push(new THREE.Vector3(p2.x, p2.y, p2.z));
           colors.push(color);
+          realLine.push(currentLine)
         },
         addArcCurve: (modal: Modal, v1: Position , v2: Position , v0: Position ) => {
 
@@ -211,6 +222,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                         vertices.push(new THREE.Vector3(z, point.x, point.y));
                     }
                     colors.push(color);
+                    realLine.push(currentLine)
                 }
         },
       });
@@ -218,12 +230,14 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       toolPath.loadFromString(this.gcode, (err: unknown, _data: string) => {
             if(err)console.error(err)
-            this.totalframes = vertices.length
+            this.totalframes = vertices.length-1
       })
         .on('data',(event: { line: string, words: Array<string|number>})=>{
         //  console.log("Data:",event)
-          if(this.gcode)
+          if(this.gcode){
             this.$emit('onprogress',event.line.length / this.gcode.length * 100)
+          }
+          currentLine = event.line.length;
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
@@ -246,6 +260,9 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
               new Float32Array(
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
+            workpiece.geometry.setAttribute( 'line', new THREE.BufferAttribute(
+              new Float32Array(realLine),1))
+
 
             workpiece.geometry.computeBoundingBox()
             if(workpiece.geometry.boundingBox){
@@ -350,6 +367,17 @@ this.scene.add( helper );
         this.renderer?.render(this.scene, this.camera);
       }
       this.$forceUpdate();
+    }
+
+    changeLine(line:number){
+      const workpiece = (this.scene?.children[0] as THREE.Line)
+      const lineArray = workpiece.geometry.getAttribute('line').array as Float32Array
+      this.currentframe = lineArray.reduce( (prev,current,index)=>{
+        if( Math.abs(current-line) <= Math.abs(current-prev.value))return {index:index,value:current};
+        else return prev
+      },{index:0,value:lineArray[0]}).index
+      console.log(`Line ${line} => frame: ${this.currentframe}`)
+      this.changeFrame()
     }
 
     changeFrame(){

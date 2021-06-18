@@ -5,6 +5,7 @@
         :gcode="gcode"
         :gcgrid="true"
         :dark-mode="$q.dark.isActive"
+        :current-line="$store.state.tightcnc.lastStatus?.job?.stats.lineCount"
         @onprogress='progress'
       >
           <q-btn-group outline>
@@ -27,7 +28,13 @@
               <q-tooltip>Stop</q-tooltip>
             </q-btn> 
           </q-btn-group>
-
+          <q-btn-group outline>
+            <!--
+            <q-btn outline dense label="To Line 5"></q-btn> 
+            -->
+          </q-btn-group>
+          {{ $store.state.tightcnc.lastStatus?.job?.progress}}
+          {{ $store.state.tightcnc.lastStatus?.job?.stats.lineCount}}
       </vue-3-gcode-viewer>
     </div>
   </q-page>    
@@ -78,7 +85,7 @@ export default class WorkBench extends Vue.with(Props) {
 
   gcode = ''
 
-   mounted(): void {
+  mounted(): void {
      console.log('File Opened:',this.$route.params.id)
      //console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
      this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}

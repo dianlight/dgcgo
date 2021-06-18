@@ -53,7 +53,7 @@
         "@quasar/cli": "^1.2.1",
         "@quasar/icongenie": "^2.4.0",
         "@types/colornames": "^1.1.1",
-        "@types/node": "^15.12.2",
+        "@types/node": "^14",
         "@types/three": "^0.129.1",
         "@types/url-parse": "^1.4.3",
         "@types/webpack-env": "^1.16.0",
