@@ -34,7 +34,7 @@ contextBridge.exposeInMainWorld(
             const validChannels = ['MenuEvent', 'OpenEvent'];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender` 
-                console.log('mount listener for', channel);
+                //console.log('mount listener for', channel);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ipcRenderer.on(channel, (event, ...args:any[]) => func(...args));
             }

@@ -2,7 +2,7 @@
 declare module 'gcode-toolpath' {
     //import { Stream } from "serialport"
     import EventEmitter from 'events';
-    import Stream from 'stream'
+    import { Readable } from 'stream';
 
 
     export type LoadEventData = {
@@ -114,7 +114,7 @@ declare module 'gcode-toolpath' {
 
         loadFromFileSync(file: string, callback: (err: never, data: string) => void): never[];
 
-        loadFromStream(data: Stream, callback: (err: never, data: string) => void): EventEmitter;
+        loadFromStream(data: Readable, callback: (err: never, data: string) => void): EventEmitter;
 
         loadFromString(data: string, callback: (err: never, data: string) => void): EventEmitter;
     

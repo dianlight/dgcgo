@@ -130,11 +130,11 @@ export default class Preferences extends Vue {
   
 
       private refreshSerialList(){
-        console.log('-->Serial List!')
+        // console.log('-->Serial List!')
         void this.$tightcnc.getAvailableSerials().then( serials => {
-          console.log('-->Serial List Return', serials)
+        //  console.log('-->Serial List Return', serials)
           this.serials = serials.map( ss =>  {
-            console.log(ss)
+            //console.log(ss)
             return {
               label:ss.path,
               value:ss.path,
@@ -163,26 +163,25 @@ export default class Preferences extends Vue {
             }
           break;
         }
-        console.debug('Saving:',this.config)
+        //console.debug('Saving:',this.config)
         this.$tightcnc.updateConfig(this.config,true)
-       // void this.$store.dispatch('tightcnc/updateClientConfig', this.config)
       }
 
       onReset(){
         this.config = JSON.parse(JSON.stringify(this.$tightcnc.config || {})) as Partial<TightCNCConfig>
         if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
           const acontrol = this.config.controllers[this.config.controller]
-          console.log(acontrol)
+          //console.log(acontrol)
           const porturl =  new URLParse(acontrol?.port ||'')
           this.portType = porturl.protocol?porturl.protocol.slice(0,-1):'serial'
-          console.log('->',this.portType,porturl)
+          //console.log('->',this.portType,porturl)
           switch(this.portType){
             case 'http': // Special case for save without protocol
               this.portType = 'serial'
               this.port = porturl.pathname
               break;
             case 'serial':
-              console.log(acontrol)
+              //console.log(acontrol)
               this.port = acontrol?.port || ''
               break;
             case 'socket':

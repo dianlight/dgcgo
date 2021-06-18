@@ -15,11 +15,12 @@
             <q-btn outline dense icon='restart_alt' v-if="$store.state.tightcnc.lastStatus?.controller?.programRunning">
               <q-tooltip>Restart</q-tooltip>
             </q-btn> 
-            <q-btn outline dense icon='pause' v-if="$store.state.tightcnc.lastStatus?.controller?.programRunning">
+            <q-btn outline dense icon='pause' v-if="($store.state.tightcnc.lastStatus?.controller?.programRunning) &&
+                                                    (!$store.state.tightcnc.lastStatus?.controller?.held)">
               <q-tooltip>Pause</q-tooltip>
             </q-btn> 
-            <q-btn outline dense icon='arrow_right' v-if="$store.state.tightcnc.lastStatus?.controller?.held">
-              <q-tooltip>Continue</q-tooltip>
+            <q-btn outline dense icon='arrow_right' v-if="$store.state.tightcnc.lastStatus?.controller?.held" @click="resume">
+              <q-tooltip>Resume</q-tooltip>
             </q-btn> 
             <q-btn outline dense icon='contact_support' v-if="$store.state.tightcnc.lastStatus?.controller?.held">
               <q-tooltip>Action required</q-tooltip>
@@ -33,8 +34,9 @@
             <q-btn outline dense label="To Line 5"></q-btn> 
             -->
           </q-btn-group>
-          {{ $store.state.tightcnc.lastStatus?.job?.progress}}
-          {{ $store.state.tightcnc.lastStatus?.job?.stats.lineCount}}
+          State: {{ $store.state.tightcnc.lastStatus?.job?.state}} <br/>
+          Progress: {{ $store.state.tightcnc.lastStatus?.job?.progress}} <br/>
+          Stats: {{ $store.state.tightcnc.lastStatus?.job?.stats}}
       </vue-3-gcode-viewer>
     </div>
   </q-page>    
@@ -110,6 +112,10 @@ export default class WorkBench extends Vue.with(Props) {
     }).then( (jobstatus)=>{
       this.$store.commit('tightcnc/setJobStatus',jobstatus)
     })
+  }
+
+  async resume(){
+     await this.$tightcnc.resume()
   }
 
 }

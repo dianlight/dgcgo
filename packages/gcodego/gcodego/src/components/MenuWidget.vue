@@ -96,7 +96,7 @@ export default class ManuWidget extends Vue {
   }
 
   mounted(){
-    console.log(this.$q.platform)
+    //console.log(this.$q.platform)
     if(this.$q.platform.is.electron){
  //     for( let pcx in this.$tm('menu') as any){
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -105,13 +105,13 @@ export default class ManuWidget extends Vue {
       //console.log('------->',this.i18nToJson('menu'))
       window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
       window.api.receive('MenuEvent',(params:{link?:string,dialog?:string})=>{       
-        console.log(params)
+        //console.log(params)
         if(params.link)void this.$router.push(params.link)
         if(params.dialog)void this.$store.commit('dialogs/showDialog',params.dialog)
       })
       window.api.receive('OpenEvent',(param:{filaname:string, gcode:string})=>{
-          console.log('Open filename:',param.filaname);
-          console.log(param.gcode)
+          //console.log('Open filename:',param.filaname);
+          //console.log(param.gcode)
           this.open(param.filaname,param.gcode)
       })
     }

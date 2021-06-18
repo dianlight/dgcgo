@@ -39,6 +39,9 @@ import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
 import { dom } from 'quasar'
 import { Options, Vue } from 'vue-class-component';
+import split2 from 'split2'
+import through2 from 'through2'
+import { write } from 'fs';
 
 class Props {
     gcgrid?:boolean
@@ -93,7 +96,7 @@ class MotionColor {
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     darkMode(newData:boolean, _oldData:boolean){
-        console.log('Dark mode change to:',newData);
+//        console.log('Dark mode change to:',newData);
         (this as Vue3GcodeViewer).render3d()
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -151,7 +154,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
   mounted() {
     this.init();
     this.chight = dom.height(this.$refs.container) 
-    console.log(dom.height(this.$refs.container))
+    //console.log(dom.height(this.$refs.container))
     //this.animate();
   }
 
@@ -164,27 +167,24 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
       const vertices:Array<THREE.Vector3> = [] 
       const colors:Array<THREE.Color> = []
-      const realLine:Array<number> = []
+      const evLine:Array<{ line: string, words: Array<string|number>, ln?:number}> = []
 
-      let currentLine = 0;
+      let cevent: { line: string, words: Array<string|number>, ln?:number};
 
       const toolPath = new Toolpath({
         position: [0, 0, 0],
         modal: {
           distance: 'G90',
         },
-        addLine: (
-          modal: Modal,
-          p1: Position,
-          p2: Position
-        ) => {
+        addLine: (modal: Modal,p1: Position,p2: Position) => {
+          //console.log('->L')
           const color = modal.motion? this.motionColor[modal.motion] || this.defaultColor: this.defaultColor;
           vertices.push(new THREE.Vector3(p2.x, p2.y, p2.z));
           colors.push(color);
-          realLine.push(currentLine)
+          evLine.push(cevent)
         },
         addArcCurve: (modal: Modal, v1: Position , v2: Position , v0: Position ) => {
-
+          //console.log('->C')
            const { motion, plane } = modal;
                 const isClockwise = (motion === 'G2');
                 const radius = Math.sqrt(
@@ -222,22 +222,48 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                         vertices.push(new THREE.Vector3(z, point.x, point.y));
                     }
                     colors.push(color);
-                    realLine.push(currentLine)
+                    evLine.push(cevent)
                 }
         },
       });
     
+
+      let currentLine = 0;
+      const writer = split2()
+      const rewriter = through2((chunk:Buffer,enc,cb)=>{
+        const line = chunk.toLocaleString()
+        if(line.startsWith('N') || line.startsWith('n')){   
+          cb(undefined,line.replace(/^[Nn]\d+/,`N${currentLine}`)+'\n')
+        } else {
+          cb(undefined,`N${currentLine}${line}\n`)
+        }
+      })
+
+      writer.on('data', (obj:string) => {
+        //console.log('@@@@',obj)
+        consumedGcode+= obj.length+1
+        currentLine++
+        rewriter.write(obj)
+          //each chunk now is a js object
+      }).on('end', ()=>{
+        rewriter.end()
+      } )
+
+
+
+      let consumedGcode = 0;
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      toolPath.loadFromString(this.gcode, (err: unknown, _data: string) => {
+      toolPath.loadFromStream(rewriter, (err: unknown, _data: string) => {
             if(err)console.error(err)
             this.totalframes = vertices.length-1
       })
-        .on('data',(event: { line: string, words: Array<string|number>})=>{
-        //  console.log("Data:",event)
+        .on('data',(event: { line: string, words: Array<string|number>, ln?:number})=>{
           if(this.gcode){
-            this.$emit('onprogress',event.line.length / this.gcode.length * 100)
+            this.$emit('onprogress', consumedGcode / this.gcode.length)
+            //console.log('->',currentLine,consumedGcode,this.gcode.length,event)
+            cevent = event
           }
-          currentLine = event.line.length;
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
@@ -261,8 +287,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
             workpiece.geometry.setAttribute( 'line', new THREE.BufferAttribute(
-              new Float32Array(realLine),1))
-
+              new Int32Array(evLine.map(ev=>ev.ln||0)),1))
 
             workpiece.geometry.computeBoundingBox()
             if(workpiece.geometry.boundingBox){
@@ -303,6 +328,9 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
 
         })
+      writer.write(this.gcode)
+      writer.end()
+      writer.destroy()
     }
   }
 
@@ -344,9 +372,10 @@ this.scene.add( helper );
       this.resize();
     }
 
-    resize(event?: Event): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resize(_event?: Event): void {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-      if(this.$refs.container)console.log('State',event?.target,(this.$refs.container as any).value);
+      //if(this.$refs.container)console.log('State',event?.target,(this.$refs.container as any).value);
       if (this.$refs.container) {
         const clientWidth = this.$refs.container?.clientWidth || 0;
         const clientHeight = this.$refs.container?.clientHeight || 0;
@@ -376,7 +405,7 @@ this.scene.add( helper );
         if( Math.abs(current-line) <= Math.abs(current-prev.value))return {index:index,value:current};
         else return prev
       },{index:0,value:lineArray[0]}).index
-      console.log(`Line ${line} => frame: ${this.currentframe}`)
+      //console.log(`Line ${line} => frame: ${this.currentframe}`,lineArray)
       this.changeFrame()
     }
 

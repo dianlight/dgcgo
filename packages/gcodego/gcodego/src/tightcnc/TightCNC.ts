@@ -149,6 +149,10 @@ export class Client {
             return this.op<JobStatus>('startJob',jobOptions)
         }
     
+        resume(): Promise<void>{
+            return this.op('resume')    
+        }
+    
     
     
 	}
