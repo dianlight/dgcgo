@@ -6,6 +6,7 @@
         :gcgrid="true"
         :dark-mode="$q.dark.isActive"
         :current-line="$store.state.tightcnc.lastStatus?.job?.stats.lineCount"
+        :cursor-position="$store.state.tightcnc.lastStatus?.controller?.pos"
         @onprogress='progress'
       >
           <q-btn-group outline>
@@ -29,14 +30,16 @@
               <q-tooltip>Stop</q-tooltip>
             </q-btn> 
           </q-btn-group>
-          <q-btn-group outline>
             <!--
+          <q-btn-group outline>
             <q-btn outline dense label="To Line 5"></q-btn> 
-            -->
           </q-btn-group>
-          State: {{ $store.state.tightcnc.lastStatus?.job?.state}} <br/>
-          Progress: {{ $store.state.tightcnc.lastStatus?.job?.progress}} <br/>
-          Stats: {{ $store.state.tightcnc.lastStatus?.job?.stats}}
+            -->
+          <span>
+            State: {{ $store.state.tightcnc.lastStatus?.job?.state}}
+            Progress: {{ $store.state.tightcnc.lastStatus?.job?.progress}}
+            Stats: {{ $store.state.tightcnc.lastStatus?.job?.stats}}   
+          </span>
       </vue-3-gcode-viewer>
     </div>
   </q-page>    

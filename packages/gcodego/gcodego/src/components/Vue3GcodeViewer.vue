@@ -49,7 +49,6 @@
 
 import  * as THREE from 'three';
 import CameraControls from 'camera-controls';
-//import { OrbitControls } from '@three-ts/orbit-controls';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
 import { dom } from 'quasar'
@@ -62,6 +61,7 @@ class Props {
     darkMode?:boolean
     gcode?:string
     currentLine?:number
+    cursorPosition?:number[]
 }
 
 class MotionColor {
@@ -72,6 +72,7 @@ class MotionColor {
     G3 = new THREE.Color(colornames('deepskyblue'))
     CURRENT = new THREE.Color(colornames('red'))
     NEXT = new THREE.Color(colornames('grey'))
+    POINTER = new THREE.Color(colornames('purple'))
 
     constructor(private _darkMode:boolean){
     }
@@ -118,6 +119,11 @@ class MotionColor {
  //       console.log('current-line change to:',newData);
         (this as Vue3GcodeViewer).changeLine(newData)
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    cursorPosition(newData?:number[],_oldData?:number[]){
+//         console.log('curstor-position change to:',newData);
+        (this as Vue3GcodeViewer).changeCursorPosition(newData)
+    }
   },
   emits: {
     onprogress: null
@@ -132,7 +138,6 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
   defaultColor = new THREE.Color(colornames('lightgrey'));
 
   currentframe = Number.MAX_VALUE;
-//  currentline = 0;
   totalframes = 0;
   renderer?: THREE.WebGLRenderer;
   scene?: THREE.Scene;
@@ -292,6 +297,29 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
             this.scene?.add(this.workpiece);
 
+            // Cursor
+            const lgt = 1
+            const pointer = new THREE.ArrowHelper(
+              new THREE.Vector3(0,0,-1), // Direction
+              new THREE.Vector3(0,0,0),  // Position
+              lgt, // Length
+              this.motionColor.POINTER,//0xFFFF30, // color
+              lgt*0.2,// head Length
+              lgt*0.2// head Width
+              );
+            console.log(pointer.line, pointer.cone);
+            (pointer.line.material as THREE.Material).visible = false;
+            (pointer.cone.material as THREE.MeshBasicMaterial).visible = false;
+            (pointer.cone.material as THREE.MeshBasicMaterial).opacity = 0.9;
+            //(pointer.cone.material as THREE.MeshBasicMaterial).vertexColors = true;
+            //(pointer.cone.material as THREE.MeshBasicMaterial).color = new THREE.Color(0xFFFF40);
+            //pointer.line.material = new THREE.LineBasicMaterial({
+            //  color: 0xFFFF40,
+            //  linewidth: 5
+            //})
+            //(pointer.line.material as THREE.LineBasicMaterial).linewidth = 5
+            this.scene?.add(pointer)
+
             this.workpiece.geometry.setFromPoints(vertices.slice());
             this.workpiece.geometry.setAttribute( 'org_color', new THREE.BufferAttribute(
               new Float32Array(
@@ -308,7 +336,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
               if (this.gcgrid) {
                 const axesHelper = new THREE.AxesHelper();
-                //axesHelper.material.depthTest = false;
+                (axesHelper.material as THREE.Material).depthTest = false;
                 this.scene?.add(axesHelper);   
 
                 const gridHelper = new THREE.GridHelper(
@@ -338,16 +366,6 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
       writer.destroy()
     }
   }
-
-/*
-    center(){
-      if(this.controls && this.camera){
-        this.controls.reset(true)
-//        this.controls.setLookAt((this.width) / 2,(this.height) / 2,(this.width) * 1.3,(this.width) / 2,(this.height) / 2,0)
-        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
-      }
-    }
-*/
 
     front(){
       const DEG90 = Math.PI * 0.5;
@@ -445,8 +463,6 @@ this.scene.add( helper );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     resize(_event?: Event): void {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-      //if(this.$refs.container)console.log('State',event?.target,(this.$refs.container as any).value);
       if (this.$refs.container) {
         const clientWidth = this.$refs.container?.clientWidth || 0;
         const clientHeight = this.$refs.container?.clientHeight || 0;
@@ -466,7 +482,7 @@ this.scene.add( helper );
         this.scene.background = new THREE.Color(!this.darkMode?'white':'black');
         this.renderer?.render(this.scene, this.camera);
       }
-      this.$forceUpdate();
+//      this.$forceUpdate();
     }
 
     changeLine(line:number){
@@ -477,6 +493,21 @@ this.scene.add( helper );
         else return prev
       },{index:0,value:lineArray[0]}).index
       //console.log(`Line ${line} => frame: ${this.currentframe}`,lineArray)
+      this.changeFrame()
+    }
+
+    changeCursorPosition(position?:number[]){
+      const pointer = (this.scene?.children[1] as THREE.ArrowHelper)
+      if(position){
+        (pointer.line.material as THREE.Material).visible = true;
+        (pointer.cone.material as THREE.MeshBasicMaterial).visible = true;
+        pointer.position.x = position[0]
+        pointer.position.y = position[1]
+        pointer.position.z = position[2]+1
+      } else {
+        (pointer.line.material as THREE.Material).visible = false;
+        (pointer.cone.material as THREE.MeshBasicMaterial).visible = false;
+      }
       this.changeFrame()
     }
 
