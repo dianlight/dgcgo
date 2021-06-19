@@ -183,9 +183,9 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
       const vertices:Array<THREE.Vector3> = [] 
       const colors:Array<THREE.Color> = []
-      const evLine:Array<{ line: string, words: Array<string|number>, ln?:number}> = []
+      const evLine:Array<{ line: string, ln?:number}> = []
 
-      let cevent: { line: string, words: Array<string|number>, ln?:number};
+      let cevent: { line: string, ln?:number};
 
       const toolPath = new Toolpath({
         position: [0, 0, 0],
@@ -197,10 +197,10 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
           const color = modal.motion? this.motionColor[modal.motion] || this.defaultColor: this.defaultColor;
           vertices.push(new THREE.Vector3(p2.x, p2.y, p2.z));
           colors.push(color);
+          //console.log('-L->',cevent)
           evLine.push(cevent)
         },
         addArcCurve: (modal: Modal, v1: Position , v2: Position , v0: Position ) => {
-          //console.log('->C')
            const { motion, plane } = modal;
                 const isClockwise = (motion === 'G2');
                 const radius = Math.sqrt(
@@ -226,6 +226,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                 const points = arcCurve.getPoints(divisions);
                 const color = motion? this.motionColor[motion] || this.defaultColor : this.defaultColor;
 
+                //console.log('-C->',cevent)
                 for (let i = 0; i < points.length; ++i) {
                     const point = points[i];
                     const z = ((v2.z - v1.z) / points.length) * i + v1.z;
@@ -248,7 +249,12 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
       const writer = split2()
       const rewriter = through2((chunk:Buffer,enc,cb)=>{
         const line = chunk.toLocaleString()
-        if(line.startsWith('N') || line.startsWith('n')){   
+    //    console.log('Pr->',line) 
+        cevent={
+          line,
+          ln: currentLine
+        }
+        if(line.startsWith('N') || line.startsWith('n')){  
           cb(undefined,line.replace(/^[Nn]\d+/,`N${currentLine}`)+'\n')
         } else {
           cb(undefined,`N${currentLine}${line}\n`)
@@ -257,7 +263,6 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
 
       writer.on('data', (obj:string) => {
         //console.log('@@@@',obj)
-        consumedGcode+= obj.length+1
         currentLine++
         rewriter.write(obj)
           //each chunk now is a js object
@@ -274,11 +279,12 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
             if(err)console.error(err)
             this.totalframes = vertices.length-1
       })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('data',(event: { line: string, words: Array<string|number>, ln?:number})=>{
           if(this.gcode){
+            consumedGcode+= event.line.length+1;
             this.$emit('onprogress', consumedGcode / this.gcode.length)
-            //console.log('->',currentLine,consumedGcode,this.gcode.length,event)
-            cevent = event
+       //     console.log('END->',currentLine,consumedGcode,this.gcode.length,event)
           }
         })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -290,7 +296,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                     color: this.defaultColor,
                     linewidth: 1,
                     vertexColors: true, // THREE.VertexColors,
-                    opacity: 0.5,
+                    opacity: 0.8,
                     transparent: true
                 })
             );
@@ -307,17 +313,12 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
               lgt*0.2,// head Length
               lgt*0.2// head Width
               );
-            console.log(pointer.line, pointer.cone);
+            //console.log(pointer.line, pointer.cone);
             (pointer.line.material as THREE.Material).visible = false;
             (pointer.cone.material as THREE.MeshBasicMaterial).visible = false;
             (pointer.cone.material as THREE.MeshBasicMaterial).opacity = 0.9;
             //(pointer.cone.material as THREE.MeshBasicMaterial).vertexColors = true;
             //(pointer.cone.material as THREE.MeshBasicMaterial).color = new THREE.Color(0xFFFF40);
-            //pointer.line.material = new THREE.LineBasicMaterial({
-            //  color: 0xFFFF40,
-            //  linewidth: 5
-            //})
-            //(pointer.line.material as THREE.LineBasicMaterial).linewidth = 5
             this.scene?.add(pointer)
 
             this.workpiece.geometry.setFromPoints(vertices.slice());
@@ -325,8 +326,12 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
               new Float32Array(
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
+            //console.log(evLine);  
             this.workpiece.geometry.setAttribute( 'line', new THREE.BufferAttribute(
-              new Int32Array(evLine.map(ev=>ev.ln||0)),1))
+              new Int32Array(evLine.map(ev=>{
+                //console.log(':',ev)
+                return ev.ln||0
+              })),1))
 
             this.workpiece.geometry.computeBoundingBox()
             if(this.workpiece.geometry.boundingBox){
@@ -488,6 +493,7 @@ this.scene.add( helper );
     changeLine(line:number){
       const workpiece = (this.scene?.children[0] as THREE.Line)
       const lineArray = workpiece.geometry.getAttribute('line').array as Float32Array
+      // console.log(lineArray)
       this.currentframe = lineArray.reduce( (prev,current,index)=>{
         if( Math.abs(current-line) <= Math.abs(current-prev.value))return {index:index,value:current};
         else return prev
