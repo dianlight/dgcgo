@@ -11,6 +11,7 @@
         "dev": "quasar dev",
         "dev:electron": "quasar dev -m electron",
         "build": "quasar build",
+        "rebuild": "electron-rebuild",
         "build:electron": "quasar build -m electron",
         "gen:patch": "patch-package --exclude '^\\.(eslintrc|nyc_output|travis\\.yml)' gcode-toolpath",
         "postinstall": "patch-package --exclude  && electron-rebuild",

@@ -90,12 +90,14 @@ interface LogLine {
 })
 export default class Terminal extends Vue {
 
+  readonly LIMIT = 1000
+
   filterStatus = true
   matchStatus = true
 
   command = ''
   sendingCommand = false
-  start = 0
+  start = -this.LIMIT
   logs:LogLine[] = []
 
   declare $refs: {
@@ -108,28 +110,29 @@ export default class Terminal extends Vue {
   
   readLog = (self:Terminal)=>{
     if(!self.$refs.terminal)return // Terminal not visible!
-    void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:this.start,limit:20}).then( 
+    void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:self.start,limit:self.LIMIT}).then( 
        (lines)=>{
-         self.start+=lines.length
  //        console.log('>Before:',self.logs)
-         //console.log('Ricevute:',lines.length,lines)
+         console.log('Ricevute:',lines.length,lines)
          self.logs.push(...lines
+           .filter( l => l[0] > self.start)
            .map( l => { 
               // Basic Log Mapping 
+              self.start= l[0]
               return {
                 line:l[0],
                 direction: l[1].substr(0,1) as '<'|'>',
                 data: l[1].substr(2)
               } as LogLine
             })
-          .filter( this.markStatusGcode() )
+          .filter( self.markStatusGcode() )
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .reduce<LogLine[]>( (previousValue: LogLine[], currentValue: LogLine, currentIndex: number, all: LogLine[])=>{
-              if(this.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
+              if(self.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
               //  console.log('Response!',currentValue,currentIndex)
                 let match = false;
                   // Search in previus 100 lines
-                for( let value of this.logs.slice(this.logs.length-100).filter( dv=>dv.direction === '>')){
+                for( let value of self.logs.slice(self.logs.length-100).filter( dv=>dv.direction === '>')){
                   if(!value.result){
                    // console.log('Setting on line:',value,currentValue.data)
                     value.result = currentValue.data 
@@ -150,10 +153,10 @@ export default class Terminal extends Vue {
                     previousValue.push(currentValue)
                   }
                 }
-              } else if(this.matchStatus && currentValue.direction == '@'){
+              } else if(self.matchStatus && currentValue.direction == '@'){
                 let match=false
                 // Search in previus 100 lines
-                for( let value of this.logs.slice(this.logs.length-100).filter( dv=>dv.direction === '>')){
+                for( let value of self.logs.slice(self.logs.length-100).filter( dv=>dv.direction === '>')){
                   if(value.result?.startsWith('error:')){
                     value.error = currentValue.data 
                     match=true
@@ -177,18 +180,18 @@ export default class Terminal extends Vue {
               }
               return previousValue;
           },[] as LogLine[]) 
-          .filter( this.filterStatusGcode())
-          .map( this.colorGcode())
+          .filter( self.filterStatusGcode())
+          .map( self.colorGcode())
          );
 
 //         console.log('After:',self.logs)
 
 //         self.$refs.terminal.refresh(self.autoScroll?self.logs.length-1:undefined)
          if(lines.length > 0 && self.$refs.terminal)self.$refs.terminal.refresh()
-         if(lines.length < 20){
-           setTimeout(this.readLog,1000,self);
+         if(lines.length < self.LIMIT){
+           setTimeout(self.readLog,1000,self);
          } else {
-           this.readLog(self)
+           self.readLog(self)
          }
        } )
   }
@@ -204,8 +207,9 @@ export default class Terminal extends Vue {
   private markStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => LogLine {
     return (log) => {
       if(log.direction==='>') {
-        if(log.data==='?')
+        if(log.data==='?'){
           log.direction='%'
+        }
       } else {
         if(log.data.startsWith('<'))
           log.direction='%'
@@ -216,7 +220,9 @@ export default class Terminal extends Vue {
 
   private filterStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => unknown {
     return (log) => {
-      if(this.filterStatus)return log.direction !== '%'
+      if(this.filterStatus){
+        return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)
+      }
       else return true;
     };
   }
