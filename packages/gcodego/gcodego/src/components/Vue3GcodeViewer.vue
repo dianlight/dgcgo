@@ -304,7 +304,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
             this.scene?.add(this.workpiece);
 
             // Cursor
-            const lgt = 1
+            const lgt = 5
             const pointer = new THREE.ArrowHelper(
               new THREE.Vector3(0,0,-1), // Direction
               new THREE.Vector3(0,0,0),  // Position
@@ -509,7 +509,7 @@ this.scene.add( helper );
         (pointer.cone.material as THREE.MeshBasicMaterial).visible = true;
         pointer.position.x = position[0]
         pointer.position.y = position[1]
-        pointer.position.z = position[2]+1
+        pointer.position.z = position[2]+5
       } else {
         (pointer.line.material as THREE.Material).visible = false;
         (pointer.cone.material as THREE.MeshBasicMaterial).visible = false;
