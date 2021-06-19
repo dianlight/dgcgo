@@ -16,32 +16,46 @@
           snap
           dense
           markers
-          label-always
           @change="changeFrame"
       />
     </div>
     <div class="row control">
       <q-btn-group outline>
-        <q-btn outline label="Center" @click="center"/>
-        <q-btn outline label="Origin" disable/>
+        <q-btn outline icon="photo_camera_front" @click="front">
+          <q-tooltip>Front</q-tooltip>
+        </q-btn>  
+        <q-btn outline icon="photo_camera_back" @click="back">
+          <q-tooltip>Back</q-tooltip>
+        </q-btn>  
+        <q-btn outline icon="filter_center_focus" @click="up">
+          <q-tooltip>Up</q-tooltip>
+        </q-btn>  
+        <q-btn outline icon="center_focus_weak" @click="down">
+          <q-tooltip>Down</q-tooltip>
+        </q-btn>  
+        <q-btn outline icon="switch_left" @click="left">
+          <q-tooltip>Left</q-tooltip>
+        </q-btn>  
+        <q-btn outline icon="switch_right" @click="right">
+          <q-tooltip>Right</q-tooltip>
+        </q-btn>  
       </q-btn-group>
       <slot></slot>    
-      <p _class="infobox"> {{ camera?.matrix }} </p>
+      <!--p _class="infobox"> {{ camera?.matrix }} </!--p-->
     </div> 
 </template>
 
 <script lang="ts">
 
-import * as THREE from 'three';
-import { OrbitControls } from '@three-ts/orbit-controls';
-//import { defineComponent, Prop, ref } from 'vue';
+import  * as THREE from 'three';
+import CameraControls from 'camera-controls';
+//import { OrbitControls } from '@three-ts/orbit-controls';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
 import { dom } from 'quasar'
 import { Options, Vue } from 'vue-class-component';
 import split2 from 'split2'
 import through2 from 'through2'
-import { write } from 'fs';
 
 class Props {
     gcgrid?:boolean
@@ -123,7 +137,8 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
   renderer?: THREE.WebGLRenderer;
   scene?: THREE.Scene;
   camera?: THREE.PerspectiveCamera;
-  controls?: OrbitControls;
+  workpiece?: THREE.Line; //THREE.Object3D;
+  controls?: CameraControls;
   width = 0
   height = 0
 
@@ -143,11 +158,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
       0.1,
       1000
     );
-    this.controls = new OrbitControls(
-      this.camera,
-      this.renderer?.domElement
-    );
-//    this.currentline = this.$props.currentLine || Number.MAX_VALUE
+    CameraControls.install( { THREE: THREE } );
   }
   
 
@@ -268,7 +279,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .on('end',(_event: LoadEventData[])=>{
             this.scene?.clear()
-            const workpiece = new THREE.Line(
+            this.workpiece = new THREE.Line(
                 new THREE.BufferGeometry(),
                 new THREE.LineBasicMaterial({
                     color: this.defaultColor,
@@ -279,31 +290,32 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
                 })
             );
 
-            this.scene?.add(workpiece);
+            this.scene?.add(this.workpiece);
 
-            workpiece.geometry.setFromPoints(vertices.slice());
-            workpiece.geometry.setAttribute( 'org_color', new THREE.BufferAttribute(
+            this.workpiece.geometry.setFromPoints(vertices.slice());
+            this.workpiece.geometry.setAttribute( 'org_color', new THREE.BufferAttribute(
               new Float32Array(
                 colors.map( color=>[ color.r, color.g, color.b ]).flat()
               ),3))
-            workpiece.geometry.setAttribute( 'line', new THREE.BufferAttribute(
+            this.workpiece.geometry.setAttribute( 'line', new THREE.BufferAttribute(
               new Int32Array(evLine.map(ev=>ev.ln||0)),1))
 
-            workpiece.geometry.computeBoundingBox()
-            if(workpiece.geometry.boundingBox){
-              const bbox = workpiece.geometry.boundingBox;
+            this.workpiece.geometry.computeBoundingBox()
+            if(this.workpiece.geometry.boundingBox){
+              const bbox = this.workpiece.geometry.boundingBox;
               this.width = (bbox.max.x - bbox.min.x)
               this.height = (bbox.max.y - bbox.min.y)
 
               if (this.gcgrid) {
-                const axesHelper = new THREE.AxesHelper(5);
-                this.scene?.add(axesHelper);                
+                const axesHelper = new THREE.AxesHelper();
+                //axesHelper.material.depthTest = false;
+                this.scene?.add(axesHelper);   
+
                 const gridHelper = new THREE.GridHelper(
                   Math.max(this.width, this.height),
                   Math.max(this.width, this.height) / 10
                 );
                 gridHelper.rotateX(Math.PI / 2);
-                //      gridHelper.rotateOnAxis()
                 gridHelper.position.y = (this.height - 10) / 2;
                 gridHelper.position.x = (this.width - 10) / 2;
                 gridHelper.position.z = 0;
@@ -311,19 +323,12 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
               }
 
               if(this.controls && this.camera){
-                this.controls.target.y = (this.height) / 2;
-                this.controls.target.x = (this.width) / 2;
-                this.camera.position.x = (this.width) / 2;
-                this.camera.position.y = (this.height) / 2;
-                this.camera.position.z = (this.width) * 1.3;
-                this.camera.updateProjectionMatrix();
-
-                this.controls.update();
+                this.controls.setLookAt((this.width) / 2,(this.height) / 2,(this.width) * 1.3,(this.width) / 2,(this.height) / 2,0)
+                this.controls.fitToBox( this.workpiece, true )
               }
             }
 
             this.changeFrame()
-            this.render3d()
             this.$emit('onprogress',100)
 
 
@@ -334,19 +339,67 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
     }
   }
 
-  
+/*
     center(){
       if(this.controls && this.camera){
-        this.controls.target.y = (this.height) / 2;
-        this.controls.target.x = (this.width) / 2;
-        this.camera.position.x = (this.width) / 2;
-        this.camera.position.y = (this.height) / 2;
-        this.camera.position.z = (this.width) * 1.3;
-        this.camera.updateProjectionMatrix();
-
-        this.controls.update();
+        this.controls.reset(true)
+//        this.controls.setLookAt((this.width) / 2,(this.height) / 2,(this.width) * 1.3,(this.width) / 2,(this.height) / 2,0)
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
       }
-      this.render3d();
+    }
+*/
+
+    front(){
+      const DEG90 = Math.PI * 0.5;
+      if(this.controls && this.camera){
+        this.controls.rotateTo( 0, DEG90, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+    }
+
+    back(){
+      const DEG90 = Math.PI * 0.5;
+      const DEG180 = Math.PI;
+      if(this.controls && this.camera){
+        this.controls.rotateTo( DEG180, DEG90, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+
+    }
+
+    up(){
+      if(this.controls && this.camera){
+        this.controls.rotateTo( 0, 0, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+
+    }
+
+    down(){
+      const DEG180 = Math.PI;
+      if(this.controls && this.camera){
+        this.controls.rotateTo( 0, DEG180, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+
+    }
+
+    right(){
+      const DEG90 = Math.PI * 0.5;
+      if(this.controls && this.camera){
+        this.controls.rotateTo( DEG90, DEG90, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+
+    }
+
+    left(){
+      const DEG90 = Math.PI * 0.5;
+      if(this.controls && this.camera){
+        this.controls.rotateTo( -DEG90, DEG90, true );
+        this.controls.fitToBox( this.workpiece as THREE.Object3D, true )
+      }
+
     }
 
     init(): void {
@@ -358,14 +411,32 @@ this.scene.add( helper );
 */
       this.renderer?.setPixelRatio(window.devicePixelRatio);
       this.$refs.container?.appendChild(this.renderer?.domElement as Node);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      this.controls?.addEventListener('change', this.render3d ); // use if there is no animation loop
+      this.controls = new CameraControls( this.camera as THREE.PerspectiveCamera, this.renderer?.domElement as HTMLCanvasElement);
+
       if(this.controls){
         this.controls.minDistance = -500;
         this.controls.maxDistance = 500;
-        this.controls.enablePan = true;
-        this.controls.target.z = 0.0;
       }
+
+      // Animation
+      const clock = new THREE.Clock();
+      const anim = ()=>{
+        const delta = clock.getDelta();
+        const updated = this.controls?.update( delta );
+
+        requestAnimationFrame( anim );
+
+        if ( updated ) {
+
+          this.renderer?.render( this.scene as THREE.Scene, this.camera  as THREE.PerspectiveCamera);
+          //          console.log( 'rendered' );
+
+        }
+      }
+
+      anim()
+
+
       //window.addEventListener("resize", this.resize, false);
       // eslint-disable-next-line @typescript-eslint/unbound-method
       this.$refs.container?.parentElement?.addEventListener('resize', this.resize, false);
@@ -384,8 +455,8 @@ this.scene.add( helper );
           this.camera.aspect = clientWidth / clientHeight;
           this.camera.updateProjectionMatrix();
           this.renderer?.setSize(clientWidth, clientHeight);
-          this.controls.update();
-          }
+          this.controls.update(0);
+        }
         this.render3d();
       }
     }
