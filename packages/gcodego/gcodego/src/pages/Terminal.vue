@@ -4,18 +4,19 @@
       <q-virtual-scroll
         ref="terminal"
         style="height:70vh;width:100%"
-        :items="logs"
+        :items="$store.state.tightcnc.logs.lines"
+        @virtual-scroll="scrolling"
         >
           <template v-slot="{item}">
             <q-item :key="item.line" dense class='row q-gutter-xs q-pa-none'>
               <q-item-section side class="linenumber">
-                {{item.line}}
+                {{item.line}} <!-- {{index}} -->
               </q-item-section>
               <q-item-section side class="linedirection">
                 {{' '+item.direction}}
               </q-item-section>
               <q-item-section>
-                  <code :class="item.result?.startsWith('error')?'error':''" v-html="item.data"></code>
+                  <code :class="item.result?.startsWith('error')?'error':''" v-html="colorGcode(item.data)"></code>
                   <q-item-label v-if="item.result !== undefined" :class="item.result?.startsWith('error')?'error-message':''" caption>{{item.result}} {{item.error}}</q-item-label>
               </q-item-section>
             </q-item>
@@ -48,11 +49,18 @@
     </q-input>
   </div>
   <div class="row" ref="toggles">
+    <!--
     <q-btn
         outline
         dense
         label="Autoscroll"
         @click="autoScroll"
+    />
+    -->
+    <q-toggle
+        size="sx"
+        v-model="autoScroll"
+        label="Autoscroll"
     />
     <q-toggle
         size="sx"
@@ -62,8 +70,12 @@
     <q-toggle
         size="sx"
         v-model="matchStatus"
-        label="Inline response (*alpha)"
+        label="Inline response"
     />
+    <!--
+    {{ $store.state.tightcnc.logs.options }}
+    {{ $store.state.tightcnc.logs.lastVisualizedLine }}
+    -->
   </div>
 </q-page>  
 </template>
@@ -74,32 +86,60 @@ import hljs from 'highlight.js/lib/core';
 import gcode from 'highlight.js/lib/languages/gcode';
 import { QPage, QVirtualScroll } from 'quasar';
 import { dom } from 'quasar'
+//import { LogLine } from '../tightcnc/TightCNC';
 
 hljs.registerLanguage('gcode',gcode);
 
-interface LogLine {
-    line: number,
-    direction: '<'|'>'|'@'|'%',
-    data: string,
-    result?:string
-    error?:string
-  }
+
 
 @Options({
   components: {},
+  /*
+  watch: {
+    '$store.state.tightcnc.logs.lines'(lines:LogLine[]) {
+      if( (this as Terminal).$store.state.tightcnc.logs.options.autoScroll){
+        console.log('Autoscroll to:',lines.length);
+        (this as Terminal).$refs.terminal.scrollTo(lines.length)
+      }
+    }
+  }
+  */
 })
 export default class Terminal extends Vue {
 
-  readonly LIMIT = 1000
 
-  filterStatus = true
-  matchStatus = true
+  get filterStatus(){
+    return this.$store.state.tightcnc.logs.options.filterStatus
+  }
+  set filterStatus(value:boolean){
+    this.$store.commit('tightcnc/setLogOptions',{
+      filterStatus:value
+    })
+  }
+
+  get matchStatus(){
+    return this.$store.state.tightcnc.logs.options.matchStatus
+  }
+  set matchStatus(value:boolean){
+    this.$store.commit('tightcnc/setLogOptions',{
+      matchStatus: value
+    })
+  }
+
+  get autoScroll(){
+    return this.$store.state.tightcnc.logs.options.autoScroll
+  }
+  set autoScroll(value:boolean){
+    this.$store.commit('tightcnc/setLogOptions',{
+      autoScroll: value
+    })
+    if(value)this.$refs.terminal.scrollTo(this.$store.state.tightcnc.logs.lines.length-1)
+    else this.$refs.terminal.scrollTo(this.$store.state.tightcnc.logs.lines.length-2)
+  }
 
   command = ''
   sendingCommand = false
-  start = -this.LIMIT
-  logs:LogLine[] = []
-
+  
   declare $refs: {
     terminal:QVirtualScroll,
     page: QPage,
@@ -107,139 +147,22 @@ export default class Terminal extends Vue {
     toggles: HTMLDivElement
   }
 
-  
-  readLog = (self:Terminal)=>{
-    if(!self.$refs.terminal)return // Terminal not visible!
-    void self.$tightcnc.op<[number,string][]>('getLog',{logType:'comms',start:self.start,limit:self.LIMIT}).then( 
-       (lines)=>{
- //        console.log('>Before:',self.logs)
-         console.log('Ricevute:',lines.length,lines)
-         self.logs.push(...lines
-           .filter( l => l[0] > self.start)
-           .map( l => { 
-              // Basic Log Mapping 
-              self.start= l[0]
-              return {
-                line:l[0],
-                direction: l[1].substr(0,1) as '<'|'>',
-                data: l[1].substr(2)
-              } as LogLine
-            })
-          .filter( self.markStatusGcode() )
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          .reduce<LogLine[]>( (previousValue: LogLine[], currentValue: LogLine, currentIndex: number, all: LogLine[])=>{
-              if(self.matchStatus && currentValue.direction === '<' && (currentValue.data==='ok' || currentValue.data.startsWith('error:'))){
-              //  console.log('Response!',currentValue,currentIndex)
-                let match = false;
-                  // Search in previus 100 lines
-                for( let value of self.logs.slice(self.logs.length-100).filter( dv=>dv.direction === '>')){
-                  if(!value.result){
-                   // console.log('Setting on line:',value,currentValue.data)
-                    value.result = currentValue.data 
-                    match=true
-                    break
-                  }
-                }
-                if(!match){
-                  for(let value of previousValue.filter( dv=>dv.direction === '>')){
-                    if(!value.result){
-                    //  console.log('Setting on line:',value,currentValue.data)
-                      value.result = currentValue.data 
-                      match=true
-                      break
-                    }
-                  }
-                  if(!match){
-                    previousValue.push(currentValue)
-                  }
-                }
-              } else if(self.matchStatus && currentValue.direction == '@'){
-                let match=false
-                // Search in previus 100 lines
-                for( let value of self.logs.slice(self.logs.length-100).filter( dv=>dv.direction === '>')){
-                  if(value.result?.startsWith('error:')){
-                    value.error = currentValue.data 
-                    match=true
-                    break
-                  }
-                }
-                if(!match){
-                  for(let value of previousValue.filter( dv=>dv.direction === '>')){
-                    if(value.result?.startsWith('error:')){
-                      value.error = currentValue.data 
-                      match=true
-                      break
-                    }
-                  }
-                  if(!match){
-                    previousValue.push(currentValue)
-                  }
-                }
-              } else {
-                previousValue.push(currentValue)
-              }
-              return previousValue;
-          },[] as LogLine[]) 
-          .filter( self.filterStatusGcode())
-          .map( self.colorGcode())
-         );
 
-//         console.log('After:',self.logs)
-
-//         self.$refs.terminal.refresh(self.autoScroll?self.logs.length-1:undefined)
-         if(lines.length > 0 && self.$refs.terminal)self.$refs.terminal.refresh()
-         if(lines.length < self.LIMIT){
-           setTimeout(self.readLog,1000,self);
-         } else {
-           self.readLog(self)
-         }
-       } )
-  }
-
-  private colorGcode(): (value: LogLine, index: number, array: LogLine[]) => LogLine {
-    return l => {
+  colorGcode(l:string) {
       // Highligt GCODE
-      l.data=hljs.highlight(l.data, { language: 'gcode' }).value;
-      return l;
-    };
-  }
-
-  private markStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => LogLine {
-    return (log) => {
-      if(log.direction==='>') {
-        if(log.data==='?'){
-          log.direction='%'
-        }
-      } else {
-        if(log.data.startsWith('<'))
-          log.direction='%'
-      }
-      return log;
-    };
-  }
-
-  private filterStatusGcode(): (value: LogLine, index: number, array: LogLine[]) => unknown {
-    return (log) => {
-      if(this.filterStatus){
-        return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)
-      }
-      else return true;
-    };
+      return hljs.highlight(l, { language: 'gcode' }).value;
   }
 
   mounted(){
-    this.logs=[]
-    this.$refs.terminal.reset()
-    setTimeout(this.readLog,1000,this)
+    console.log('Scroll to:',this.$store.state.tightcnc.logs.lastVisualizedLine)
+    this.$refs.terminal.scrollTo(this.$store.state.tightcnc.logs.lastVisualizedLine,'start')
+//    this.logs=[]
+//    this.$refs.terminal.reset()
+//    setTimeout(this.readLog,1000,this)
    // void this.$nextTick(()=>{
    //   this.autoScroll()
    //   }
    // )
-  }
-
-  unmounted(){
-    console.log('unount');
-    this.logs=[]
   }
 
   viewPortHight():number{
@@ -249,29 +172,18 @@ export default class Terminal extends Vue {
     -dom.height(this.$refs.toggles)
 
   }
-
-  autoScroll(){
-    this.$refs.terminal.refresh(this.logs.length-1)
-  }
   
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//  handleScroll(...args:any[]){
-//    console.log('Scroll',args)
-//    this.autoScroll = false;
-//    if(pixel < this.logs.length)this.autoScroll=false
-//  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//  handleStartReached(pixel:number){
-//    console.log('Start scroll',pixel)
-//  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//  handleEndReached(pixel:number){
-//    console.log('Stop scroll',pixel)
-//    this.autoScroll = true;
-//  }
+  scrolling(detail:{index:number,from:number,to:number,direction:'increase'|'decreise'}){
+    //console.log('Ricevuto evento scroll:',detail)
+    this.$store.commit('tightcnc/setLogLastVisualizedLine',detail.index) 
+    if(this.autoScroll && detail.direction==='increase'){
+      this.$refs.terminal.scrollTo(this.$store.state.tightcnc.logs.lines.length-1)
+    } else {
+      this.$store.commit('tightcnc/setLogOptions',{
+        autoScroll: detail.index === detail.to
+      })    
+    }
+  }
 
   sendCommand(event: KeyboardEvent){
     if(event.key && event.key !== 'Enter')return
@@ -279,7 +191,7 @@ export default class Terminal extends Vue {
     void this.$tightcnc.op('send',{line:this.command, wait: false}).then( ()=> {
       this.sendingCommand = false
       this.command = ''
-      this.autoScroll()
+//      this.$refs.terminal.refresh(this.$store.state.tightcnc.logs.lines.length-1)
     })
   }
 

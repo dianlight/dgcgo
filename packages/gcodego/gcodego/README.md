@@ -47,7 +47,9 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
       - [ ] Recent files / Dropin open file
     - [x] Reexpose WebMenu functionalities
   - [x] ~~electron-icon-builder~~ ( Used Quasar icongeine)
-  - [ ] electron-process-type
+  - [ ] electron-process-type ( need for worker? )
+  - [ ] About window - electron-util
+  - [ ] Open GitHub issue - electron-util + electron-unhandled
 - [ ] WebServer version
   - [ ] Start/Stop scripts
   - [ ] Autoupdate support
@@ -61,7 +63,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [x] Language switcher
   - [x] Vue3-gcode-viewer
 - [ ] UI
-  - [x] Multi language
+  - [x] Multilanguage
     - [ ] English complete translation
     - [ ] Italian complete translation
   - [x] Web Menu for non electron view (autohide?)
@@ -69,6 +71,10 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [ ] Gcode open for Electron based
     - [ ] Import/Export configuration
       - [ ] Import/Eport for Electron
+  - [x] Terminal
+    - [x] Global terminal ( with bedge for new lines?!?)
+    - [x] Autoscroll
+    - [ ] @appliedengdesign/gcode-reference integration
   - [ ] Base Layout
     - [x] Keyboard support
     - [ ] Remote Joystic / Joypad support
@@ -101,16 +107,16 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
         - [ ] Graduate grid with dimension
           - [ ] Add detail on zoom-in
       - [x] G2/G3 Arch support
-      - [ ] Spindle position
+      - [x] Spindle position
       - [ ] UI view control
         - [x] Reset/Center
-        - [ ] Remember position on rab switch.
-        - [ ] Timeline visulaizer
-          - [ ] Sync with work
-    - [ ] Job running v
+        - [ ] Remember position on tab switch. (see camera-control suspend and resume if works)
+        - [x] Timeline visulaizer
+          - [x] Sync with work
+    - [x] Job running v
       - [ ] Start/Pause/Resume/Stop job control
-      - [ ] Timeframe vision
-      - [ ] Job status indicator
+      - [x] Timeframe vision
+      - [ ] Job-status indicator
     - [ ] Gcode Editor
       - [ ] Selectable path
         - [ ] Remove selected path

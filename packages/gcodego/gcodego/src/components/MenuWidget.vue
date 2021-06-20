@@ -14,7 +14,10 @@
           <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')" disable>
             <q-tooltip>{{ $t('menu.file.open')}} **not yet implemented**</q-tooltip>
           </q-btn>
-          <q-route-tab to="/terminal" label="Terminal" />
+          <q-route-tab to="/terminal" icon="dvr">
+            <q-tooltip>{{ $t('menu.terminal')}}</q-tooltip>
+            <q-badge color="positive" v-if="$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine > 1" floating>{{$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine-1}}</q-badge>
+          </q-route-tab>
           <q-route-tab to="/pippo" label="404" />
         </q-tabs>
 
@@ -98,11 +101,6 @@ export default class ManuWidget extends Vue {
   mounted(){
     //console.log(this.$q.platform)
     if(this.$q.platform.is.electron){
- //     for( let pcx in this.$tm('menu') as any){
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        //console.log('>',pcx,this.$t(`menu.${pcx}`),this.$tm(`menu.${pcx}`));
- //     }
-      //console.log('------->',this.i18nToJson('menu'))
       window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
       window.api.receive('MenuEvent',(params:{link?:string,dialog?:string})=>{       
         //console.log(params)

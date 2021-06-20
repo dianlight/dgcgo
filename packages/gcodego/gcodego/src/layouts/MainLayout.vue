@@ -183,6 +183,7 @@ export default class MainLayout extends Vue {
       const starter = setInterval(()=>{
         if(this.$tightcnc){
           void this.$store.dispatch('tightcnc/clientStatus', this.$tightcnc)
+          void this.$store.dispatch('tightcnc/logReader', this.$tightcnc)
           this.clientExists=true
           clearInterval(starter)
         }
