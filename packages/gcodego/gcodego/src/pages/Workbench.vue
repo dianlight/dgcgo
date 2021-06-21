@@ -113,10 +113,12 @@ export default class WorkBench extends Vue.with(Props) {
     return this.$tightcnc.startJob({
       filename: this.wdata.tmpFileName,    
       gcodeProcessors: this.$tightcnc.getConfig().selectedProcessors?.map( (sel,index) => {
+        const options = this.$tightcnc.getConfig().processorsConfigs![sel];
         return {
           name: sel,
           options: {
-              id: sel
+              id: sel,
+              ...options
           },
           order: index
         }

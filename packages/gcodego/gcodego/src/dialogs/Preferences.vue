@@ -85,7 +85,11 @@
             :data="processorConfig(prc)"
             :renderers="renderers"
             :schema="availableProcessors[prc].schema" 
-            :uischema="availableProcessors[prc].uiSchema"
+            :uischema="{
+              type: 'Group',
+              label: capitalize(prc),
+              elements: [availableProcessors[prc].uiSchema]
+              }"
             @change="onChange(prc,$event)"
           />           
     </template>
@@ -129,6 +133,8 @@ import {
   vanillaRenderers,
 } from '@jsonforms/vue-vanilla';
 import { UISchemaElement } from '@jsonforms/core';
+import { format } from 'quasar'
+
 
 
 @Options({
@@ -219,6 +225,10 @@ export default class Preferences extends Vue {
         })
       }
 
+      private capitalize(str:string){
+        return format.capitalize(str)
+      }
+
       private processorConfig(prc:string){
         if(this.config.processorsConfigs && this.config.processorsConfigs[prc]){
               return this.config.processorsConfigs[prc] 
@@ -305,4 +315,5 @@ export default class Preferences extends Vue {
 </script>
 
 <style lang="scss">
+@import '@jsonforms/vue-vanilla/vanilla.css';
 </style>
