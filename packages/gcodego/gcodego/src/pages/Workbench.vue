@@ -112,6 +112,15 @@ export default class WorkBench extends Vue.with(Props) {
     }
     return this.$tightcnc.startJob({
       filename: this.wdata.tmpFileName,    
+      gcodeProcessors: this.$tightcnc.getConfig().selectedProcessors?.map( (sel,index) => {
+        return {
+          name: sel,
+          options: {
+              id: sel
+          },
+          order: index
+        }
+      })
     }).then( (jobstatus)=>{
       this.$store.commit('tightcnc/setJobStatus',jobstatus)
     })

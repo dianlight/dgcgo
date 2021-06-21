@@ -22,6 +22,9 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
+        "@jsonforms/core": "^2.5.2",
+        "@jsonforms/vue": "^2.5.2",
+        "@jsonforms/vue-vanilla": "^2.5.2",
         "@quasar/extras": "^1.10.7",
         "axios": "^0.21.1",
         "camera-controls": "^1.28.4",

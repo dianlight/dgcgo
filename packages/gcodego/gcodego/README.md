@@ -66,17 +66,31 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] Multilanguage
     - [ ] English complete translation
     - [ ] Italian complete translation
-  - [x] Web Menu for non electron view (autohide?)
-    - [ ] GCode upload
-    - [ ] Gcode open for Electron based
+  - [ ] Web Menu
+    - [x] Gcode open for Electron based
+      - [ ] GCode upload
+    - [ ] SVG import for Electron based ( piLeoni/svgcode or em/svg2gcode)
+      - [ ] SVG upload
     - [ ] Import/Export configuration
       - [ ] Import/Eport for Electron
+  - [ ] Home
+    - [ ] Welcome text
+    - [ ] Autohide on nc open
+  - [ ] Preferencies
+    - [ ] Base TightCNC connection params
+    - [ ] Plugins management
+      - [ ] GCodeGo plugin system ( tightcnc + visual)
+    - [ ] Active Processor
+    - [ ] Active Macros
   - [x] Terminal
-    - [x] Global terminal ( with bedge for new lines?!?)
+    - [x] Global terminal
+      - [x] Bedge for unread line
+      - [ ] Bedge fro urread errors
     - [x] Autoscroll
     - [ ] @appliedengdesign/gcode-reference integration
-  - [ ] Base Layout
+  - [ ] WebControl Widget
     - [x] Keyboard support
+    - [ ] Got to position
     - [ ] Remote Joystic / Joypad support
       - [ ] grbl offline controller
       - [ ] PS4 Joypad support
@@ -114,6 +128,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
         - [x] Timeline visulaizer
           - [x] Sync with work
     - [x] Job running v
+      - [ ] Job status in tab title as bedge
       - [ ] Start/Pause/Resume/Stop job control
       - [x] Timeframe vision
       - [ ] Job-status indicator

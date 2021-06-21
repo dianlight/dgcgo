@@ -19,6 +19,7 @@
             <q-badge color="positive" v-if="$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine > 1" floating>{{$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine-1}}</q-badge>
           </q-route-tab>
           <q-route-tab to="/pippo" label="404" />
+          <q-route-tab to="/testPage" label="Test" />
         </q-tabs>
 
         <q-separator vertical inset />

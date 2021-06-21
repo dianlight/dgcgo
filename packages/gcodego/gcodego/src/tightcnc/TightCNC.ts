@@ -9,6 +9,11 @@ import {
 import { uid } from 'quasar';
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
 
+export interface GcodeGoConfig extends TightCNCConfig {
+  selectedProcessors: string[],
+  processorsConfigs: Record<string,Record<string,unknown>>
+}
+
 
 export type LogLineDirection = '<' | '>' | '@' | '%'
 export interface LogLine {
@@ -77,7 +82,7 @@ export class Client {
     );
   }
 
-  public getConfig(): Partial<TightCNCConfig> {
+  public getConfig(): Partial<GcodeGoConfig> {
     return this.config;
   }
 
@@ -127,22 +132,22 @@ export class Client {
     window.api.send('SaveTightCNCConfig', cc);
   }
 
-  updateConfig(config: Partial<TightCNCConfig>, restart?: boolean) {
-    const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>;
+  updateConfig(config: Partial<GcodeGoConfig>, restart?: boolean) {
+    const cc = JSON.parse(JSON.stringify(config)) as Partial<GcodeGoConfig>;
     this.config = cc;
     //console.log('Save config',cc)
     window.api.send('SaveTightCNCConfig', cc);
     if (restart) void this.restart();
   }
 
-  static async loadConfig(): Promise<Partial<TightCNCConfig>> {
-    return window.api.invoke<undefined, Partial<TightCNCConfig>>(
+  static async loadConfig(): Promise<Partial<GcodeGoConfig>> {
+    return window.api.invoke<undefined, Partial<GcodeGoConfig>>(
       'LoadTightCNCConfig'
     );
   }
 
   async op<T>(opname: string, params?: JSONRPCParams): Promise<T> {
-    return this.jsonrpc.request(opname, params || {});
+    return this.jsonrpc.request(opname, params);
   }
 
   /**
@@ -150,7 +155,7 @@ export class Client {
    */
 
   getStatus(): Promise<Partial<StatusObject>> {
-    return this.op<Partial<StatusObject>>('getStatus');
+    return this.op<Partial<StatusObject>>('getStatus',{});
   }
 
   getAvailableSerials(): Promise<PortInfo[]> {

@@ -1,7 +1,11 @@
 <template>
-<q-dialog v-model="show">
-  <q-card>
-  <h5>TightCNC Preferences</h5>
+<q-dialog v-model="show" full-width full-height>
+  <q-card class="column full-height">
+        <q-card-section>
+          <div class="text-h6">{{$t('menu.preferences')}}</div>
+        </q-card-section>
+
+         <q-card-section class="col q-pt-none">
   <q-form @submit="onSubmit" @reset="onReset" autofocus>
     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
       <q-input :disable="$q.platform.is.electron" dense v-model="config.host" outlined type="text" label="TightCNC host" />
@@ -27,11 +31,6 @@
           <q-select dense outlined v-model="port" @popup-show="refreshSerialList"  clearable :options="serials" label="Port" emit-value>
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
-              <!--
-              <q-item-section avatar>
-                <q-icon :name="scope.opt.icon" />
-              </q-item-section>
-              -->
               <q-item-section>
                 <q-item-label v-html="scope.opt.label" />
                 <q-item-label caption>{{ scope.opt.portInfo.manufacturer }} {{ scope.opt.portInfo.vendorId}} {{ scope.opt.portInfo.productId }}</q-item-label>
@@ -70,45 +69,91 @@
 
     <q-separator class="q-mt-sm"/>
 
+    <q-select
+          filled
+          v-model="config.selectedProcessors"
+          multiple
+          :options="Object.keys(availableProcessors).filter( k=> availableProcessors[k].uiSchema !== undefined)"
+          use-chips
+          stack-label
+          label="Active GCode Processors"
+    />
+
+    <template v-for="prc in config.selectedProcessors || []" :key="prc">
+          <q-separator class="q-mt-sm"/>
+          <json-forms
+            :data="processorConfig(prc)"
+            :renderers="renderers"
+            :schema="availableProcessors[prc].schema" 
+            :uischema="availableProcessors[prc].uiSchema"
+            @change="onChange(prc,$event)"
+          />           
+    </template>
+
+<!--
+
+    <q-separator class="q-mt-sm"/>
+
     <div class="q-gutter-md q-mt-sm q-pr-md column items-end">
          <q-btn-group>
             <q-btn label="Reset" type="reset" color="negative"/>
             <q-btn label="Save" type="submit" color="positive" v-close-popup="1"/>
          </q-btn-group> 
     </div>
+-->    
+   
   </q-form>
-  </q-card>
+         </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn label="Reset" @click="onReset" color="negative"/>
+          <q-btn label="Save" @click="onSubmit" color="positive" v-close-popup="1"/>
+        </q-card-actions>
+
+  </q-card>         
+
 </q-dialog>  
 </template>
 
 <script lang="ts">
 import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
-//import { Client } from '../tightcnc/TightCNC'
 import { Options, Vue } from 'vue-class-component';
+import { markRaw } from 'vue'
 import URLParse from 'url-parse'
+import { GcodeGoConfig } from '../tightcnc/TightCNC';
+import { JSONSchema7 } from 'json-schema';
+import { JsonForms, JsonFormsChangeEvent } from '@jsonforms/vue';
+import {
+//  defaultStyles,
+//  mergeStyles,
+  vanillaRenderers,
+} from '@jsonforms/vue-vanilla';
+import { UISchemaElement } from '@jsonforms/core';
 
 
 @Options({
-  components: {}
+  components: { JsonForms }
 })
 export default class Preferences extends Vue {
-
       get show(){
         return this.$store.state.dialogs.preferences
       }
       set show(value:boolean){
         this.$store.commit(`dialogs/${value?'show':'hide'}Dialog`,'preferences');
         this.refreshSerialList()
+        this.refreshGcodeProcessorsList()
+        console.log(this.availableProcessors)
       }
 
       portType = 'serial'
       isPwd = true
-      config:Partial<TightCNCConfig> = {}
+      config:Partial<GcodeGoConfig> = {}
       port = ''
       baudRate = 115200
       usedAxes = [ true, true, true ]
       homableAxes =  [ true, true, true ]
       serials:{label:string,value:string, portInfo:PortInfo}[] = []
+
 
 
       controllers = [
@@ -122,11 +167,25 @@ export default class Preferences extends Vue {
 
       grblSimPath=''      
 
+      availableProcessors:Record<string,{
+        schema: JSONSchema7,
+        uiSchema: UISchemaElement|void
+      }> = markRaw({})
+
+      // Json Form
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      renderers = Object.freeze(markRaw([
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        ...vanillaRenderers,
+        // here you can add custom renderers
+      ]));
+
+
       mounted(){
         this.onReset()
         this.refreshSerialList()  
+        this.refreshGcodeProcessorsList()
       }
-
   
 
       private refreshSerialList(){
@@ -141,6 +200,47 @@ export default class Preferences extends Vue {
               portInfo: ss}
               })
         })
+      }
+
+      private refreshGcodeProcessorsList(){
+        void this.$tightcnc.op<Record<string,{
+        schema: JSONSchema7,
+        uiSchema: UISchemaElement|void
+        }>>('getAvailableGcodeProcessors').then( (list)=>{
+          this.availableProcessors =  list
+          console.log(list)
+          // initialized empty config
+          if(!this.config.processorsConfigs)this.config.processorsConfigs={}
+          for(const akey of Object.keys(list)){
+            if(!this.config.processorsConfigs[akey]){
+              this.config.processorsConfigs[akey] = {}
+            }
+          }
+        })
+      }
+
+      private processorConfig(prc:string){
+        if(this.config.processorsConfigs && this.config.processorsConfigs[prc]){
+              return this.config.processorsConfigs[prc] 
+        } else if(this.config.processorsConfigs) {
+              this.config.processorsConfigs[prc] = {}
+              return {}
+        } else {
+              this.config.processorsConfigs={}
+              this.config.processorsConfigs[prc] = {}
+              return {}
+        }
+      }
+
+      onChange(prc:string,event: JsonFormsChangeEvent) {
+        console.log(prc,event,event.data);
+        if(this.config.processorsConfigs){
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          this.config.processorsConfigs[prc]=event.data;
+        } else if(this.config.processorsConfigs) {
+              this.config.processorsConfigs[prc] = {} as never
+              this.config.processorsConfigs[prc]=event.data as never;
+        }       
       }
 
       onSubmit(){
