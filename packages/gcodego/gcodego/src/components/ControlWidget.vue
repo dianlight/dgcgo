@@ -160,7 +160,7 @@
 </template>
 
 <script lang="ts">
-import { ControllerStatus } from 'app/../tightcnc/types/src';
+import { ControllerStatus } from 'tightcnc';
 import { QBtn } from 'quasar';
 import { Options, Vue } from 'vue-class-component';
 

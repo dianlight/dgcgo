@@ -1,20 +1,16 @@
 <template>
   <!-- notice dialogRef here -->
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
-      <!--
-        ...content
-        ... use q-card-section for it?
-      -->
-      <q-card-actions>
 
-      <json-forms
-        :data="cdata"
-        :renderers="renderers"
-        :schema="schema"
-        :uischema="uischema"
-        @change="onChange"
-      />
+      <q-card-actions>
+        <json-forms
+          :data="cdata"
+          :renderers="renderers"
+          :schema="schema"
+          :uischema="uischema"
+          @change="onChange"
+        />
       </q-card-actions>
 
       <!-- buttons example -->
@@ -27,80 +23,95 @@
 </template>
 
 <script lang="ts">
-
-import { markRaw } from 'vue'
-import { useDialogPluginComponent } from 'quasar'
-//import { JSONSchema7 } from 'json-schema';
+import { Options, Vue } from 'vue-class-component';
+import { markRaw } from 'vue';
+import { QDialog, useDialogPluginComponent } from 'quasar';
+import { JSONSchema7 } from 'json-schema';
 import { JsonForms, JsonFormsChangeEvent } from '@jsonforms/vue';
 import {
-//  defaultStyles,
-//  mergeStyles,
+  //  defaultStyles,
+  //  mergeStyles,
   vanillaRenderers,
 } from '@jsonforms/vue-vanilla';
-//import { UISchemaElement } from '@jsonforms/core';
+import { UISchemaElement } from '@jsonforms/core';
 
-const renderers = [
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  ...vanillaRenderers,
-  // here you can add custom renderers
-];
+class Props {
+  text?: string;
+  schema?: JSONSchema7;
+  uischema?: UISchemaElement;
+  data?: Record<string, unknown>;
+}
 
-export default {
-  props: {
-    text: String,
-    schema: Object, // JsonSchema7,
-    uischema: Object, // UISchemaElement, 
-    data:Object
-  },
+@Options({
   components: { JsonForms },
-
   emits: [
     // REQUIRED; need to specify some events that your
     // component will emit through useDialogPluginComponent()
-    ...useDialogPluginComponent.emits
+    ...useDialogPluginComponent.emits,
   ],
-
-  setup () {
-    // REQUIRED; must be called inside of setup()
-    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
-    // dialogRef      - Vue ref to be applied to QDialog
-    // onDialogHide   - Function to be used as handler for @hide on QDialog
-    // onDialogOK     - Function to call to settle dialog with "ok" outcome
-    //                    example: onDialogOK() - no payload
-    //                    example: onDialogOK({ /*.../* }) - with payload
-    // onDialogCancel - Function to call to settle dialog with "cancel" outcome
-
-    const cdata = {}
-
-
-    return {
-      // This is REQUIRED;
-      // Need to inject these (from useDialogPluginComponent() call)
-      // into the vue scope for the vue html template
-      dialogRef,
-      onDialogHide,
-      onDialogOK,
-
-      // we can passthrough onDialogCancel directly
-      onCancelClick: onDialogCancel,
+})
+export default class JsonFormDialog extends Vue.with(Props) {
+  // Json Form
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  renderers = Object.freeze(
+    markRaw([
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      renderers: markRaw(renderers),
-      cdata
-    }
-  },
-    methods: {
-      onChange(event: JsonFormsChangeEvent) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        this.cdata = event.data;
-      },
-      onOKClick(){
-        // on OK, it is REQUIRED to
-        // call onDialogOK (with optional payload)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        this.onDialogOK(this.cdata)
-        // or with payload: onDialogOK({ ... })
-        // ...and it will also hide the dialog automatically
-      }
-  },
+      ...vanillaRenderers,
+      // here you can add custom renderers
+    ])
+  );
+
+  declare $refs: {
+    dialog: QDialog;
+  };
+
+  // REQUIRED; must be called inside of setup()
+  //{ dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+  // dialogRef      - Vue ref to be applied to QDialog
+  // onDialogHide   - Function to be used as handler for @hide on QDialog
+  // onDialogOK     - Function to call to settle dialog with "ok" outcome
+  //                    example: onDialogOK() - no payload
+  //                    example: onDialogOK({ /*.../* }) - with payload
+  // onDialogCancel - Function to call to settle dialog with "cancel" outcome
+
+  cdata: Record<string, unknown> = {};
+
+  onChange(event: JsonFormsChangeEvent) {
+    this.cdata = event.data as Record<string, unknown>;
+  }
+
+  // following method is REQUIRED
+  // (don't change its name --> "show")
+  show() {
+    this.$refs.dialog.show();
+  }
+
+  // following method is REQUIRED
+  // (don't change its name --> "hide")
+  hide() {
+    this.$refs.dialog.hide();
+  }
+
+  onDialogHide() {
+    // required to be emitted
+    // when QDialog emits "hide" event
+    this.$emit('hide');
+  }
+
+  onOKClick() {
+    // on OK, it is REQUIRED to
+    // emit "ok" event (with optional payload)
+    // before hiding the QDialog
+    this.$emit('ok', this.cdata);
+    // or with payload: this.$emit('ok', { ... })
+
+    // then hiding dialog
+    this.hide();
+  }
+
+  onCancelClick() {
+    // we just need to hide the dialog
+    this.hide();
+  }
 }
 </script>

@@ -149,7 +149,6 @@
 </template>
 
 <script lang="ts">
-//import { ControllerStatus, StatusObject } from 'app/../tightcnc/types/src';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({

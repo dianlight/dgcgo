@@ -1,5 +1,5 @@
 import { boot } from 'quasar/wrappers';
-import { Client } from 'src/tightcnc/TightCNC';
+import { Client } from '../tightcnc/TightCNC';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {

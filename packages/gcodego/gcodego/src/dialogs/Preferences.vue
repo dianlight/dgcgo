@@ -73,10 +73,12 @@
           filled
           v-model="config.selectedPlugins"
           multiple
-          :options="$plugins.listPluginRegiter()"
+          :options="$plugins.listPluginRegister()"
           use-chips
           stack-label
           label="Active Plugins"
+          @add='addUIPlugin'
+          @remove='removeUIPlugin'
     /> 
 
     <q-separator class="q-mt-sm"/>
@@ -85,11 +87,14 @@
           filled
           v-model="config.selectedProcessors"
           multiple
-          :options="Object.keys(availableProcessors).filter( k=> availableProcessors[k].uiSchema !== undefined)"
+          :options="availableProgessorsFiltered()"
+          options-dense  
           use-chips
           stack-label
           label="Active GCode Processors"
-    />
+          readonly
+    >
+    </q-select>
 
     <template v-for="prc in config.selectedProcessors || []" :key="prc">
           <q-separator class="q-mt-sm"/>
@@ -105,18 +110,6 @@
             @change="onChange(prc,$event)"
           />           
     </template>
-
-<!--
-
-    <q-separator class="q-mt-sm"/>
-
-    <div class="q-gutter-md q-mt-sm q-pr-md column items-end">
-         <q-btn-group>
-            <q-btn label="Reset" type="reset" color="negative"/>
-            <q-btn label="Save" type="submit" color="positive" v-close-popup="1"/>
-         </q-btn-group> 
-    </div>
--->    
    
   </q-form>
          </q-card-section>
@@ -133,7 +126,7 @@
 </template>
 
 <script lang="ts">
-import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from 'tightcnc'
+import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo,GcodeProcessorLifeCycle } from 'tightcnc'
 import { Options, Vue } from 'vue-class-component';
 import { markRaw } from 'vue'
 import URLParse from 'url-parse'
@@ -147,6 +140,7 @@ import {
 } from '@jsonforms/vue-vanilla';
 import { UISchemaElement } from '@jsonforms/core';
 import { format } from 'quasar'
+import * as _ from 'lodash';
 
 
 
@@ -195,7 +189,8 @@ export default class Preferences extends Vue {
 
       availableProcessors:Record<string,{
         schema: JSONSchema7,
-        uiSchema: UISchemaElement|void
+        uiSchema: UISchemaElement|void,
+        lifeCycle: GcodeProcessorLifeCycle
       }> = markRaw({})
 
       // Json Form
@@ -215,11 +210,8 @@ export default class Preferences extends Vue {
   
 
       private refreshSerialList(){
-        // console.log('-->Serial List!')
         void this.$tightcnc.getAvailableSerials().then( serials => {
-        //  console.log('-->Serial List Return', serials)
           this.serials = serials.map( ss =>  {
-            //console.log(ss)
             return {
               label:ss.path,
               value:ss.path,
@@ -231,7 +223,8 @@ export default class Preferences extends Vue {
       private refreshGcodeProcessorsList(){
         void this.$tightcnc.op<Record<string,{
         schema: JSONSchema7,
-        uiSchema: UISchemaElement|void
+        uiSchema: UISchemaElement|void,
+        lifeCycle: GcodeProcessorLifeCycle
         }>>('getAvailableGcodeProcessors').then( (list)=>{
           this.availableProcessors =  list
         })
@@ -244,17 +237,53 @@ export default class Preferences extends Vue {
     
 
       private processorConfig(prc:string){
-//        const configKey = _.camelCase(this.availableProcessors[prc].schema.$id?.slice(1)||'bogus')
         return this.config[prc as keyof GcodeGoConfig] || {}
       }
 
+      private availableProgessorsFiltered(){
+        return Object.keys(this.availableProcessors)
+   //      .filter( k=> this.availableProcessors[k].lifeCycle in ['server-only','optional-ui'])
+         .map ( k => {
+           return {
+             label: k,
+             value: k,
+             disabled: !(this.availableProcessors[k].lifeCycle in ['server-only','optional-ui'])
+           }
+         })
+      }
+
       onChange(prc:string,event: JsonFormsChangeEvent) {
-//        const configKey = _.camelCase(this.availableProcessors[prc].schema.$id?.slice(1)||'bogus')
-        //return this.config[configKey as keyof GcodeGoConfig] || {}
-        console.log(prc/*,configKey*/,event,event.data);
+        //console.log(prc/*,configKey*/,event,event.data);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.config[prc as keyof GcodeGoConfig] = event.data
       }
+
+
+      addUIPlugin(details:{index:number,value:string}){
+        console.log('Added:',details)
+        const pliugin = this.$plugins.getPluginFromRegister(details.value)
+        if(pliugin){
+          pliugin.activatePlugin()
+          this.config.selectedProcessors?.push(...pliugin.dependencies().tightcncProcessors||[])
+        }
+      }
+
+      removeUIPlugin(details:{index:number,value:string}){
+        console.log('Removed:',details)
+        const pliugin = this.$plugins.getPluginFromRegister(details.value)
+        if(pliugin){
+          pliugin.deactivatePlugin()
+          const mp = pliugin.dependencies().tightcncProcessors
+          if(mp && this.config.selectedProcessors){
+              const toRemove = _.intersection(mp,
+               ...Object.values(this.$plugins._pluginRegister).map( pl=>pl.dependencies().tightcncProcessors)
+              )
+              _.pullAll(this.config.selectedProcessors,toRemove)
+              
+          }
+        }
+      }
+
 
       onSubmit(){     
         switch(this.config.controller){
@@ -309,11 +338,6 @@ export default class Preferences extends Vue {
         }
       }
 
-      
-
-//valueChanged(values:TightCNCConfig) {
-//     console.log('Values', values);
-//   }
 }
 </script>
 

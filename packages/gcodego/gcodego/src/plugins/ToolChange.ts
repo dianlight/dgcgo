@@ -1,8 +1,8 @@
 
-import { GcPlugin } from './GcPlugin'
+import { GcPlugin, GcPluginDependencies } from './GcPlugin'
 import { JobStatus } from 'tightcnc';
 import * as objtools from 'objtools'
-import { JsonSchema7, UISchemaElement } from 'app/../tightcnc/node_modules/@jsonforms/core/lib';
+import { JsonSchema7, UISchemaElement } from '@jsonforms/core/lib';
 
 export class ToolChange extends GcPlugin {
 
@@ -14,6 +14,13 @@ export class ToolChange extends GcPlugin {
     deactivatePlugin(): boolean {
         this.adapter.unregisterJobStatusUpdateHook(this.statusHook)
         return true
+    }
+
+    dependencies(): GcPluginDependencies {
+        return {
+            tightcncProcessors: ['toolChange'],
+            tightcncOptionalProcessors: ['autolevel']
+        }
     }
 
     statusHook = (state: JobStatus) => {

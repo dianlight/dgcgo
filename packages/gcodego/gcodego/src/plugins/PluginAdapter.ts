@@ -27,9 +27,13 @@ export class PluginAdapter {
       this._pluginRegister[name]=plugin
   }
     
-  listPluginRegiter(): string[]{
+  listPluginRegister(): string[]{
       return Object.keys(this._pluginRegister)
   }
+    
+  getPluginFromRegister(name: string): GcPlugin|undefined {
+      return this._pluginRegister[name]
+  }  
     
   /**
    * Exposed API to register to events

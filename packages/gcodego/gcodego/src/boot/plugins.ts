@@ -1,5 +1,5 @@
 import { boot } from 'quasar/wrappers'
-import { PluginAdapter } from 'src/plugins/PluginAdapter'
+import { PluginAdapter } from '../plugins/PluginAdapter'
 import { registerInternalPlugins } from '../plugins'
 
 

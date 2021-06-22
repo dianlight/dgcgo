@@ -1,5 +1,4 @@
-//import { ControllerStatus, StatusObject } from 'app/../tightcnc/types/src';
-import { Client } from 'src/tightcnc/TightCNC';
+import { Client } from '../../tightcnc/TightCNC';
 import { ActionTree, ActionContext } from 'vuex';
 import { StateInterface } from '../index';
 import { TightCNCStateInterface } from './state';

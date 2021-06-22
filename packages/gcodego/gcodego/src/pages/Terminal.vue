@@ -86,7 +86,6 @@ import hljs from 'highlight.js/lib/core';
 import gcode from 'highlight.js/lib/languages/gcode';
 import { QPage, QVirtualScroll } from 'quasar';
 import { dom } from 'quasar'
-//import { LogLine } from '../tightcnc/TightCNC';
 
 hljs.registerLanguage('gcode',gcode);
 
