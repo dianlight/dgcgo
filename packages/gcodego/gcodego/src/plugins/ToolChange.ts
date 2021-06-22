@@ -17,19 +17,19 @@ export class ToolChange extends GcPlugin {
     }
 
     statusHook = (state: JobStatus) => {
-        console.log('Nuovo stato job:', state)
+        //console.log('Nuovo stato job:', state)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const jobWaiting = (state.state === 'waiting')?state.waits[0]:undefined;
         if (jobWaiting === 'tool_change') {
             const toolNum = objtools.getPath(state, 'gcodeProcessors.toolchange.tool') as string;
-            let textobj = '\n{blue-bg}Waiting for Tool Change{/blue-bg}\n';
+            let textobj = '<b>Waiting for Tool Change</b><br/>';
             if (toolNum !== null && toolNum !== undefined) {
-                textobj += 'Tool number: ' + toolNum + '\n';
+                textobj += 'Tool number: ' + toolNum;
             }
-            this.adapter.showDialog('Tool Change',textobj, ['Continue', 'Manual Tool Offset']).then(async (select) => {
+            this.adapter.showDialog('Tool Change',textobj, ['Continue', 'Manual Tool Offset'/*,'Probe'*/]).then(async (select) => {
                 if (select === 'Manual Tool Offset') {
                     // Dialog to return a ToolOffset
-                    this.adapter.showJsonFormDialog<{ toolOffset: number }>(
+                    await this.adapter.showJsonFormDialog<{ toolOffset: number }>(
                         'Tool change action required',
                         {
                             type:'object',
@@ -51,11 +51,10 @@ export class ToolChange extends GcPlugin {
                             ]
                         } as UISchemaElement
                     ).then((data) => {
-                        void this.adapter.tightcnc.op('setToolOffset',data /*{
-                            toolOffset: 0
-                        }*/)                        
-                    }).catch(() => {
-                        // User cancel?
+                        void this.adapter.tightcnc.op('setToolOffset',data).then(()=>this.statusHook(state))                        
+                    }).catch((err) => {
+                        if (err) console.error(err)
+                        this.statusHook(state)
                     })
                 }  else if (select === 'Continue') {
                     await this.adapter.tightcnc.op('resumeFromStop')
@@ -64,7 +63,7 @@ export class ToolChange extends GcPlugin {
                 // Chiuso il dialog senza scegliere. Che facciamo?!?!
             })
         } else if (jobWaiting === 'program_stop') {
-            const textobj = '\n{blue-bg}Program Stop{/blue-bg}';
+            const textobj = 'Program Stop';
             this.adapter.showDialog('Program Stop',textobj, ['Continue']).then(async () => {
                 await this.adapter.tightcnc.op('resumeFromStop')
             }).catch(() => {

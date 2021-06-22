@@ -63,7 +63,7 @@ export class PluginAdapter {
                     }
                 }),
                 onDismiss: () => {
-                    console.warn('Closed Dialog!')
+                   //console.warn('Closed Dialog!')
                     reject()
                 },
                 closeBtn: exits.length == 0?true:false
@@ -81,7 +81,7 @@ export class PluginAdapter {
                     text,
                     schema,
                     uischema,
-                    data
+                    data: data || {}
                 }
             }).onOk((values:T) => {
                 console.log('OK',values)

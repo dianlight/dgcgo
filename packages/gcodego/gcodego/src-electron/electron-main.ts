@@ -300,7 +300,7 @@ app.on('will-finish-launching', (/*event:any*/) => {
 
 /** Application Menu */
 ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
-  console.debug('Popupating Menu', args[0]);
+  //console.debug('Popupating Menu', args[0]);
   createMenu((path: string) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
     const tr = path.split('.').reduce<any>((prev, curr) => {

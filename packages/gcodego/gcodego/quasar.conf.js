@@ -144,7 +144,8 @@ module.exports = configure(function(ctx) {
             plugins: [
                 'LoadingBar',
                 'Notify',
-                'SessionStorage'
+                'SessionStorage',
+                'Dialog'
             ],
         },
 

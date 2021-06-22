@@ -147,7 +147,6 @@ import {
 } from '@jsonforms/vue-vanilla';
 import { UISchemaElement } from '@jsonforms/core';
 import { format } from 'quasar'
-import * as _ from 'lodash';
 
 
 
