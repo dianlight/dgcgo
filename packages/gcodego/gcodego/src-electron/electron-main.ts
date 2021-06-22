@@ -336,53 +336,60 @@ let tightcnc: ChildProcess | undefined = undefined;
 let serverPort = 0;
 
 ipcMain.handle('StartTightCNC', async (event, ...args) => {
-  if (tightcnc && tightcnc.connected) {
-    console.warn('Tight Server PID already running ', tightcnc.pid);
-  } else {
-    const config: TightCNCConfig = args[0] as TightCNCConfig;
-    if (!config.serverPort) {
-      [config.serverPort] = await findFreePorts(1);
+  
+  const config: TightCNCConfig = args[0] as TightCNCConfig;
+  if (!config.serverPort) {
+       [config.serverPort] = await findFreePorts(1);
       console.info(`Found Free TCP/Port ${config.serverPort}`);
-    } else {
+  } else {
       console.info(`Use configured TCP/Port ${config.serverPort}`);
-    }
+  }
 
-    console.log(tightcnc_env['TIGHTCNC_CONFIG']);
 
-    // Setting basedit to AppData
-    (args[0] as TightCNCConfig).baseDir = app.getPath('userData')
-    console.log('TightCNC BaseDir:',(args[0] as TightCNCConfig).baseDir)
+  return new Promise<{ pid?: number, serverPort: number }>((resolve, reject) => {
+    if (tightcnc && tightcnc.connected) {
+      console.warn('Tight Server PID already running ', tightcnc.pid);
+      resolve({ pid: tightcnc?.pid, serverPort: serverPort });
+    } else {
+      console.log(tightcnc_env['TIGHTCNC_CONFIG']);
 
-    fs.writeFileSync(tightcnc_conf, yaml.stringify(args[0]));
-    //  const tightcnc = spawn(process.argv[0], [tight_path], {
-    tightcnc = fork(tight_path, {
-      env: tightcnc_env,
-      silent: true,
-      //    stdio: ['pipe','pipe', 'ipc']
-    })
-      .on('error', (error) => {
-        console.error('TightCNC Error:', error);
+      // Setting basedit to AppData
+      (args[0] as TightCNCConfig).baseDir = app.getPath('userData')
+      console.log('TightCNC BaseDir:',(args[0] as TightCNCConfig).baseDir)
+
+      fs.writeFileSync(tightcnc_conf, yaml.stringify(args[0]));
+      //  const tightcnc = spawn(process.argv[0], [tight_path], {
+      tightcnc = fork(tight_path, {
+        env: tightcnc_env,
+        silent: true,
+        //    stdio: ['pipe','pipe', 'ipc']
       })
-      .on('close', (code) => {
-        const newLocal = 'TightCNC Exit code';
-        console.error(newLocal, code);
+        .on('error', (error) => {
+          console.error('TightCNC Error:', error);
+          reject(error)
+        })
+        .on('close', (code) => {
+          const newLocal = 'TightCNC Exit code';
+          console.error(newLocal, code);
+        });
+
+      tightcnc.stderr?.on('data', (data: Buffer) => {
+        console.error('E:', data.toString());
       });
 
-    tightcnc.stderr?.on('data', (data: Buffer) => {
-      console.error('E:', data.toString());
-    });
+      tightcnc.stdout?.on('data', (data: Buffer) => {
+        console.info('O', data.toString());
+        if (data.toString().indexOf('Controller ready.') >= 0) {
+            resolve({ pid: tightcnc?.pid, serverPort: serverPort });
+        }
+      });
 
-    tightcnc.stdout?.on('data', (data: Buffer) => {
-      console.info('O', data.toString());
-    });
-
-    app.on('quit', () => {
-      tightcnc?.kill('SIGTERM');
-    });
-
-    serverPort = config.serverPort;
-  }
-  return { pid: tightcnc.pid, serverPort: serverPort };
+      app.on('quit', () => {
+        tightcnc?.kill('SIGTERM');
+      });
+      serverPort = config.serverPort;
+    } 
+  })
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

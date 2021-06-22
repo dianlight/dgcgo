@@ -50,6 +50,8 @@
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
 import { uid } from 'quasar'
+import { GcodeGoConfig } from 'src/tightcnc/TightCNC';
+import * as _ from 'lodash';
 
 export interface WorkBenchSessionData {
     id:string,
@@ -113,14 +115,15 @@ export default class WorkBench extends Vue.with(Props) {
     return this.$tightcnc.startJob({
       filename: this.wdata.tmpFileName,    
       gcodeProcessors: this.$tightcnc.getConfig().selectedProcessors?.map( (sel,index) => {
-        const options = this.$tightcnc.getConfig().processorsConfigs![sel];
+        const options = this.$tightcnc.getConfig()[sel as keyof GcodeGoConfig];
         return {
           name: sel,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           options: {
-              id: sel,
-              ...options
-          },
-          order: index
+              id: _.kebabCase(sel),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              ...( options as any)
+          }
         }
       })
     }).then( (jobstatus)=>{

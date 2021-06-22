@@ -8,10 +8,14 @@ import {
 } from 'tightcnc';
 import { uid } from 'quasar';
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
+import { EventEmitter } from 'events';
+import objectHash from 'object-hash'
+import { timeout } from 'utils-decorators'
 
 export interface GcodeGoConfig extends TightCNCConfig {
   selectedProcessors: string[],
-  processorsConfigs: Record<string,Record<string,unknown>>
+  selectedPlugins: string[]
+//  processorsConfigs: Record<string,Record<string,unknown>>
 }
 
 
@@ -23,8 +27,12 @@ export interface LogLine {
   result?: string;
   error?: string;
 }
-export class Client {
+export class Client extends EventEmitter {
   jsonrpc: JSONRPCClient;
+
+  hashes: Record<ClientEvents, string> = {
+    'job-status-update':'00x00'
+  }
 
   config: Partial<TightCNCConfig> = {
     enableServer: true,
@@ -46,6 +54,7 @@ export class Client {
   };
 
   constructor(config: Partial<TightCNCConfig>) {
+    super()
     Object.assign(this.config, config);
 
     const serverUrl = new URL(
@@ -82,10 +91,11 @@ export class Client {
     );
   }
 
-  public getConfig(): Partial<GcodeGoConfig> {
+  getConfig(): Partial<GcodeGoConfig> {
     return this.config;
   }
 
+  @timeout(15000)
   static async start(config: Partial<TightCNCConfig>): Promise<Client> {
     console.log(config);
     if (!config.authKey) {
@@ -102,7 +112,10 @@ export class Client {
         .then((res) => {
           console.info('TightCNC Pid', res.pid);
           tight_client.config.serverPort = res.serverPort;
-          resolve(tight_client);
+          void tight_client.op<TightCNCConfig>('getRunningConfig').then((config) => {
+            tight_client.config = config
+            resolve(tight_client); 
+          })
         })
         .catch((err) => {
           console.error(err);
@@ -155,7 +168,16 @@ export class Client {
    */
 
   getStatus(): Promise<Partial<StatusObject>> {
-    return this.op<Partial<StatusObject>>('getStatus',{});
+    return this.op<Partial<StatusObject>>('getStatus', {}).then(status => {
+      if (status.job) {
+        const nh = objectHash(status.job)
+        if (this.hashes[ClientEvents.JOB_STATUS] !== nh) {
+          this.hashes[ClientEvents.JOB_STATUS] = nh;
+          this.emit(ClientEvents.JOB_STATUS, status.job)
+        }
+      }
+      return status
+    })
   }
 
   getAvailableSerials(): Promise<PortInfo[]> {
@@ -216,4 +238,12 @@ export class Client {
             })
         });
   }
+  
+}
+
+
+export type JobStatusUpdateHookCallback = (newstate: JobStatus) => void
+
+export enum ClientEvents {
+  JOB_STATUS = 'job-status-update'
 }

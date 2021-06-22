@@ -65,7 +65,19 @@
         <q-checkbox dense v-model="homableAxes[1]" label="Y" color="orange" />
         <q-checkbox dense v-model="homableAxes[2]" label="Z" color="red" />
       </q-field>
-    </div>   
+    </div>  
+
+    <q-separator class="q-mt-sm"/>
+
+    <q-select
+          filled
+          v-model="config.selectedPlugins"
+          multiple
+          :options="$plugins.listPluginRegiter()"
+          use-chips
+          stack-label
+          label="Active Plugins"
+    /> 
 
     <q-separator class="q-mt-sm"/>
 
@@ -110,6 +122,7 @@
          </q-card-section>
 
         <q-card-actions align="right">
+          <q-btn label="Cancel" color="primary" v-close-popup="1"/>
           <q-btn label="Reset" @click="onReset" color="negative"/>
           <q-btn label="Save" @click="onSubmit" color="positive" v-close-popup="1"/>
         </q-card-actions>
@@ -134,11 +147,21 @@ import {
 } from '@jsonforms/vue-vanilla';
 import { UISchemaElement } from '@jsonforms/core';
 import { format } from 'quasar'
+import * as _ from 'lodash';
 
 
 
 @Options({
-  components: { JsonForms }
+  components: { JsonForms },
+  watch:{
+    '$store.state.dialogs.preferences'(oldValue:boolean,newValue:boolean){
+       // console.log('@@@@@@@@@@@@@@@@@@',(this as Preferences).availableProcessors);
+       if(oldValue !== newValue && newValue == true){
+        (this as Preferences).refreshSerialList();
+        (this as Preferences).refreshGcodeProcessorsList();
+       }
+    }
+  }
 })
 export default class Preferences extends Vue {
       get show(){
@@ -146,10 +169,8 @@ export default class Preferences extends Vue {
       }
       set show(value:boolean){
         this.$store.commit(`dialogs/${value?'show':'hide'}Dialog`,'preferences');
-        this.refreshSerialList()
-        this.refreshGcodeProcessorsList()
-        console.log(this.availableProcessors)
       }
+      
 
       portType = 'serial'
       isPwd = true
@@ -214,14 +235,6 @@ export default class Preferences extends Vue {
         uiSchema: UISchemaElement|void
         }>>('getAvailableGcodeProcessors').then( (list)=>{
           this.availableProcessors =  list
-          console.log(list)
-          // initialized empty config
-          if(!this.config.processorsConfigs)this.config.processorsConfigs={}
-          for(const akey of Object.keys(list)){
-            if(!this.config.processorsConfigs[akey]){
-              this.config.processorsConfigs[akey] = {}
-            }
-          }
         })
       }
 
@@ -229,32 +242,22 @@ export default class Preferences extends Vue {
         return format.capitalize(str)
       }
 
+    
+
       private processorConfig(prc:string){
-        if(this.config.processorsConfigs && this.config.processorsConfigs[prc]){
-              return this.config.processorsConfigs[prc] 
-        } else if(this.config.processorsConfigs) {
-              this.config.processorsConfigs[prc] = {}
-              return {}
-        } else {
-              this.config.processorsConfigs={}
-              this.config.processorsConfigs[prc] = {}
-              return {}
-        }
+//        const configKey = _.camelCase(this.availableProcessors[prc].schema.$id?.slice(1)||'bogus')
+        return this.config[prc as keyof GcodeGoConfig] || {}
       }
 
       onChange(prc:string,event: JsonFormsChangeEvent) {
-        console.log(prc,event,event.data);
-        if(this.config.processorsConfigs){
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          this.config.processorsConfigs[prc]=event.data;
-        } else if(this.config.processorsConfigs) {
-              this.config.processorsConfigs[prc] = {} as never
-              this.config.processorsConfigs[prc]=event.data as never;
-        }       
+//        const configKey = _.camelCase(this.availableProcessors[prc].schema.$id?.slice(1)||'bogus')
+        //return this.config[configKey as keyof GcodeGoConfig] || {}
+        console.log(prc/*,configKey*/,event,event.data);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        this.config[prc as keyof GcodeGoConfig] = event.data
       }
 
-      onSubmit(){
-        
+      onSubmit(){     
         switch(this.config.controller){
           case 'grbl':
             if(!this.config.controllers)this.config.controllers = {} as TightCNCControllers
@@ -273,6 +276,7 @@ export default class Preferences extends Vue {
             }
           break;
         }
+        void this.$plugins.reloadPlugins()
         //console.debug('Saving:',this.config)
         this.$tightcnc.updateConfig(this.config,true)
       }

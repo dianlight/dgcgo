@@ -32,8 +32,8 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [x] quasar icongenie
   - [ ] Automatic release (github)
 - [ ] Quasar
-  - [ ] integrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)
-  - [ ] integrate JSON-form ( alternative to blazier)
+  - ~~integrate a form creator ( blazier not yet compatible )[Bug #55](https://github.com/CyCraft/blitzar/issues/55)~~
+  - [x] integrate JSON-form ( alternative to blazier)
     - [ ] JSONForm quasar rendering
 - [ ] Unit test
   - [ ] @quasar/testing ( not yet compatible )
@@ -77,15 +77,19 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [ ] Welcome text
     - [ ] Autohide on nc open
   - [ ] Preferencies
-    - [ ] Base TightCNC connection params
+    - [x] Base TightCNC connection params
     - [ ] Plugins management
-      - [ ] GCodeGo plugin system ( tightcnc + visual)
-    - [ ] Active Processor
+      - [x] GCodeGo plugin system ( tightcnc + visual)
+        - [ ] JSonForm support dialog
+      - [ ] Plugin dependencies
+      - [x] Internal Plugins
+      - [ ] External Plugins
+    - [x] Active Processor
     - [ ] Active Macros
   - [x] Terminal
     - [x] Global terminal
       - [x] Bedge for unread line
-      - [ ] Bedge fro urread errors
+      - [ ] Bedge fro unread errors
     - [x] Autoscroll
     - [ ] @appliedengdesign/gcode-reference integration
   - [ ] WebControl Widget
@@ -102,7 +106,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
       - [ ] Web Remote control ( Mobile Phones on the same network? )
         - [ ] QrCode based link
   - [ ] Autolever Widget
-  - [ ] Change tool Widget
+  - [x] ~~Change tool Widget~~ ToolChange Plugin
   - [ ] Probe Widget
     - [ ] Z-Probe
     - [ ] Auto Zero Camera
@@ -113,8 +117,10 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
     - [ ] Suspend/Resume
     - [ ] Area scan/check
     - [ ] Tool change
-      - [ ] M6 intercetp
-      - [ ] Tool change Workflow
+      - [x] T/M6 intercetp
+      - [x] Tool change standard Workflow
+      - [ ] Tool change offset Workflow
+      - [ ] Tool change probe Workflow
   - [ ] GCode viewer
     - [x] Initial Viewer
       - [ ] Machine plane view
@@ -127,6 +133,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
         - [ ] Remember position on tab switch. (see camera-control suspend and resume if works)
         - [x] Timeline visulaizer
           - [x] Sync with work
+    - [ ] Follow Spindle View
     - [x] Job running v
       - [ ] Job status in tab title as bedge
       - [ ] Start/Pause/Resume/Stop job control
@@ -158,6 +165,8 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
   - [ ] UI DOCUMENTATION
   - [ ] ISSUE TEMPLATE
   - [ ] UI
+  - [ ] Plugin system
+    - [ ] UI Plugins vs TightCNC Plugins
   - [ ] generate github pages
 
 ## Install the dependencies
