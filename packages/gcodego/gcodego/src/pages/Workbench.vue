@@ -50,7 +50,7 @@
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
 import { uid } from 'quasar'
-import { GcodeGoConfig } from '../tightcnc/TightCNC';
+import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
 import * as _ from 'lodash';
 
 export interface WorkBenchSessionData {

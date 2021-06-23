@@ -32,9 +32,9 @@
         <q-separator vertical inset />
 
         <q-badge rounded :color="lastStatus?.controller?.ready?'green':'yellow'" v-if="lastStatus?.controller">
-          <q-tooltip>
+          <!--q-tooltip>
           {{ lastStatus?.controller }}
-          </q-tooltip>
+          </!--q-tooltip-->
         </q-badge> 
         <q-badge rounded color="red" v-if="lastStatus?.controller?.error">
           <q-tooltip>
@@ -127,10 +127,10 @@ import { SerializedError } from 'new-error'
               message: errorData.message,
               color: color,
               icon: 'announcement',
-              actions: [
-                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
-                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
-              ]          
+//              actions: [
+//                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
+//                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
+//              ]          
             })
 /*            break;
           default:
@@ -156,10 +156,10 @@ import { SerializedError } from 'new-error'
               message: error,
               color: 'accent',
               icon: 'announcement',
-              actions: [
-                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
-                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
-              ]          
+//              actions: [
+//                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },
+//                { label: 'Dismiss', color: 'white', handler: () => { /* ... */ } }
+//              ]          
             })
       }
     }

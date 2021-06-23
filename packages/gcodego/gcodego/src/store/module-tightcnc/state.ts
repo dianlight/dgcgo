@@ -1,4 +1,4 @@
-import { LogLine } from '../../tightcnc/TightCNC';
+import { LogLine } from '../../tightcnc/TightCNCClient';
 import { StatusObject } from 'tightcnc'
 
 
@@ -6,8 +6,8 @@ export interface TightCNCStateInterface {
   lastStatus?: StatusObject
   logs: {
     options: {
-      bufferSize:number
-      filterStatus:boolean
+      bufferSize: number
+      filterStatus: boolean
       matchStatus: boolean
       autoScroll: boolean
     },
@@ -22,8 +22,8 @@ function state(): TightCNCStateInterface {
     lastStatus: undefined,
     logs: {
       options: {
-        bufferSize:1000,
-        filterStatus:true,
+        bufferSize: 1000,
+        filterStatus: true,
         matchStatus: true,
         autoScroll: true
       },

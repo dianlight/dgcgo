@@ -1,21 +1,21 @@
 import { boot } from 'quasar/wrappers';
-import { Client } from '../tightcnc/TightCNC';
+import { TightCNCClient } from '../tightcnc/TightCNCClient';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
-    $tightcnc: Client;
+    $tightcnc: TightCNCClient;
   }
 }
 
 
-export default boot(async ({ app,/* router, store*/ }) => {
+export default boot(({ app,/* router, store*/ }) => {
 
-  app.config.globalProperties.$tightcnc = await Client.loadConfig().then( config =>  Client.start(config));
+  //app.config.globalProperties.$tightcnc = await Client.loadConfig().then( config =>  Client.start(config));
   // ^ ^ ^ this will allow you to use this.$tightcnc (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
-
-//  console.log('*!*!*!*!**!*!*!*!**!', app.config.globalProperties.$tightcnc )
-
+  const client = new TightCNCClient({})
+  app.config.globalProperties.$tightcnc = client
+  void client.loadConfig().then(() => client.start())
 });
 
 //export { tightcnc };

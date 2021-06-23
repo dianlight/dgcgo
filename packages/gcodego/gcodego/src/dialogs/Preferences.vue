@@ -69,6 +69,7 @@
 
     <q-separator class="q-mt-sm"/>
 
+     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
     <q-select
           filled
           v-model="config.selectedPlugins"
@@ -79,26 +80,45 @@
           label="Active Plugins"
           @add='addUIPlugin'
           @remove='removeUIPlugin'
+          style="min-width: 100vh"
     /> 
+     </div>
 
     <q-separator class="q-mt-sm"/>
 
-    <q-select
-          filled
-          v-model="config.selectedProcessors"
-          multiple
-          :options="availableProgessorsFiltered()"
-          options-dense  
-          use-chips
-          stack-label
-          label="Active GCode Processors"
-          readonly
-    >
-    </q-select>
+     <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
+      <q-select
+            filled
+            v-model="selectedRequiredProcessors"
+            multiple
+            :options="[] /*availableProgessorsFiltered(true)*/"
+            options-dense  
+            use-chips
+            stack-label
+            label="Active GCode Processors (required)"
+            readonly
+            style="min-width: 50vh"
+      >
+      </q-select>
+
+      <q-select
+            filled
+            v-model="config.selectedProcessors"
+            multiple
+            :options="availableProgessorsFiltered(false)"
+            options-dense  
+            use-chips
+            stack-label
+            label="Active GCode Processors (all active)"
+            @remove="removeProcessor"
+            style="min-width: 50vh"
+      >
+      </q-select>
+     </div>
 
     <template v-for="prc in config.selectedProcessors || []" :key="prc">
           <q-separator class="q-mt-sm"/>
-          <json-forms
+          <json-forms v-if="availableProcessors[prc] !== undefined"
             :data="processorConfig(prc)"
             :renderers="renderers"
             :schema="availableProcessors[prc].schema" 
@@ -130,7 +150,7 @@ import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo,GcodeP
 import { Options, Vue } from 'vue-class-component';
 import { markRaw } from 'vue'
 import URLParse from 'url-parse'
-import { GcodeGoConfig } from '../tightcnc/TightCNC';
+import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
 import { JSONSchema7 } from 'json-schema';
 import { JsonForms, JsonFormsChangeEvent } from '@jsonforms/vue';
 import {
@@ -147,11 +167,14 @@ import * as _ from 'lodash';
 @Options({
   components: { JsonForms },
   watch:{
-    '$store.state.dialogs.preferences'(oldValue:boolean,newValue:boolean){
-       // console.log('@@@@@@@@@@@@@@@@@@',(this as Preferences).availableProcessors);
+    '$store.state.dialogs.preferences'(newValue:boolean,oldValue:boolean){
+       const self = (this as Preferences) 
+       //console.log('@@@@@@@@@@@@@@@@@@',oldValue,newValue,self.availableProcessors);
        if(oldValue !== newValue && newValue == true){
-        (this as Preferences).refreshSerialList();
-        (this as Preferences).refreshGcodeProcessorsList();
+        self.config = self.$tightcnc.getConfig(); 
+        self.refreshSerialList();
+        self.refreshGcodeProcessorsList();
+        void self.$nextTick( ()=>  self.onReset())
        }
     }
   }
@@ -176,6 +199,7 @@ export default class Preferences extends Vue {
 
 
 
+
       controllers = [
         {label:'none', value:undefined },
         {label:'grbl', value:'grbl'},
@@ -193,6 +217,8 @@ export default class Preferences extends Vue {
         lifeCycle: GcodeProcessorLifeCycle
       }> = markRaw({})
 
+      selectedRequiredProcessors:string[] = [] 
+
       // Json Form
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       renderers = Object.freeze(markRaw([
@@ -202,11 +228,14 @@ export default class Preferences extends Vue {
       ]));
 
 
+/*
       mounted(){
+        console.log('Mounted!')
         this.onReset()
         this.refreshSerialList()  
         this.refreshGcodeProcessorsList()
       }
+      */
   
 
       private refreshSerialList(){
@@ -215,8 +244,9 @@ export default class Preferences extends Vue {
             return {
               label:ss.path,
               value:ss.path,
-              portInfo: ss}
-              })
+              portInfo: ss
+              }
+            })
         })
       }
 
@@ -240,16 +270,36 @@ export default class Preferences extends Vue {
         return this.config[prc as keyof GcodeGoConfig] || {}
       }
 
-      private availableProgessorsFiltered(){
-        return Object.keys(this.availableProcessors)
-   //      .filter( k=> this.availableProcessors[k].lifeCycle in ['server-only','optional-ui'])
-         .map ( k => {
-           return {
-             label: k,
-             value: k,
-             disabled: !(this.availableProcessors[k].lifeCycle in ['server-only','optional-ui'])
-           }
-         })
+      private availableProgessorsFiltered(required:boolean) {
+        console.log('Processors:',required,this.availableProcessors)
+        const allProcessors = Object.keys(this.availableProcessors)
+        const freeProcessors = allProcessors.filter( pl => ['server-only' as GcodeProcessorLifeCycle,'optional-ui' as GcodeProcessorLifeCycle].includes(this.availableProcessors[pl].lifeCycle))        
+        const requiredProcessors = this.config.selectedPlugins?.reduce( (res:string[],cur:string)=>{
+              res.push( ...this.$plugins._pluginRegister[cur].dependencies().tightcncProcessors || [] )
+              return res
+        }, [] as string[]) || []
+        if(required){
+          console.log(allProcessors,requiredProcessors,this.config.selectedPlugins)
+          this.selectedRequiredProcessors = _.intersection(allProcessors,requiredProcessors)
+          return this.selectedRequiredProcessors
+        } else {
+          return _.difference(freeProcessors,requiredProcessors)
+        }
+      }
+
+      removeProcessor( details: {index:number, value:string }){
+        console.log('Removed:',this.selectedRequiredProcessors,details.value)
+        this.availableProgessorsFiltered(true)
+        if( this.selectedRequiredProcessors.includes(details.value)){
+          void this.$nextTick( ()=> {
+            console.log('Reenter the obligatory data!')
+            this.$q.notify({
+              message:`${details.value} cannot be removed. It's a plugin dependency!`,
+              type: 'negative'
+            })
+            this.config.selectedProcessors?.push(details.value)
+           })
+        }
       }
 
       onChange(prc:string,event: JsonFormsChangeEvent) {
@@ -266,6 +316,10 @@ export default class Preferences extends Vue {
           pliugin.activatePlugin()
           this.config.selectedProcessors?.push(...pliugin.dependencies().tightcncProcessors||[])
         }
+        void this.$nextTick( ()=>{
+          this.selectedRequiredProcessors = this.availableProgessorsFiltered(true)
+        })
+
       }
 
       removeUIPlugin(details:{index:number,value:string}){
@@ -282,6 +336,9 @@ export default class Preferences extends Vue {
               
           }
         }
+        void this.$nextTick( ()=>{
+          this.selectedRequiredProcessors = this.availableProgessorsFiltered(true)
+        })
       }
 
 
@@ -310,7 +367,7 @@ export default class Preferences extends Vue {
       }
 
       onReset(){
-        this.config = JSON.parse(JSON.stringify(this.$tightcnc.config || {})) as Partial<TightCNCConfig>
+        this.config = JSON.parse(JSON.stringify(this.$tightcnc.getConfig())) as Partial<TightCNCConfig>
         if(this.config.controllers && this.config.controller && this.config.controllers[this.config.controller]){
           const acontrol = this.config.controllers[this.config.controller]
           //console.log(acontrol)
@@ -336,7 +393,9 @@ export default class Preferences extends Vue {
               break;
           }
         }
+        this.selectedRequiredProcessors = this.availableProgessorsFiltered(true)
       }
+
 
 }
 </script>
