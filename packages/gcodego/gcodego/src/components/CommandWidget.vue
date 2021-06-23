@@ -26,12 +26,74 @@
               </q-btn>
             </q-btn-group>
             <q-btn-group>    
-              <q-btn dense outline icon="upgrade" @click="probe()" disable>
-                  <q-tooltip>Probe</q-tooltip>
-              </q-btn>
+              <!--q-btn dense outline icon="vertical_align_bottom" @click="probe()">
+                  <q-tooltip>Probe Z in current position</q-tooltip>
+              </!--q-btn-->
+              <q-btn-dropdown
+                split
+                dense
+                outline
+                icon="vertical_align_bottom"
+                @click="probe"
+              >
+                <template v-slot:label>
+                    <q-tooltip>Probe Z in current position</q-tooltip>
+                </template>
+                <q-list>
+                  
+                  <q-item v-for="(pos,index) in $tightcnc.getConfig()?.probe?.bookmarkPositions" :key='index' clickable v-close-popup dense>
+                    <q-item-section avatar @click="probe(pos)">
+                      <q-avatar icon="play_for_work"/>
+                    </q-item-section>
+                    <q-item-section @click="probe(pos)">
+                      <q-item-label>Probe Z at position</q-item-label>
+                      <q-item-label caption>x: {{ format(pos.x) }} y: {{ format(pos.y) }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-icon name="delete" @click="probeRmovePosition(index)"/>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item clickable v-close-popup @click="probeAddPosition" dense>
+                    <q-item-section avatar>
+                      <q-avatar icon="add_circle_outline"/>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Add current position...</q-item-label>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item dense>
+                    <q-item-section>
+                      <q-input 
+                        v-model="zprobe"
+                        dense
+                        outlined
+                        label="Min Z"
+                        type="number"
+                      />
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item dense>
+                    <q-item-section>
+                      <q-input 
+                        v-model="probefeed"
+                        dense
+                        outlined
+                        label="Feed"
+                        type="number"
+                      />
+                    </q-item-section>
+                  </q-item>
+
+                </q-list>
+              </q-btn-dropdown>
+              <!--
               <q-btn dense outline icon="settings_overscan" disable>
                   <q-tooltip>Run on project outline</q-tooltip>
               </q-btn>
+              -->
             </q-btn-group>
           </div>
         </div>  
@@ -59,59 +121,6 @@ import { Options, Vue } from 'vue-class-component';
 })
 export default class CommandWidget extends Vue {
 
-  keyboardEvent?:(e:KeyboardEvent) => void;
-  
-  /*
-  declare $refs:{
-      front:QBtn,
-      back:QBtn,
-      left:QBtn
-      right:QBtn
-      up:QBtn
-      down:QBtn
-  }
-  */
-
-
-
-  mounted(){
-   // console.log(this.$store.getters)
-         /*
-    this.keyboardEvent = (e:KeyboardEvent) => {
-        // console.log(this)
-         if(!this.$refs.front)return
-          switch(e.code){
-              case 'ArrowUp':
-                  this.simulateClick(this.$refs.front,e)
-                break;
-              case 'ArrowDown':
-                  this.simulateClick(this.$refs.back,e)
-                break;
-              case 'ArrowLeft':
-                  this.simulateClick(this.$refs.left,e)
-                break;
-              case 'ArrowRight':
-                  this.simulateClick(this.$refs.right,e)
-                break;
-              case 'PageUp':
-                  this.simulateClick(this.$refs.up,e)
-                break;
-              case 'PageDown':
-                  this.simulateClick(this.$refs.down,e)
-                break;
-          }
-    }
-    document.addEventListener('keydown',this.keyboardEvent)
-          */
-  }
-
-  unmounted(){
-   if(this.keyboardEvent){
-     document.removeEventListener('keydown',this.keyboardEvent)
-     delete this.keyboardEvent
-   }
-  }
-
   private simulateClick(target:QBtn, evt:Event){
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       target.$el.dispatchEvent(new MouseEvent('mousedown'),evt)
@@ -125,6 +134,21 @@ export default class CommandWidget extends Vue {
     return this.$store.state.tightcnc.lastStatus;
   }
 
+  get zprobe(){
+    return this.$tightcnc.getConfigKey('probe.z',-0.1)
+  }
+  set zprobe(z){
+    this.$tightcnc.updateConfigKey('probe.z',z)
+  }
+
+  get probefeed(){
+    return this.$tightcnc.getConfigKey('probe.feed',25)
+  }
+  set probefeed(f){
+    this.$tightcnc.updateConfigKey('probe.feed',f)
+  }
+  
+
   format(num: number) {
     return num.toFixed(3 /* Precision */);
   }
@@ -133,10 +157,30 @@ export default class CommandWidget extends Vue {
     void this.$tightcnc.home(axes)
   }
 
-  probe() {  
-//    void this.$tightcnc.op('send',{line:'M9'}) // StopAll   
-//    if(mist) void this.$tightcnc.op('send',{line:'M7'}) // On Mist
-//    if(flood) void this.$tightcnc.op('send',{line:'M8'}) // On flood
+  probe(pos?:{x:number,y:number}) {  
+    console.log('Probe:',pos)
+    const ppos = [
+      pos?.x || this.$store.state.tightcnc.lastStatus?.controller?.pos[0] || 0,
+      pos?.y || this.$store.state.tightcnc.lastStatus?.controller?.pos[1] || 0,
+      this.zprobe
+    ]
+    void this.$tightcnc.op<number[]>('probe',{
+      pos: ppos,
+      feed: this.$tightcnc.getConfigKey('probe.feed',this.$store.state.tightcnc.lastStatus?.controller?.axisMaxFeeds[3] || 25)
+    }).then( points => console.log('Probed Points',points))
+  }
+
+  probeAddPosition(){
+    this.$tightcnc.getConfig().probe?.bookmarkPositions.push({
+      x:this.$store.state.tightcnc.lastStatus?.controller?.pos[0] || 0,
+      y:this.$store.state.tightcnc.lastStatus?.controller?.pos[1] || 0
+    })
+    this.$tightcnc.saveConfig()
+  }
+
+  probeRmovePosition(index:number){
+    this.$tightcnc.getConfig().probe?.bookmarkPositions.splice(index,1)
+    this.$tightcnc.saveConfig()
   }
 
   clearError() {

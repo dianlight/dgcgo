@@ -10,10 +10,17 @@ import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
 import { EventEmitter } from 'events';
 import objectHash from 'object-hash';
 import { timeout } from 'utils-decorators';
+import { Notify } from 'quasar'
+import objtools from 'objtools'
 
 export interface GcodeGoConfig extends TightCNCConfig {
     selectedProcessors: string[];
     selectedPlugins: string[];
+    probe: {
+        bookmarkPositions: { x: number, y: number }[],
+        z: number,
+        feed: number
+    }
 }
 
 export type LogLineDirection = '<' | '>' | '@' | '%';
@@ -34,7 +41,8 @@ export class TightCNCClient extends EventEmitter {
     hashes: Record<ClientEvents, string> = {
         'job-status-update': '0x0000',
         'client-config-updated': '0x0000',
-        'client-connection-error': '0x0000'
+        'client-connection-error': '0x0000',
+        'op-error': '0x0000'
     };
 
     private config: Partial<GcodeGoConfig> = {
@@ -50,6 +58,11 @@ export class TightCNCClient extends EventEmitter {
                 homableAxes: [true, true, true],
             },
         },
+        probe: {
+            bookmarkPositions: [],
+            z: -0.1,
+            feed: 25
+        }
     };
 
     constructor(config: Partial<TightCNCConfig>) {
@@ -74,9 +87,10 @@ export class TightCNCClient extends EventEmitter {
                                 //console.log('Risposta', jsonRPCResponse, this.jsonrpc)
                                 this.jsonrpc.receive(jsonRPCResponse)
                             }
-                            );
+                            ).catch(err => console.error('Errore!', err));
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     } else if (jsonRPCRequest.id) {
+                        //console.log('Questo errore', jsonRPCRequest)
                         return Promise.reject(new Error(response.statusText));
                     }
                 }).catch(err => {
@@ -93,6 +107,13 @@ export class TightCNCClient extends EventEmitter {
             ).toString())
 
             console.log('Server URL:', this.serverUrl/*, config.authKey*/);
+        })
+
+        this.on('op-error', (error: Error) => {
+            Notify.create({
+                message: error.message,
+                type: 'negative'
+            })
         })
 
     }
@@ -140,8 +161,9 @@ export class TightCNCClient extends EventEmitter {
         });
     }
 
-    saveConfig(config: Partial<TightCNCConfig>) {
-        const cc = JSON.parse(JSON.stringify(config)) as Partial<TightCNCConfig>;
+    saveConfig(config?: Partial<TightCNCConfig>) {
+        const cc = JSON.parse(JSON.stringify(this.config)) as Partial<TightCNCConfig>;
+        Object.assign(cc, config)
         //console.log('Save config',cc)
         window.api.send('SaveTightCNCConfig', cc);
     }
@@ -154,6 +176,16 @@ export class TightCNCClient extends EventEmitter {
             window.api.send('SaveTightCNCConfig', cc);
             if (restart) void this.restart();
         }
+    }
+
+    updateConfigKey(key: string, value: unknown) {
+        objtools.setPath(this.config, key, value)
+        this.saveConfig(this.config)
+    }
+
+    getConfigKey<T>(key: string, defvalue?: T): T {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return objtools.getPath(this.config, key) || defvalue
     }
 
     /**
@@ -178,9 +210,19 @@ export class TightCNCClient extends EventEmitter {
      * @param params
      * @returns
      */
-    @timeout(15000)
+    //@timeout(15000)
     async op<T>(opname: string, params?: JSONRPCParams): Promise<T> {
-        return this.jsonrpc.request(opname, params)
+        return this.jsonrpc.request(opname, params).then(
+            x => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                return x;
+            },
+            (err: unknown) => {
+                //console.error('Intercettato in OP:', err)
+                this.emit('op-error', err)
+                throw err
+            }
+        )
     }
 
     /**
@@ -289,5 +331,5 @@ export type JobStatusUpdateHookCallback = (newstate: JobStatus) => void;
 
 export type ClientEvents =
     'job-status-update' |
-    'client-config-updated' | 'client-connection-error'
+    'client-config-updated' | 'client-connection-error' | 'op-error'
     ;
