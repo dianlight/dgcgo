@@ -5,5 +5,14 @@
         "packages/gcodege/*",
         "packages/tightcnc/*"
     ],
-    "version": "independent"
+    "version": "independent",
+    "command": {
+        "publish": {
+            "ignoreChanges": ["ignored-file", "*.md"],
+            "message": "chore(release): publish"
+        },
+        "run": {
+            "npmClient": "yarn"
+        }
+    }
 }

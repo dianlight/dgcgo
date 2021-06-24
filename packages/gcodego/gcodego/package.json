@@ -9,6 +9,7 @@
         "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
         "dev": "quasar dev",
         "dev:electron": "quasar dev -m electron",
+        "dev:default": "yarn run dev:electron",
         "build": "quasar build",
         "rebuild": "electron-rebuild -m ../../../node_modules/serialport",
         "build:electron": "quasar build -m electron",
@@ -44,7 +45,7 @@
         "split2": "^3.2.2",
         "three": "^0.129.0",
         "through2": "^4.0.2",
-        "tightcnc": "file:../../tightcnc/server",
+        "tightcnc": "^0.3.0-alpha2",
         "url-parse": "^1.5.1",
         "utils-decorators": "^1.10.0",
         "vue-class-component": "^8.0.0-rc.1",
@@ -75,7 +76,7 @@
         "url": "git@github.com:dianlight/cncgo.git"
     },
     "devDependencies": {
-        "electron-builder": "^22.4.0",
-        "worker-loader": "^3.0.8"
+        "@quasar/cli": "^1.2.1",
+        "electron-builder": "^22.4.0"
     }
 }

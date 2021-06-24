@@ -4,7 +4,6 @@
         "@babel/eslint-parser": "^7.14.7",
         "@intlify/vue-i18n-loader": "^2.1.0",
         "@quasar/app": "^3.0.0",
-        "@quasar/cli": "^1.2.1",
         "@quasar/icongenie": "^2.4.0",
         "@types/blessed": "^0.1.17",
         "@types/colornames": "^1.1.1",
@@ -57,12 +56,16 @@
         "packages/tightcnc/*"
     ],
     "scripts": {
-        "bootstrap": "lerna bootstrap",
         "git:update": "git submodule update --init --recursive",
-        "build": "lerna run build"
+        "build": "lerna run build --stream",
+        "build:electron": "lerna run build:electron --stream",
+        "dev": "lerna run --parallel dev:default"
     },
     "dependencies": {
         "gcodego": "file:packages/gcodego/gcodego",
         "tightcnc": "file:packages/tightcnc/server"
+    },
+    "engines": {
+        "node": "14"
     }
 }
