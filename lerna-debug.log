@@ -1,0 +1,21 @@
+0 silly argv {
+0 silly argv   _: [ 'import' ],
+0 silly argv   lernaVersion: '4.0.0',
+0 silly argv   '$0': '/Users/ltarantino/Documents/dgcgo/node_modules/.bin/lerna',
+0 silly argv   dir: '../gcodego'
+0 silly argv }
+1 notice cli v4.0.0
+2 verbose rootPath /Users/ltarantino/Documents/dgcgo
+3 info versioning independent
+4 error Error: Command failed with exit code 128: git rev-parse HEAD
+4 error fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+4 error Use '--' to separate paths from revisions, like this:
+4 error 'git <command> [<revision>...] -- [<file>...]'
+4 error HEAD
+4 error     at makeError (/Users/ltarantino/Documents/dgcgo/node_modules/execa/lib/error.js:60:11)
+4 error     at Function.module.exports.sync (/Users/ltarantino/Documents/dgcgo/node_modules/execa/index.js:194:17)
+4 error     at Object.execSync (/Users/ltarantino/Documents/dgcgo/node_modules/@lerna/child-process/index.js:39:16)
+4 error     at ImportCommand.execSync (/Users/ltarantino/Documents/dgcgo/node_modules/@lerna/import/index.js:141:25)
+4 error     at ImportCommand.getCurrentSHA (/Users/ltarantino/Documents/dgcgo/node_modules/@lerna/import/index.js:133:17)
+4 error     at ImportCommand.initialize (/Users/ltarantino/Documents/dgcgo/node_modules/@lerna/import/index.js:102:31)
+4 error     at /Users/ltarantino/Documents/dgcgo/node_modules/@lerna/command/index.js:274:24

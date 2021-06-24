@@ -1,0 +1,10 @@
+{
+    "devDependencies": {
+        "lerna": "^4.0.0"
+    },
+    "name": "dgcgo",
+    "workspaces": [
+        "packages/gcodego/*",
+        "packages/tightcnc/*"
+    ]
+}
