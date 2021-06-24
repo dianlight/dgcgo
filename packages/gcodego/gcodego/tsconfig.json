@@ -8,6 +8,9 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "types": ["quasar", "webpack-env"],
-    "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"]
-  }
+    "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
+  },
+  "references": [
+    { "path": "../../tightcnc/server"}
+  ]
 }

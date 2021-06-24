@@ -1,0 +1,3 @@
+[submodule "packages/tightcnc/server"]
+	path = packages/tightcnc/server
+	url = git@github.com:dianlight/tightcnc.git

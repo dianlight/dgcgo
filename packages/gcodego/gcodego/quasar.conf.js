@@ -260,7 +260,7 @@ module.exports = configure(function(ctx) {
                     role: 'Viewer',
                 }],
                 extraResources: [{
-                    from: 'node_modules/tightcnc',
+                    from: '../../../node_modules/tightcnc',
                     to: 'node_modules/tightcnc',
                     filter: ['!.git']
                 }]
@@ -268,8 +268,16 @@ module.exports = configure(function(ctx) {
             },
 
             // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-            chainWebpack( /* chain */ ) {
-                /*
+            chainWebpackMain(chain) {
+                chain.module
+                    .rule('worker-loader')
+                    .before('typescript')
+                    .test(/\.worker\.ts$/)
+                    .use()
+                    .loader('worker-loader')
+                    .end()
+                    .end()
+                    /*
                 chain.plugin('copy-webpack-plugin').use(CopyPlugin, {
                         patterns: [{
                             from: 'node_modules/tightcnc/ ** / *',
@@ -282,8 +290,8 @@ module.exports = configure(function(ctx) {
                         }],
         })
                     */
-                // do something with the Electron main process Webpack cfg
-                // extendWebpackMain also available besides this chainWebpackMain
+                    // do something with the Electron main process Webpack cfg
+                    // extendWebpackMain also available besides this chainWebpackMain
             },
 
             // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
