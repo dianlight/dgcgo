@@ -15,7 +15,7 @@
         "build:electron": "quasar build -m electron",
         "gen:patch": "patch-package --exclude '^\\.(eslintrc|nyc_output|travis\\.yml)' gcode-toolpath",
         "_postinstall": "patch-package --exclude  && electron-rebuild",
-        "version": "offline-github-changelog -p > CHANGELOG.md && git add CHANGELOG.md",
+        "_version": "offline-github-changelog -p > CHANGELOG.md && git add CHANGELOG.md",
         "gen:icons": "icongenie generate",
         "gen:native": "electron-rebuild",
         "gen:license": "yarn icenses generate-disclaimer > DEPS_LICENSES.md",
