@@ -1,6 +1,6 @@
 {
     "name": "gcodego",
-    "version": "0.1.1",
+    "version": "0.2.0-alpha.0",
     "description": "A GCode sender and application.",
     "productName": "GCode Go",
     "author": "dianlight <lucio.tarantino@gmail.com>",
@@ -45,7 +45,7 @@
         "split2": "^3.2.2",
         "three": "^0.129.0",
         "through2": "^4.0.2",
-        "tightcnc": "^0.3.0-alpha2",
+        "tightcnc": "^0.3.1-alpha2.0",
         "url-parse": "^1.5.1",
         "utils-decorators": "^1.10.0",
         "vue-class-component": "^8.0.0-rc.1",
@@ -73,11 +73,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:dianlight/cncgo.git"
+        "url": "git@github.com:dianlight/dgcgo.git"
     },
     "devDependencies": {
         "@quasar/cli": "^1.2.1",
-        "electron-builder": "^22.4.0",
+        "electron": "^13.1.4",
+        "electron-builder": "^22.11.7",
+        "electron-devtools-installer": "^3.2.0",
+        "electron-packager": "^15.2.0",
+        "electron-rebuild": "^2.3.5",
         "offline-github-changelog": "^2.3.0"
     }
 }

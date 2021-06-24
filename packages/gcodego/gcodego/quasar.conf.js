@@ -236,13 +236,19 @@ module.exports = configure(function(ctx) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
         electron: {
-            bundler: 'builder', // 'packager' or 'builder'
+            bundler: 'packager', // 'packager' or 'builder'
 
             packager: {
                 // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
 
                 // OS X / Mac App Store
-                // appBundleId: '',
+                appBundleId: 'org.dianlight.gcodego',
+                //all: true,
+                extraResource: [
+                    '../../tightcnc'
+                ],
+                darwinDarkModeSupport: true,
+
                 // appCategoryType: '',
                 // osxSign: '',
                 // protocol: 'myapp://path',

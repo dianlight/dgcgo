@@ -25,10 +25,6 @@
         "@types/webpack-manifest-plugin": "^3.0.4",
         "@typescript-eslint/eslint-plugin": "^4.28.0",
         "@typescript-eslint/parser": "^4.28.0",
-        "electron": "^13.1.4",
-        "electron-builder": "^22.11.7",
-        "electron-devtools-installer": "^3.2.0",
-        "electron-rebuild": "^2.3.5",
         "eslint": "^7.29.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-jest": "^24.3.6",
@@ -59,7 +55,8 @@
         "git:update": "git submodule update --init --recursive",
         "build": "lerna run build --stream",
         "build:electron": "lerna run build:electron --stream",
-        "dev": "lerna run --parallel dev:default"
+        "dev": "lerna run --parallel dev:default",
+        "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/"
     },
     "dependencies": {
         "gcodego": "file:packages/gcodego/gcodego",
