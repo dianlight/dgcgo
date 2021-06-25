@@ -347,6 +347,7 @@ const tightcnc_env = Object.assign(process.env, {
 
 let tightcnc: ChildProcess | undefined = undefined;
 let serverPort = 0;
+const host = 'http://localhost'
 
 ipcMain.handle('StartTightCNC', async (event, ...args) => {
   
@@ -357,12 +358,12 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
   } else {
       console.info(`Use configured TCP/Port ${config.serverPort}`);
   }
+  config.host = host
 
-
-  return new Promise<{ pid?: number, serverPort: number }>((resolve, reject) => {
+  return new Promise<{ pid?: number, host:string, serverPort: number,newInstance:boolean }>((resolve, reject) => {
     if (tightcnc && tightcnc.connected) {
       console.warn('Tight Server PID already running ', tightcnc.pid);
-      resolve({ pid: tightcnc?.pid, serverPort: serverPort });
+      resolve({ pid: tightcnc?.pid,host:host, serverPort: serverPort,newInstance:false });
     } else {
       console.log(tightcnc_env['TIGHTCNC_CONFIG']);
 
@@ -392,8 +393,8 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
 
       tightcnc.stdout?.on('data', (data: Buffer) => {
         console.info('O', data.toString());
-        if (data.toString().indexOf('Controller ready.') >= 0) {
-            resolve({ pid: tightcnc?.pid, serverPort: serverPort });
+        if (data.toString().indexOf('Listening on port') >= 0) {
+            resolve({ pid: tightcnc?.pid,host: host, serverPort: serverPort,newInstance:true });
         }
       });
 
@@ -414,7 +415,7 @@ ipcMain.handle('StopTightCNC', (_event, ..._args) => {
 });
 
 ipcMain.on('SaveTightCNCConfig', (_event, ...args) => {
-  console.debug('Saving config', args[0]);
+  //console.debug('Saving config', args[0]);
   electron_cfg.set('tightcnc.config', args[0]);
 
   return;

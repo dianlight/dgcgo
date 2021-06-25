@@ -27,6 +27,7 @@
         "@jsonforms/vue-vanilla": "^2.5.2",
         "@quasar/extras": "^1.10.7",
         "axios": "^0.21.1",
+        "bluebird": "^3.7.2",
         "camera-controls": "^1.28.4",
         "colornames": "^1.1.1",
         "core-js": "^3.15.1",
@@ -45,7 +46,7 @@
         "split2": "^3.2.2",
         "three": "^0.129.0",
         "through2": "^4.0.2",
-        "tightcnc": "^0.3.1-alpha2.0",
+        "tightcnc": "file:../../tightcnc/server",
         "url-parse": "^1.5.1",
         "utils-decorators": "^1.10.0",
         "vue-class-component": "^8.0.0-rc.1",
@@ -67,7 +68,7 @@
         "not dead"
     ],
     "engines": {
-        "node": ">= 14.17.0",
+        "node": "14",
         "npm": ">= 6.14.13",
         "yarn": ">= 1.22.10"
     },
@@ -76,12 +77,6 @@
         "url": "git@github.com:dianlight/dgcgo.git"
     },
     "devDependencies": {
-        "@quasar/cli": "^1.2.1",
-        "electron": "^13.1.4",
-        "electron-builder": "^22.11.7",
-        "electron-devtools-installer": "^3.2.0",
-        "electron-packager": "^15.2.0",
-        "electron-rebuild": "^2.3.5",
-        "offline-github-changelog": "^2.3.0"
+        "electron-rebuild": "^2.3.5"
     }
 }

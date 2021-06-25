@@ -8,14 +8,14 @@ declare module '@vue/runtime-core' {
 }
 
 
-export default boot(({ app,/* router, store*/ }) => {
+export default boot(async ({ app,/* router, store*/ }) => {
 
   //app.config.globalProperties.$tightcnc = await Client.loadConfig().then( config =>  Client.start(config));
   // ^ ^ ^ this will allow you to use this.$tightcnc (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
-  const client = new TightCNCClient({})
+  const client = new TightCNCClient()
   app.config.globalProperties.$tightcnc = client
-  void client.loadConfig().then(() => client.start())
+  await client.loadConfig().then(() => client.start())
 });
 
 //export { tightcnc };

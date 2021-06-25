@@ -53,6 +53,16 @@
       </template>
     </div>
     <q-separator class="q-mt-sm"/>
+
+    <div class="q-gutter-md q-mt-sm q-pl-md row items-start">
+      <q-input v-if="config.machine"
+       v-model="config.machine.zsafe"
+       type="number"
+       label="Z safe position (wcord)"
+       />
+    </div>  
+
+    <q-separator class="q-mt-sm"/>
     <div v-if="config.controller === 'grbl'" class="q-gutter-sm q-mt-sm q-pl-md row items-start">
       <q-field dense outlined label="Available Axes" stack-label>
         <q-checkbox dense v-model="usedAxes[0]" label="X" color="teal" />

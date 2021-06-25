@@ -4,6 +4,7 @@
         "@babel/eslint-parser": "^7.14.7",
         "@intlify/vue-i18n-loader": "^2.1.0",
         "@quasar/app": "^3.0.0",
+        "@quasar/cli": "^1.2.1",
         "@quasar/icongenie": "^2.4.0",
         "@types/blessed": "^0.1.17",
         "@types/colornames": "^1.1.1",
@@ -25,6 +26,12 @@
         "@types/webpack-manifest-plugin": "^3.0.4",
         "@typescript-eslint/eslint-plugin": "^4.28.0",
         "@typescript-eslint/parser": "^4.28.0",
+        "@types/bluebird": "^3.5.35",
+        "electron": "^13.1.4",
+        "electron-builder": "^22.11.7",
+        "electron-devtools-installer": "^3.2.0",
+        "electron-packager": "^15.2.0",
+        "electron-rebuild": "^2.3.5",
         "eslint": "^7.29.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-jest": "^24.3.6",
@@ -56,7 +63,8 @@
         "build": "lerna run build --stream",
         "build:electron": "lerna run build:electron --stream",
         "dev": "lerna run --parallel dev:default",
-        "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/"
+        "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/",
+        "ncu": "lerna exec -- ncu"
     },
     "dependencies": {
         "gcodego": "file:packages/gcodego/gcodego",

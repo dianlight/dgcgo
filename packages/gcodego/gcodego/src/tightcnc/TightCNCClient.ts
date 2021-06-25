@@ -20,6 +20,9 @@ export interface GcodeGoConfig extends TightCNCConfig {
         bookmarkPositions: { x: number, y: number }[],
         z: number,
         feed: number
+    },
+    machine: {
+        zsafe: number
     }
 }
 
@@ -60,14 +63,16 @@ export class TightCNCClient extends EventEmitter {
         },
         probe: {
             bookmarkPositions: [],
-            z: -0.1,
+            z: -0.2,
             feed: 25
+        },
+        machine: {
+            zsafe: 10, // in work coordinate   
         }
     };
 
-    constructor(config: Partial<TightCNCConfig>) {
+    constructor() {
         super();
-        Object.assign(this.config, config);
 
         this.jsonrpc = new JSONRPCClient((jsonRPCRequest) => {
             return this.serverUrl.then((serverUrl) => {
@@ -102,11 +107,13 @@ export class TightCNCClient extends EventEmitter {
 
         this.on('client-config-updated', (config: Partial<GcodeGoConfig>) => {
             //console.log('Update config event', config)
-            this.serverUrl = Promise.resolve(new URL(
-                `${config.host as string}:${config.serverPort as number}/v1/jsonrpc`
-            ).toString())
-
-            console.log('Server URL:', this.serverUrl/*, config.authKey*/);
+            if (config.host && config.serverPort) {
+                const nURL = new URL(
+                `${config.host}:${config.serverPort}/v1/jsonrpc`
+                )
+                    this.serverUrl = Promise.resolve(nURL.toString())
+                    console.log('Server URL:', this.serverUrl/*, config.authKey*/);
+                }
         })
 
         this.on('op-error', (error: Error) => {
@@ -131,13 +138,20 @@ export class TightCNCClient extends EventEmitter {
         }
         return new Promise((resolve, reject) => {
             window.api
-                .invoke<Partial<TightCNCConfig>, { serverPort: number; pid: number }>(
+                .invoke<Partial<TightCNCConfig>, { serverPort: number, host: string; pid: number, newInstance: boolean }>(
                     'StartTightCNC',
                     this.config
                 )
                 .then(async (res) => {
-                    console.info('TightCNC Pid', res.pid);
-                    await this.loadRunningConfig(true).then((config) => resolve(config))
+                    console.info('TightCNC ', res);
+                        this.config.host = res.host
+                        this.config.serverPort = res.serverPort
+                        this.fireUniqueEvent('client-config-updated', this.config)
+                        if (res.newInstance){ // Reload config only if is a fresh start!
+                            await this.loadRunningConfig(true).then((config) => resolve(config))
+                        } else {
+                            resolve(this.config as TightCNCConfig)
+                        }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -161,31 +175,64 @@ export class TightCNCClient extends EventEmitter {
         });
     }
 
-    saveConfig(config?: Partial<TightCNCConfig>) {
+    /**
+     * Store current config to disk
+     */
+    storeConfig() {
         const cc = JSON.parse(JSON.stringify(this.config)) as Partial<TightCNCConfig>;
-        Object.assign(cc, config)
-        //console.log('Save config',cc)
         window.api.send('SaveTightCNCConfig', cc);
     }
 
+    /**
+     * Update current config and optionally restart
+     * @param config the new config to save ( merged )
+     * @param restart true if can restart if the server need a restart
+     */
     updateConfig(config: Partial<GcodeGoConfig>, restart?: boolean) {
         const cc = JSON.parse(JSON.stringify(config)) as Partial<GcodeGoConfig>;
-        this.config = cc;
-        if (this.fireUniqueEvent('client-config-updated', cc)) {
-            console.log('Need Save config', cc)
-            window.api.send('SaveTightCNCConfig', cc);
+        Object.assign(this.config,cc);
+        if (this.fireUniqueEvent('client-config-updated', this.config)) {
+            console.log('Need Save config', this.config)
+            this.storeConfig()
             if (restart) void this.restart();
         }
     }
 
-    updateConfigKey(key: string, value: unknown) {
+    /**
+     * Update a single config key
+     * @param key the key path
+     * @param value the new value
+     */
+    updateConfigKey<T>(key: string, value: T):T {
         objtools.setPath(this.config, key, value)
-        this.saveConfig(this.config)
+        //console.log('----->',this.config)
+        this.storeConfig()
+        return value
     }
 
-    getConfigKey<T>(key: string, defvalue?: T): T {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return objtools.getPath(this.config, key) || defvalue
+
+    /**
+     * Return a single config key
+     * @param key  the key path
+     * @param defvalue a default value if no key exists
+     * @returns 
+     */
+    getConfigKey<T>(key: string, defvalue: undefined, createIfmissing: undefined): T | undefined;
+
+    /**
+     * Return a single config key
+     * @param key  the key path
+     * @param defvalue a default value if no key exists
+     * @returns 
+     */
+    getConfigKey<T>(key: string, defvalue: T, createIfmissing?: boolean): T;
+
+    getConfigKey<T>(key: string, defvalue?: T,createIfmissing?:boolean): T {
+        const value = objtools.getPath(this.config, key) as T 
+        if (!value && defvalue && createIfmissing) {
+            return this.updateConfigKey<T>(key, defvalue)
+        } 
+        return value
     }
 
     /**
@@ -198,7 +245,7 @@ export class TightCNCClient extends EventEmitter {
             .then((config) => {
                 Object.assign(this.config, config);
                 console.log('LoadedConfig:', this.config)
-                this.emit('client-config-updated', this.config);
+                this.fireUniqueEvent('client-config-updated', this.config);
                 return this.config;
             });
     }
@@ -257,6 +304,14 @@ export class TightCNCClient extends EventEmitter {
         return this.op('realTimeMove', { axis: axis, inc: inc });
     }
 
+    realTimeMove(axis: number, inc: number): Promise<void> {
+        return this.op('realTimeMove', { axis: axis, inc: inc });
+    }
+
+    move(pos: (number|boolean)[], feed?: number): Promise<void> {
+        return this.op('move', { pos, feed });
+    }
+
     home(axes?: boolean[]): Promise<void> {
         return this.op('home', { axes: axes });
     }
@@ -278,15 +333,16 @@ export class TightCNCClient extends EventEmitter {
     }
 
     loadRunningConfig(apply?: boolean): Promise<TightCNCConfig> {
-        return new Promise((resolve) => {
+        return new Promise((resolve,reject) => {
             void this.op<TightCNCConfig>('getRunningConfig')
                 .then((config) => {
+                    console.log('Returned Config:',config)
                     if (apply) {
-                        this.config = config;
+                        Object.assign(this.config,config);
                         this.fireUniqueEvent('client-config-updated', this.config)
                     }
                     resolve(config);
-                })
+                }).catch (err => reject(err))
         })
     }
 

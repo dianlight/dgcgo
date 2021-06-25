@@ -5,17 +5,34 @@
         <div class="row items-start">
           <div class="q-pa-none  q-gutter-y-xs col items-start">
             <q-btn-group>
-              <q-btn dense outline icon="home" @click="home()">
+              <q-btn-dropdown
+               split
+               dense 
+               outline 
+               icon="home" 
+               @click="home()">
+                <template v-slot:label>
                   <q-tooltip>Home</q-tooltip>
-              </q-btn>
-              <q-btn dense outline icon="home" @click="home([true,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
-                  X/Y
-                  <q-tooltip>Home X/Y</q-tooltip>
-              </q-btn>
-              <q-btn dense outline icon="home" @click="home([false,false,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
-                  Z
-                  <q-tooltip>Home Z</q-tooltip>
-              </q-btn>
+                </template>
+                <q-list>
+                  <q-item clickable  v-close-popup dense @click="home([true,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
+                    <q-item-section avatar>
+                      <q-avatar icon="home"/>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Home X/Y only</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable  v-close-popup dense @click="home([false,false,true])" v-if="$store.getters['tightcnc/capabilities']?.homingSingleAxis">
+                    <q-item-section avatar>
+                      <q-avatar icon="home"/>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Home Z only</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
             </q-btn-group>
             <q-btn-group>    
               <q-btn dense outline icon="running_with_errors" @click="clearError()" :disable='$store.state.tightcnc.lastStatus?.controller?.ready'>
@@ -34,18 +51,19 @@
                 dense
                 outline
                 icon="vertical_align_bottom"
-                @click="probe"
+                @click="probe({x:$store.state.tightcnc.lastStatus?.controller?.mpos[0],y:$store.state.tightcnc.lastStatus?.controller?.mpos[1]})"
               >
                 <template v-slot:label>
-                    <q-tooltip>Probe Z in current position</q-tooltip>
+                    <q-tooltip>Probe Z in current position {{ format($store.state.tightcnc.lastStatus?.controller?.mpos[0]||0) }} y: {{ format($store.state.tightcnc.lastStatus?.controller?.mpos[1]||0) }}</q-tooltip>
                 </template>
+
                 <q-list>
                   
-                  <q-item v-for="(pos,index) in $tightcnc.getConfig()?.probe?.bookmarkPositions" :key='index' clickable v-close-popup dense>
-                    <q-item-section avatar @click="probe(pos)">
+                  <q-item v-for="(pos,index) in $tightcnc.getConfig()?.probe?.bookmarkPositions" :key='index' clickable  dense>
+                    <q-item-section avatar @click="probe(pos)" v-close-popup>
                       <q-avatar icon="play_for_work"/>
                     </q-item-section>
-                    <q-item-section @click="probe(pos)">
+                    <q-item-section @click="probe(pos)" v-close-popup>
                       <q-item-label>Probe Z at position</q-item-label>
                       <q-item-label caption>x: {{ format(pos.x) }} y: {{ format(pos.y) }}</q-item-label>
                     </q-item-section>
@@ -54,7 +72,9 @@
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup @click="probeAddPosition" dense>
+                  <q-separator/>
+
+                  <q-item clickable @click="probeAddPosition" dense>
                     <q-item-section avatar>
                       <q-avatar icon="add_circle_outline"/>
                     </q-item-section>
@@ -63,14 +83,19 @@
                     </q-item-section>
                   </q-item>
 
+                  <q-separator/>
+
                   <q-item dense>
                     <q-item-section>
                       <q-input 
                         v-model="zprobe"
                         dense
                         outlined
-                        label="Min Z"
+                        label="Min Z (machine)"
                         type="number"
+                        step='0.001'
+                        :suffix="$store.state.tightcnc.lastStatus?.controller?.units||''"
+                        :clearable="false"
                       />
                     </q-item-section>
                   </q-item>
@@ -88,6 +113,7 @@
                   </q-item>
 
                 </q-list>
+
               </q-btn-dropdown>
               <!--
               <q-btn dense outline icon="settings_overscan" disable>
@@ -109,6 +135,16 @@ import { Options, Vue } from 'vue-class-component';
 @Options({
   components: {},
   watch: {
+    zprobe(zprobe:number, oldzprobe:number){
+      if(zprobe !== oldzprobe){
+          (this as CommandWidget).$tightcnc.updateConfigKey('probe.z',zprobe)
+      }
+    },
+    probefeed(probefeed:number, oldprobefeed:number){
+      if(probefeed !== oldprobefeed){
+          (this as CommandWidget).$tightcnc.updateConfigKey('probe.feed',probefeed)
+      }
+    }
 //    '$store.state.tightcnc.lastStatus.controller.feed'(feed:number) {
 //          (this as ControlWidget).feed = feed;
 //    },
@@ -134,19 +170,9 @@ export default class CommandWidget extends Vue {
     return this.$store.state.tightcnc.lastStatus;
   }
 
-  get zprobe(){
-    return this.$tightcnc.getConfigKey('probe.z',-0.1)
-  }
-  set zprobe(z){
-    this.$tightcnc.updateConfigKey('probe.z',z)
-  }
+  zprobe = 0
 
-  get probefeed(){
-    return this.$tightcnc.getConfigKey('probe.feed',25)
-  }
-  set probefeed(f){
-    this.$tightcnc.updateConfigKey('probe.feed',f)
-  }
+  probefeed = 25
   
 
   format(num: number) {
@@ -157,30 +183,39 @@ export default class CommandWidget extends Vue {
     void this.$tightcnc.home(axes)
   }
 
-  probe(pos?:{x:number,y:number}) {  
+  probe(pos:{x:number,y:number}) {  
     console.log('Probe:',pos)
     const ppos = [
-      pos?.x || this.$store.state.tightcnc.lastStatus?.controller?.pos[0] || 0,
-      pos?.y || this.$store.state.tightcnc.lastStatus?.controller?.pos[1] || 0,
-      this.zprobe
+      pos.x,
+      pos.y,
+      +this.zprobe
     ]
+    console.log('Start Probe at Points',ppos)
     void this.$tightcnc.op<number[]>('probe',{
       pos: ppos,
-      feed: this.$tightcnc.getConfigKey('probe.feed',this.$store.state.tightcnc.lastStatus?.controller?.axisMaxFeeds[3] || 25)
-    }).then( points => console.log('Probed Points',points))
+      feed: this.$tightcnc.getConfigKey('probe.feed',this.probefeed)
+    }).then( points => { 
+      console.log('Probed Points',points) 
+      void this.$tightcnc.op('setOrigin',{pos:[false,false,true]}).then( ()=> {
+        console.log('Move to Z',this.$tightcnc.getConfigKey('machine.zsafe',10))
+        //void this.$tightcnc.move([false,false,this.$tightcnc.getConfigKey('machine.zsafe',10)])
+      })
+    })
   }
 
   probeAddPosition(){
-    this.$tightcnc.getConfig().probe?.bookmarkPositions.push({
-      x:this.$store.state.tightcnc.lastStatus?.controller?.pos[0] || 0,
-      y:this.$store.state.tightcnc.lastStatus?.controller?.pos[1] || 0
+    this.$tightcnc.getConfigKey('probe.bookmarkPositions',[] as {x:number,y:number}[]).push({
+      x:this.$store.state.tightcnc.lastStatus?.controller?.mpos[0] || 0,
+      y:this.$store.state.tightcnc.lastStatus?.controller?.mpos[1] || 0
     })
-    this.$tightcnc.saveConfig()
+    this.$tightcnc.storeConfig()
+    this.$forceUpdate()
   }
 
   probeRmovePosition(index:number){
     this.$tightcnc.getConfig().probe?.bookmarkPositions.splice(index,1)
-    this.$tightcnc.saveConfig()
+    this.$tightcnc.storeConfig()
+    this.$forceUpdate()
   }
 
   clearError() {
@@ -190,6 +225,14 @@ export default class CommandWidget extends Vue {
   reset(){
     void this.$tightcnc.op('reset',{})
   }
+
+  mounted(){
+    this.zprobe = this.$tightcnc.getConfigKey<number>('probe.z',-0.99999)
+    this.probefeed = this.$tightcnc.getConfigKey<number>('probe.feed',25)
+  //  console.log('Got Config Z',this.zprobe)
+  }
+
+  
 
 }
 </script>

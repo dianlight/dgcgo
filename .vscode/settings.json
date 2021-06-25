@@ -1,0 +1,5 @@
+{
+    "i18n-ally.localesPaths": [
+        "packages/gcodego/gcodego/src/i18n"
+    ]
+}
