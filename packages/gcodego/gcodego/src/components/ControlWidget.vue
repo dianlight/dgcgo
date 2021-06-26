@@ -2,29 +2,52 @@
   <q-card>
     <q-card-section>
       <div class="q-pa-xs">
+        <div class="row q-gutter-sm justify-center q-mb-md">
+          <q-btn-dropdown icon="fmd_good" size="xs" rounded outline split @click="goToPosition('work')">
+            <template v-slot:label>
+              <q-tooltip>Go to position...</q-tooltip>
+            </template>
+            <q-btn icon="location_searching" size="xs" label="Point on map..." rounded outline disable/>
+            <q-btn icon="fmd_bad" size="xs" label="Machine Coords" rounded outline @click="goToPosition('machine')"/>
+          </q-btn-dropdown>
+          <q-btn icon="engineering" size="xs" rounded outline disable>
+            <q-tooltip>Go to position...</q-tooltip>
+          </q-btn>
+          <q-btn icon="engineering" size="xs" rounded outline disable>
+            <q-tooltip>Go to position...</q-tooltip>
+          </q-btn>
+          <q-btn icon="engineering" size="xs" rounded outline disable>
+            <q-tooltip>Go to position...</q-tooltip>
+          </q-btn>
+          <position-dialog
+            :title="goDialogTitle"
+            v-model="goDialog"
+            v-on:move-to="moveTo"
+          />
+        </div>
         <div class="row">
           <div class="q-pa-none q-gutter-y-none col-8 _column items-start">
             <q-btn-group>
               <q-btn outline icon="north_west" @click="move($event,'front-left')"/>
-              <q-btn outline icon="north" v-shortkey="['arrowup']" @shortkey="simulateClickNg" ref="front" @click="move($event,'front')">
+              <q-btn outline icon="north" v-shortkey="['shift','arrowup']" @shortkey="simulateClickNg" ref="front" @click="move($event,'front')">
                 <q-tooltip>Y+</q-tooltip>
               </q-btn>
               <q-btn outline icon="north_east"  @click="move($event,'front-right')"/>
             </q-btn-group>
             <q-btn-group>
-              <q-btn outline icon="west" v-shortkey="['arrowleft']" @shortkey="simulateClickNg" ref="left" @click="move($event,'left')">
+              <q-btn outline icon="west" v-shortkey="['shift','arrowleft']" @shortkey="simulateClickNg" ref="left" @click="move($event,'left')">
                 <q-tooltip>X-</q-tooltip>
               </q-btn>
               <q-btn outline icon="hide_source" @click="setOrigin([true,true,false])">
                 <q-tooltip>Work coordinate X/Y zero.</q-tooltip>
               </q-btn>
-              <q-btn outline icon-right="east" v-shortkey="['arrowright']" @shortkey="simulateClickNg" ref="right" @click="move($event,'right')">
+              <q-btn outline icon-right="east" v-shortkey="['shift','arrowright']" @shortkey="simulateClickNg" ref="right" @click="move($event,'right')">
                 <q-tooltip>X+</q-tooltip>
               </q-btn>
             </q-btn-group>
             <q-btn-group>
               <q-btn outline icon="south_west" @click="move($event,'back-left')"/>
-              <q-btn outline icon="south" v-shortkey="['arrowdown']" @shortkey="simulateClickNg" ref="back" @click="move($event,'back')">
+              <q-btn outline icon="south" v-shortkey="['shift','arrowdown']" @shortkey="simulateClickNg" ref="back" @click="move($event,'back')">
                 <q-tooltip>Y-</q-tooltip>
               </q-btn>
               <q-btn outline icon="south_east" @click="move($event,'back-right')" />
@@ -46,13 +69,13 @@
           </div> 
 
           <div class="q-pa-none q-gutter-y-none col _column _items-start">
-            <q-btn outline v-shortkey="['pageup']" @shortkey="simulateClickNg" icon="north" ref="up"  @click="move($event,'up')">
+            <q-btn outline v-shortkey="['shift','pageup']" @shortkey="simulateClickNg" icon="north" ref="up"  @click="move($event,'up')">
               <q-tooltip>Z+</q-tooltip>
             </q-btn>
             <q-btn outline icon="hide_source" @click="setOrigin([false,false,true])">
               <q-tooltip>Work coordinate Z zero.</q-tooltip>
             </q-btn>
-            <q-btn outline v-shortkey="['pagedown']" @shortkey="simulateClickNg" icon="south" ref="down"  @click="move($event,'down')">
+            <q-btn outline v-shortkey="['shift','pagedown']" @shortkey="simulateClickNg" icon="south" ref="down"  @click="move($event,'down')">
               <q-tooltip>Z-</q-tooltip>
             </q-btn>
           </div>
@@ -162,10 +185,13 @@
 <script lang="ts">
 import { ControllerStatus } from 'tightcnc';
 import { QBtn } from 'quasar';
-import { Options, Vue } from 'vue-class-component';
+import { Options, Vue } from 'vue-property-decorator';
+import PositionDialog, { PositionDialogModel } from '../dialogs/PositionDialog.vue'
 
 @Options({
-  components: {},
+  components: {
+    PositionDialog
+  },
   watch: {
     '$store.state.tightcnc.lastStatus.controller.coolant'(coolant:number) {
           (this as ControlWidget).mist = (coolant == 1 || coolant == 3)?true:false;
@@ -351,6 +377,40 @@ export default class ControlWidget extends Vue {
 
   setOrigin(pos:boolean[]){
     void this.$tightcnc.op('setOrigin',{pos:pos})
+  }
+
+  goDialog = new PositionDialogModel()
+  goDialogTitle = ''
+    coordSystemMap = [
+      'G54',
+      'G55',
+      'G56',
+      'G57',
+      'G58',
+  ]
+
+  goToPosition(mode:'machine'|'work'){
+    if(mode === 'machine'){
+      this.goDialogTitle='Go To Machine Position....'
+      this.goDialog.position= this.$store.state.tightcnc.lastStatus!.controller!.mpos
+    } else if(mode === 'work') {
+      this.goDialogTitle=`Go To ${this.coordSystemMap[this.$store.state.tightcnc.lastStatus!.controller!.activeCoordSys || 0]} Position....`
+      this.goDialog.position= this.$store.state.tightcnc.lastStatus!.controller!.pos
+    }
+    this.goDialog.type = mode
+    this.goDialog.show=true
+  }
+
+  moveTo(ev: {pos:number[], type: 'machine'|'work' }){
+    console.log('Move to',ev.pos,ev.type)
+    switch(ev.type){
+      case 'machine':
+        void this.$tightcnc.machineMove(ev.pos)
+        break;
+      case 'work':
+        void this.$tightcnc.move(ev.pos)
+        break;  
+    }
   }
 
 }

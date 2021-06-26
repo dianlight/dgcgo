@@ -312,6 +312,10 @@ export class TightCNCClient extends EventEmitter {
         return this.op('move', { pos, feed });
     }
 
+    machineMove(pos: (number|boolean)[]): Promise<void> {
+        return this.op('setAbsolutePos', { pos });
+    }
+
     home(axes?: boolean[]): Promise<void> {
         return this.op('home', { axes: axes });
     }

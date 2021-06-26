@@ -76,7 +76,7 @@
 
                   <q-item clickable @click="probeAddPosition" dense>
                     <q-item-section avatar>
-                      <q-avatar icon="add_circle_outline"/>
+                      <q-avatar icon="add_location"/>
                     </q-item-section>
                     <q-item-section>
                       <q-item-label>Add current position...</q-item-label>
@@ -91,7 +91,7 @@
                         v-model="zprobe"
                         dense
                         outlined
-                        label="Min Z (machine)"
+                        label="Min Z (mpos)"
                         type="number"
                         step='0.001'
                         :suffix="$store.state.tightcnc.lastStatus?.controller?.units||''"
