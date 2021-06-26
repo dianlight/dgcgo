@@ -153,12 +153,15 @@ function createMenu(i18n: (path: string) => string) {
 
   // Custom View menu
   (menu[3]?.submenu as Electron.MenuItemConstructorOptions[]).push(
+    /*
     { type: 'separator' },
     {
       label: i18n('menu.view.workbench'),
       click: () =>
         mainWindow?.webContents.send('MenuEvent', { link: '/workbench' }),
     },
+    */
+    { type: 'separator' },
     {
       label: i18n('menu.view.terminal'),
       click: () =>
@@ -168,14 +171,15 @@ function createMenu(i18n: (path: string) => string) {
 
   // Add custom menu
   menu.splice(4, 0, {
-    label: 'Custom',
+    label: i18n('menu.action'),
     submenu: [
       {
-        label: 'Do something',
+        label: 'Restart TightCNC server',
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         click: (item, focusedWindow) => {
+          mainWindow?.webContents.send('MenuEvent', { command: 'restartTightCNC' }),
           void dialog.showMessageBox({
-            message: 'Do something',
+            message: 'TightCNC restarting',
             buttons: ['OK'],
           });
         },
@@ -324,20 +328,6 @@ let tight_path = path.join(process.resourcesPath, 'tightcnc', 'server', 'bin', '
 if (!fs.existsSync(tight_path)) {
   tight_path = path.join(__dirname, '..', '..', '..', 'tightcnc', 'server', 'bin', 'tightcnc-server.js')
 }
-/*
-const tight_path = path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '..',
-  'node_modules',
-  'tightcnc',
-  'bin',
-  'tightcnc-server.js'
-);
-*/
-
 
 const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');
 
@@ -349,8 +339,7 @@ let tightcnc: ChildProcess | undefined = undefined;
 let serverPort = 0;
 const host = 'http://localhost'
 
-ipcMain.handle('StartTightCNC', async (event, ...args) => {
-  
+async function startTightCNC(_event: unknown, ...args:unknown[]) {
   const config: TightCNCConfig = args[0] as TightCNCConfig;
   if (!config.serverPort) {
        [config.serverPort] = await findFreePorts(1);
@@ -404,15 +393,17 @@ ipcMain.handle('StartTightCNC', async (event, ...args) => {
       serverPort = config.serverPort;
     } 
   })
-});
+}
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-ipcMain.handle('StopTightCNC', (_event, ..._args) => {
+ipcMain.handle('StartTightCNC', startTightCNC);
+
+function stopTightCNC(/*_event, ..._args*/) {
   console.info('Killing TightCNC');
   tightcnc?.kill('SIGTERM');
   tightcnc = undefined;
   return;
-});
+}
+ipcMain.handle('StopTightCNC', stopTightCNC );
 
 ipcMain.on('SaveTightCNCConfig', (_event, ...args) => {
   //console.debug('Saving config', args[0]);

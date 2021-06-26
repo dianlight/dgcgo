@@ -103,10 +103,15 @@ export default class ManuWidget extends Vue {
     //console.log(this.$q.platform)
     if(this.$q.platform.is.electron){
       window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
-      window.api.receive('MenuEvent',(params:{link?:string,dialog?:string})=>{       
+      window.api.receive('MenuEvent',(params:{link?:string,dialog?:string,command?:string})=>{       
         //console.log(params)
         if(params.link)void this.$router.push(params.link)
         if(params.dialog)void this.$store.commit('dialogs/showDialog',params.dialog)
+        switch(params.command){
+          case 'restartTightCNC':
+            void this.$tightcnc.restart()
+          break;
+        }
       })
       window.api.receive('OpenEvent',(param:{filaname:string, gcode:string})=>{
           //console.log('Open filename:',param.filaname);

@@ -51,24 +51,24 @@
                 dense
                 outline
                 icon="vertical_align_bottom"
-                @click="probe({x:$store.state.tightcnc.lastStatus?.controller?.mpos[0],y:$store.state.tightcnc.lastStatus?.controller?.mpos[1]})"
+                @click="probe({x:$store.state.tightcnc.lastStatus?.controller?.pos[0],y:$store.state.tightcnc.lastStatus?.controller?.pos[1]})"
               >
                 <template v-slot:label>
-                    <q-tooltip>Probe Z in current position {{ format($store.state.tightcnc.lastStatus?.controller?.mpos[0]||0) }} y: {{ format($store.state.tightcnc.lastStatus?.controller?.mpos[1]||0) }}</q-tooltip>
+                    <q-tooltip>Probe Z in current position {{ format($store.state.tightcnc.lastStatus?.controller?.pos[0]||0) }} y: {{ format($store.state.tightcnc.lastStatus?.controller?.pos[1]||0) }}</q-tooltip>
                 </template>
 
                 <q-list>
                   
-                  <q-item v-for="(pos,index) in $tightcnc.getConfig()?.probe?.bookmarkPositions" :key='index' clickable  dense>
+                  <q-item v-for="(pos,index) in $tightcnc.getConfigKey('probe.bookmarkPositions',[])" v-bind:key='pos' clickable  dense>
                     <q-item-section avatar @click="probe(pos)" v-close-popup>
                       <q-avatar icon="play_for_work"/>
                     </q-item-section>
                     <q-item-section @click="probe(pos)" v-close-popup>
                       <q-item-label>Probe Z at position</q-item-label>
-                      <q-item-label caption>x: {{ format(pos.x) }} y: {{ format(pos.y) }}</q-item-label>
+                      <q-item-label caption>x: {{ format(pos['x']) }} y: {{ format(pos['y']) }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                      <q-icon name="delete" @click="probeRmovePosition(index)"/>
+                      <q-icon name="delete" @click="probeRemovePosition(index)"/>
                     </q-item-section>
                   </q-item>
 
@@ -191,28 +191,30 @@ export default class CommandWidget extends Vue {
       +this.zprobe
     ]
     console.log('Start Probe at Points',ppos)
-    void this.$tightcnc.op<number[]>('probe',{
-      pos: ppos,
-      feed: this.$tightcnc.getConfigKey('probe.feed',this.probefeed)
-    }).then( points => { 
-      console.log('Probed Points',points) 
-      void this.$tightcnc.op('setOrigin',{pos:[false,false,true]}).then( ()=> {
-        console.log('Move to Z',this.$tightcnc.getConfigKey('machine.zsafe',10))
-        //void this.$tightcnc.move([false,false,this.$tightcnc.getConfigKey('machine.zsafe',10)])
+    const cpos = this.$store.state.tightcnc.lastStatus?.controller?.pos
+    void this.$tightcnc.move(ppos.slice(0,2)).then( ()=> {
+      void this.$tightcnc.op<number[]>('probe',{
+        pos: ppos,
+        feed: +this.$tightcnc.getConfigKey('probe.feed',this.probefeed)
+      }).then( points => { 
+        console.log('Probed Points',points) 
+        void this.$tightcnc.op('setOrigin',{pos:[false,false,points[2]]}).then( ()=> {
+          if(cpos)void this.$tightcnc.move(cpos)
+        })
       })
     })
   }
 
   probeAddPosition(){
     this.$tightcnc.getConfigKey('probe.bookmarkPositions',[] as {x:number,y:number}[]).push({
-      x:this.$store.state.tightcnc.lastStatus?.controller?.mpos[0] || 0,
-      y:this.$store.state.tightcnc.lastStatus?.controller?.mpos[1] || 0
+      x:this.$store.state.tightcnc.lastStatus?.controller?.pos[0] || 0,
+      y:this.$store.state.tightcnc.lastStatus?.controller?.pos[1] || 0
     })
     this.$tightcnc.storeConfig()
     this.$forceUpdate()
   }
 
-  probeRmovePosition(index:number){
+  probeRemovePosition(index:number){
     this.$tightcnc.getConfig().probe?.bookmarkPositions.splice(index,1)
     this.$tightcnc.storeConfig()
     this.$forceUpdate()

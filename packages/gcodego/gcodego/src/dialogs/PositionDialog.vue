@@ -48,14 +48,13 @@
 
 <script lang="ts">
 import { Vue, Prop, Model, Emit } from 'vue-property-decorator'
+import { PositionDialogModel } from './PositionDialogModel' 
 
-export class PositionDialogModel  {
-        show = false
-        position: number[] = []
-        type: 'machine'|'work' = 'machine'
-}
+
 
 export default class PositionDialog extends Vue {
+
+
     @Prop(String) readonly title: string | undefined
     @Model('modelValue', PositionDialogModel )
     readonly value!: PositionDialogModel

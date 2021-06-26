@@ -186,7 +186,8 @@
 import { ControllerStatus } from 'tightcnc';
 import { QBtn } from 'quasar';
 import { Options, Vue } from 'vue-property-decorator';
-import PositionDialog, { PositionDialogModel } from '../dialogs/PositionDialog.vue'
+import PositionDialog from '../dialogs/PositionDialog.vue'
+import { PositionDialogModel } from '../dialogs/PositionDialogModel'
 
 @Options({
   components: {
@@ -218,6 +219,7 @@ export default class ControlWidget extends Vue {
     incrementxy = 0.1
     mist = false
     flood = false
+
 
     keyboardEvent?:(e:KeyboardEvent) => void;
   
@@ -379,7 +381,6 @@ export default class ControlWidget extends Vue {
     void this.$tightcnc.op('setOrigin',{pos:pos})
   }
 
-  goDialog = new PositionDialogModel()
   goDialogTitle = ''
     coordSystemMap = [
       'G54',
@@ -389,13 +390,16 @@ export default class ControlWidget extends Vue {
       'G58',
   ]
 
+  goDialog = new PositionDialogModel()
+
+
   goToPosition(mode:'machine'|'work'){
     if(mode === 'machine'){
       this.goDialogTitle='Go To Machine Position....'
-      this.goDialog.position= this.$store.state.tightcnc.lastStatus!.controller!.mpos
+      this.goDialog.position= this.$store.state.tightcnc.lastStatus?.controller?.mpos || []
     } else if(mode === 'work') {
-      this.goDialogTitle=`Go To ${this.coordSystemMap[this.$store.state.tightcnc.lastStatus!.controller!.activeCoordSys || 0]} Position....`
-      this.goDialog.position= this.$store.state.tightcnc.lastStatus!.controller!.pos
+      this.goDialogTitle=`Go To ${this.coordSystemMap[this.$store.state.tightcnc.lastStatus?.controller?.activeCoordSys || 0]} Position....`
+      this.goDialog.position= this.$store.state.tightcnc.lastStatus?.controller?.pos || []
     }
     this.goDialog.type = mode
     this.goDialog.show=true
