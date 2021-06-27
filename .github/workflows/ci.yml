@@ -64,7 +64,9 @@ jobs:
       - name: Build
         run: |
           lerna run build --include-dependencies --stream
-          lerna run --scope gcodego build:electron
+          lerna run --scope gcodego build:electron --stream
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master
       #  env:
