@@ -16,7 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import yaml from 'yaml';
 import { ChildProcess, fork } from 'child_process';
 import findFreePorts from 'find-free-ports';
-import { TightCNCConfig } from 'tightcnc';
+import { TightCNCConfig } from '@dianlight/tightcnc';
 import defaultMenu from 'electron-default-menu';
 import {
   MenuItemConstructorOptions,
@@ -324,9 +324,9 @@ ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
 /** Tight CNC Server */
 
 //console.log(`Resouce Path is: "${process.resourcesPath}" "${__dirname}"`);
-let tight_path = path.join(process.resourcesPath, 'tightcnc', 'server', 'bin', 'tightcnc-server.js')
+let tight_path = path.join(process.resourcesPath, '@dianlight/tightcnc', 'server', 'bin', 'tightcnc-server.js')
 if (!fs.existsSync(tight_path)) {
-  tight_path = path.join(__dirname, '..', '..', '..', 'tightcnc', 'server', 'bin', 'tightcnc-server.js')
+  tight_path = path.join(__dirname, '..', '..', '..', '@dianlight/tightcnc', 'server', 'bin', 'tightcnc-server.js')
 }
 
 const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');

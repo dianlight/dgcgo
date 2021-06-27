@@ -183,7 +183,7 @@
 </template>
 
 <script lang="ts">
-import { ControllerStatus } from 'tightcnc';
+import { ControllerStatus } from '@dianlight/tightcnc';
 import { QBtn } from 'quasar';
 import { Options, Vue } from 'vue-property-decorator';
 import PositionDialog from '../dialogs/PositionDialog.vue'

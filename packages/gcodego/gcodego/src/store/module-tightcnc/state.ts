@@ -1,5 +1,5 @@
 import { LogLine } from '../../tightcnc/TightCNCClient';
-import { StatusObject } from 'tightcnc'
+import { StatusObject } from '@dianlight/tightcnc'
 
 
 export interface TightCNCStateInterface {

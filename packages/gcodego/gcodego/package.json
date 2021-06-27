@@ -58,7 +58,7 @@
         "yaml": "^1.10.2"
     },
     "bundledDependencies": [
-        "tightcnc"
+        "@dianlight/tightcnc"
     ],
     "browserslist": [
         "last 2 Chrome versions",

@@ -1,7 +1,7 @@
 import { GetterTree } from 'vuex';
 import { StateInterface } from '../index';
 import { TightCNCStateInterface } from './state';
-import { ControllerCapabilities } from 'tightcnc'
+import { ControllerCapabilities } from '@dianlight/tightcnc'
 
 const getters: GetterTree<TightCNCStateInterface, StateInterface> = {
   capabilities(context): ControllerCapabilities | undefined {

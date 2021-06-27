@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex';
 import { TightCNCStateInterface } from './state';
-import { ControllerStatus, StatusObject, JobStatus } from 'tightcnc'
+import { ControllerStatus, StatusObject, JobStatus } from '@dianlight/tightcnc'
 import { LogLine } from '../../tightcnc/TightCNCClient';
 
 

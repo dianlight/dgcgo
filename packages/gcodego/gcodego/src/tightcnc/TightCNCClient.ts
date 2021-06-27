@@ -4,7 +4,7 @@ import {
     StatusObject,
     JobSourceOptions,
     JobStatus,
-} from 'tightcnc';
+} from '@dianlight/tightcnc';
 import { uid } from 'quasar';
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
 import { EventEmitter } from 'events';
