@@ -12,5 +12,11 @@
   },
   "references": [
     { "path": "../../tightcnc/server"}
-  ]
+  ],
+  "plugins": [
+    {
+        "name": "@manuth/typescript-eslint-plugin",
+        "configFile": "./eslintrc.js"
+    }
+]
 }

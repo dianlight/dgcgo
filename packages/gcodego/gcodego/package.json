@@ -78,6 +78,7 @@
         "url": "git@github.com:dianlight/dgcgo.git"
     },
     "devDependencies": {
+        "@manuth/typescript-eslint-plugin": "^1.4.1",
         "electron-rebuild": "^2.3.5"
     }
 }
