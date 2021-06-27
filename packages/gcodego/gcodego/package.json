@@ -3,6 +3,7 @@
     "version": "0.2.0-alpha.0",
     "description": "A GCode sender and application.",
     "productName": "GCode Go",
+    "private": true,
     "author": "dianlight <lucio.tarantino@gmail.com>",
     "scripts": {
         "lint": "eslint --ext .js,.ts,.vue ./",
@@ -46,7 +47,7 @@
         "split2": "^3.2.2",
         "three": "^0.129.0",
         "through2": "^4.0.2",
-        "tightcnc": "file:../../tightcnc/server",
+        "tightcnc": "^0.3.1-alpha2.0",
         "url-parse": "^1.5.1",
         "utils-decorators": "^1.10.0",
         "vue-class-component": "^8.0.0-rc.1",
@@ -56,6 +57,9 @@
         "vuex": "^4.0.1",
         "yaml": "^1.10.2"
     },
+    "bundledDependencies": [
+        "tightcnc"
+    ],
     "browserslist": [
         "last 2 Chrome versions",
         "last 2 Firefox versions",
@@ -79,6 +83,7 @@
     },
     "devDependencies": {
         "@manuth/typescript-eslint-plugin": "^1.4.1",
+        "electron-packager": "^15.2.0",
         "electron-rebuild": "^2.3.5"
     }
 }
