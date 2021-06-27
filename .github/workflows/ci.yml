@@ -41,7 +41,14 @@ jobs:
             ${{ runner.os }}-node-     
 
       - name: Submodule
-        uses: snickerbockers/submodules-init@v4
+        uses: Mushus/checkout-submodule@v1.0.1
+        with:
+          # A path to execute git operation
+          #basePath: # optional, default is .
+          # A path of submodule directory
+          submodulePath: ./packages/tightcnc/server
+          # A identifier secret key to used checkout the submodule
+          identifierFile: ${{ secret.DEPLOY_KEY_TIGHTCNC }}
 
       - name: Install
         run: |
