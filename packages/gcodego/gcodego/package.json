@@ -23,6 +23,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
+        "@dianlight/tightcnc": "^0.3.1-alpha2.0",
         "@jsonforms/core": "^2.5.2",
         "@jsonforms/vue": "^2.5.2",
         "@jsonforms/vue-vanilla": "^2.5.2",
@@ -47,7 +48,6 @@
         "split2": "^3.2.2",
         "three": "^0.129.0",
         "through2": "^4.0.2",
-        "@dianlight/tightcnc": "^0.3.1-alpha2.0",
         "url-parse": "^1.5.1",
         "utils-decorators": "^1.10.0",
         "vue-class-component": "^8.0.0-rc.1",

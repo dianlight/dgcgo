@@ -63,8 +63,8 @@ jobs:
         
       - name: Build
         run: |
-          yarn build
-          yarn build:electron
+          lerna run build --include-dependencies --stream
+          lerna run --scope gcodego build:electron
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master
       #  env:
@@ -72,5 +72,10 @@ jobs:
       #    BASE_BRANCH: master
       #    BRANCH: gh-pages
       #    FOLDER: dist/spa
+#            - name: Deploy 🚀
+#              uses: JamesIves/github-pages-deploy-action@4.1.4
+#              with:
+#                branch: gh-pages # The branch the action should deploy to.
+#                folder: build # The folder the action should deploy.
      
     
