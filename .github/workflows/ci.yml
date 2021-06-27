@@ -48,7 +48,7 @@ jobs:
           # A path of submodule directory
           submodulePath: ./packages/tightcnc/server
           # A identifier secret key to used checkout the submodule
-          identifierFile: ${{ secret.DEPLOY_KEY_TIGHTCNC }}
+          identifierFile: ${{ secrets.DEPLOY_KEY_TIGHTCNC }}
 
       - name: Install
         run: |
