@@ -40,6 +40,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-     
 
+      - name: Submodule
+        uses: snickerbockers/submodules-init@v4
+
       - name: Install
         run: |
           npm install --global yarn lerna
