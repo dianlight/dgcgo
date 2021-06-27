@@ -17,8 +17,18 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    strategy:
+      matrix:
+        os: ['windows-latest','ubuntu-latest','macos-latest']
+        arch: [x64, arm64]
+        include:
+        - os: ubuntu-latest
+          arch: armv7l
+          experimental: true
+      fail-fast: false
+ 
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -61,12 +71,35 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
         
-      - name: Build
+      - name: Build (spa)
+        if: ${{ !startsWith(runner.os, 'macos') }}
         run: |
           lerna run build --include-dependencies --stream
           lerna run --scope gcodego build:electron --stream
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
+      - name: Upload artifact (spa)
+        uses: actions/upload-artifact@v2
+        if: ${{ !startsWith(runner.os, 'macos') }}
+        with:
+          name: nightly_spa.tar
+          path: |
+            dist/spa
+
+      - name: Build (electron)
+        run: |
+          lerna run --scope gcodego build:electron --stream
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+
+      - name: Upload artifact (electron)
+        uses: actions/upload-artifact@v2
+        with:
+          name: nightly_${{ runner.os }}.zip
+          path: |
+            dist/electron
+
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master
       #  env:
