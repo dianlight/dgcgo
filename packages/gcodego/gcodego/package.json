@@ -23,7 +23,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
-        "@dianlight/tightcnc": "^0.3.1-alpha2.0",
+        "@dianlight/tightcnc": "^0.3.1",
         "@jsonforms/core": "^2.5.2",
         "@jsonforms/vue": "^2.5.2",
         "@jsonforms/vue-vanilla": "^2.5.2",
@@ -58,9 +58,6 @@
         "vuex": "^4.0.1",
         "yaml": "^1.10.2"
     },
-    "bundledDependencies": [
-        "@dianlight/tightcnc"
-    ],
     "browserslist": [
         "last 2 Chrome versions",
         "last 2 Firefox versions",

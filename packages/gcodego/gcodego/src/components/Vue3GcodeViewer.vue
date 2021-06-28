@@ -66,6 +66,7 @@ class Props {
     cursorPosition?:number[]
     machineSurface?:number[]
     machineOffset?:number[]
+    homeDirection?:('+'|'-')[]
 }
 
 class MotionColor {
@@ -139,8 +140,16 @@ class MotionColor {
     },
     machineOffset(newData?:number[],oldData?:number[]){
       if(newData && _.difference(newData,oldData||[]).length > 0){
-        (this as Vue3GcodeViewer).surface?.move(newData);
-        (this as Vue3GcodeViewer).reload = true;
+        const self = this as Vue3GcodeViewer
+
+        const hdata = newData.slice()
+        if(self.homeDirection && self.machineSurface){
+          for(let index = 0; index < hdata.length; index++){
+            hdata[index]+=self.homeDirection[index] === '+'?self.machineSurface[index]:0 
+          }
+        }
+        self.surface?.move(hdata);
+        self.reload = true;
 //        (this as Vue3GcodeViewer).render3d()
       }
     }
@@ -213,6 +222,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
         }  
       }   
       if(this.pointer)this.scene?.add(this.pointer) 
+      this.pointer?.move(this.cursorPosition);
       this.render3d()
     } else if (this.gcode && this.reload) {
       this.$emit('onprogress',0)

@@ -268,8 +268,8 @@ module.exports = configure(function(ctx) {
                 }],
                 /*
                 extraResources: [{
-                    from: '../../../node_modules/tightcnc',
-                    to: 'node_modules/tightcnc',
+                    from: '../../../node_modules/@dianlight/tightcnc',
+                    to: 'node_modules/@dianlight/tightcnc',
                     filter: ['!.git']
                 }]
                 */

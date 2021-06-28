@@ -9,6 +9,7 @@
         :cursor-position="$store.state.tightcnc.lastStatus?.controller?.pos"
         :machine-surface="$store.state.tightcnc.lastStatus?.controller?.axisMaxTravel"
         :machine-offset="$store.state.tightcnc.lastStatus?.controller?.mposOffset"
+        :home-direction="$store.state.tightcnc.lastStatus?.controller?.homeDirection"
         @onprogress='progress'
       >
           <q-btn-group v-if="gcode" outline>

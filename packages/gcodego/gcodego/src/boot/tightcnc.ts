@@ -17,5 +17,3 @@ export default boot(async ({ app,/* router, store*/ }) => {
   app.config.globalProperties.$tightcnc = client
   await client.loadConfig().then(() => client.start())
 });
-
-//export { tightcnc };
