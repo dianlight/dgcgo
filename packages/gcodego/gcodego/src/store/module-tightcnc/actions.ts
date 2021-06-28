@@ -24,7 +24,7 @@ const actions: ActionTree<TightCNCStateInterface, StateInterface> = {
         if (result.length > 0) context.commit('addLogs', result)
         setTimeout(() => {
           void context.dispatch('logReader', client)
-        }, context.state.logs.options.bufferSize - result.length)
+        }, (context.state.logs.options.bufferSize - result.length)+100)
         if (context.state.logs.options.bufferSize - result.length < 250) {
           console.warn(`Log reading speed very hight ${context.state.logs.options.bufferSize - result.length}ms`)
         }

@@ -1,17 +1,3 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** github_username, repo_name, twitter_handle, email, project_title, project_description
--->
-
-
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -26,6 +12,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
+[![Nigthly Build][nigthly-shield]][nigthly-url]
 
 
 
@@ -39,7 +26,7 @@
   <h3 align="center">DGCGO</h3>
 
   <p align="center">
-    Dianlight Gcode Custom General Operator
+    Dianlight Gcode Custom Game Operator
     <br />
     <a href="https://github.com/dianlight/dgcgo"><strong>Explore the docs »</strong></a>
     <br />
@@ -194,4 +181,5 @@ Project Link: [https://github.com/dianlight/dgcgo](https://github.com/dianlight/
 [license-url]: https://github.com/dianlight/dgcgo/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/lucio-tarantino-8ab9a3
-[Nigthly/CI](https://github.com/dianlight/dgcgo/actions/workflows/ci.yml/badge.svg)
+[nigthly-shield](https://github.com/dianlight/dgcgo/actions/workflows/ci.yml/badge.svg)
+[nigthly-url](https://github.com/dianlight/dgcgo/actions)

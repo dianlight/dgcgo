@@ -7,9 +7,11 @@
         :dark-mode="$q.dark.isActive"
         :current-line="$store.state.tightcnc.lastStatus?.job?.stats.lineCount"
         :cursor-position="$store.state.tightcnc.lastStatus?.controller?.pos"
+        :machine-surface="$store.state.tightcnc.lastStatus?.controller?.axisMaxTravel"
+        :machine-offset="$store.state.tightcnc.lastStatus?.controller?.mposOffset"
         @onprogress='progress'
       >
-          <q-btn-group outline>
+          <q-btn-group v-if="gcode" outline>
             <q-btn outline dense icon='play_arrow' @click="startJob" v-if="!$store.state.tightcnc.lastStatus?.controller?.programRunning">
               <q-tooltip>Start Job</q-tooltip>
             </q-btn> 
@@ -30,12 +32,7 @@
               <q-tooltip>Stop</q-tooltip>
             </q-btn> 
           </q-btn-group>
-            <!--
-          <q-btn-group outline>
-            <q-btn outline dense label="To Line 5"></q-btn> 
-          </q-btn-group>
-            -->
-          <span>
+          <span v-if="gcode">
             State: {{ $store.state.tightcnc.lastStatus?.job?.state}}
             Progress: {{ $store.state.tightcnc.lastStatus?.job?.progress}}
             Stats: {{ $store.state.tightcnc.lastStatus?.job?.stats}}   
@@ -49,6 +46,7 @@
 
 import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
+//import { Watch } from 'vue-property-decorator'
 import { uid } from 'quasar'
 import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
 import * as _ from 'lodash';
@@ -60,10 +58,6 @@ export interface WorkBenchSessionData {
     fullPath: string,
     gcode?:string,
     tmpFileName?:string
-}
-
-class Props {
-  xid = '';
 }
 
 @Options({
@@ -83,9 +77,8 @@ class Props {
     }
   }
 })
-export default class WorkBench extends Vue.with(Props) {
+export default class WorkBench extends Vue {
 
-  //$q = useQuasar()
   id=''
 
   wdata:Partial<WorkBenchSessionData> = {}

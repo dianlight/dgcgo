@@ -61,6 +61,7 @@
         "git:update": "git submodule update --init --recursive",
         "build": "lerna run build --stream",
         "build:electron": "lerna run build:electron --stream",
+        "rebuild": "lerna run rebuild --stream",
         "dev": "lerna run --parallel dev:default",
         "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/",
         "ncu": "lerna exec -- ncu"

@@ -1,6 +1,6 @@
 <template>
         <q-tabs dense  shrink stretch outside-arrows mobile-arrows>
-          <q-route-tab to="/" label="Home" />
+          <q-route-tab to="/" label="Machine" v-if="wbTabs.length === 0"/>
           <q-route-tab v-for="(tab,index) in wbTabs" :to="`/workbench/${tab.id}`" :key="tab.id" v-bind="tab">
             <q-field dense stack-label>
               <template v-slot:append>

@@ -46,7 +46,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-     
 
@@ -67,25 +67,25 @@ jobs:
       
       - name: Publish Packages
         run: |
+          lerna run --scope @dianlight/tightcnc  build --stream
           lerna publish --no-git-tag-version --no-push from-package --registry https://npm.pkg.github.com -y
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
         
       - name: Build (spa)
-        if: ${{ !startsWith(runner.os, 'macos') }}
+        if: ${{ startsWith(runner.os, 'macos') }}
         run: |
-          lerna run build --include-dependencies --stream
-          lerna run --scope gcodego build:electron --stream
+          lerna run --scope gcodego build --stream
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
       - name: Upload artifact (spa)
         uses: actions/upload-artifact@v2
-        if: ${{ !startsWith(runner.os, 'macos') }}
+        if: ${{ startsWith(runner.os, 'macos') }}
         with:
           name: nightly_spa.tar
           path: |
-            dist/spa
+            packages/gcodego/gcodego/dist/spa
 
       - name: Build (electron)
         run: |
@@ -98,7 +98,7 @@ jobs:
         with:
           name: nightly_${{ runner.os }}.zip
           path: |
-            dist/electron
+            packages/gcodego/gcodego/dist/electron
 
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master

@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router';
 import Layout from 'layouts/MainLayout.vue'
-import Home from 'pages/Index.vue'
+//import Home from 'pages/Index.vue'
 import WorkBench from '../pages/Workbench.vue'
 import Terminal from 'pages/Terminal.vue'
 import TestPage from 'pages/TestPage.vue'
@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: Layout,
     children: [
-      { path: '', component: Home },
+      { path: '', component: WorkBench },
       { name: 'workbench', path: 'workbench/:id?', component: WorkBench , props: true},
       { name: 'terminal', path: 'terminal', component: Terminal },
       { name: 'testPage', path: 'testPage', component: TestPage }
