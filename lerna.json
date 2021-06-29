@@ -12,5 +12,13 @@
         "run": {
             "npmClient": "yarn"
         }
-    }
+    },
+    "workspaces": [
+        "packages/gcodego/*",
+        "packages/tightcnc/*"
+    ],
+    "packages": [
+        "packages/gcodego/*",
+        "packages/tightcnc/*"
+    ]      
 }

@@ -12,8 +12,8 @@ images
 assets
 
 # examples
-example
-examples
+#example
+#examples
 
 # code coverage directories
 coverage

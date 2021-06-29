@@ -83,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: ${{ startsWith(runner.os, 'macos') }}
         with:
-          name: nightly_spa.tar
+          name: nightly_spa
           path: |
             packages/gcodego/gcodego/dist/spa
 
@@ -96,9 +96,9 @@ jobs:
       - name: Upload artifact (electron)
         uses: actions/upload-artifact@v2
         with:
-          name: nightly_${{ runner.os }}.zip
+          name: nightly_${{ runner.os }}_{{ matrix.arch }}
           path: |
-            packages/gcodego/gcodego/dist/electron
+            packages/gcodego/gcodego/dist/electron/Packaged
 
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master

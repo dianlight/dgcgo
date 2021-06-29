@@ -81,7 +81,16 @@
     },
     "devDependencies": {
         "@manuth/typescript-eslint-plugin": "^1.4.1",
+        "electron": "^13.1.4",
+        "electron-builder": "^22.11.7",
+        "electron-devtools-installer": "^3.2.0",
         "electron-packager": "^15.2.0",
-        "electron-rebuild": "^2.3.5"
+        "electron-rebuild": "^2.3.5",
+        "@intlify/vue-i18n-loader": "^2.1.0",
+        "@quasar/app": "^3.0.0",
+        "@quasar/cli": "^1.2.1",
+        "@quasar/icongenie": "^2.4.0",
+        "eslint-plugin-vue": "^7.11.1",
+        "@types/colornames": "^1.1.1"
     }
 }

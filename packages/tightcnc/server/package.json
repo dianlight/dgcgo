@@ -73,7 +73,11 @@
         "node": "14"
     },
     "devDependencies": {
-        "@manuth/typescript-eslint-plugin": "^1.4.1"
-    },
-    "gitHead": "bc9b5984a67e5c3aa9bbfa5a19fd3bdfe9fd502d"
+        "@manuth/typescript-eslint-plugin": "^1.4.1",
+        "@types/serialport": "^8.0.1",
+        "@types/cors": "^2.8.10",
+        "@types/express": "^4.17.12",
+        "@types/blessed": "^0.1.17",
+        "@types/kd-tree-javascript": "^1.0.0"
+    }
 }

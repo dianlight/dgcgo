@@ -372,8 +372,8 @@ async function startTightCNC(_event: unknown, ...args:unknown[]) {
           reject(error)
         })
         .on('close', (code) => {
-          const newLocal = 'TightCNC Exit code';
-          console.error(newLocal, code);
+          console.error('TightCNC Exit code', code);
+          reject(new Error(`TightCNC Exit code ${code||'None'}`))
         });
 
       tightcnc.stderr?.on('data', (data: Buffer) => {

@@ -189,7 +189,7 @@ module.exports = configure(function(ctx) {
             },
 
             manifest: {
-                name: 'GCode Go',
+                name: 'GCodeGo',
                 short_name: 'GCode Go',
                 description: 'A GCode sender and application.',
                 display: 'standalone',
@@ -237,7 +237,7 @@ module.exports = configure(function(ctx) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
         electron: {
-            bundler: 'packager', // 'packager' or 'builder'
+            bundler: 'builder', // 'packager' or 'builder'
 
             packager: {
                 // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
@@ -250,7 +250,7 @@ module.exports = configure(function(ctx) {
                 ],
                 darwinDarkModeSupport: true,
 
-                // appCategoryType: '',
+                appCategoryType: 'public.app-category.utilities',
                 // osxSign: '',
                 // protocol: 'myapp://path',
 
@@ -260,20 +260,27 @@ module.exports = configure(function(ctx) {
 
             builder: {
                 // https://www.electron.build/configuration/configuration
-                appId: 'org.dianlight.gcodego',
+                appId: 'org.dianlight.${name}',
                 fileAssociations: [{
                     ext: ['gcode', 'nc', 'ncc'],
                     name: 'Gcode files',
                     role: 'Viewer',
                 }],
-                /*
                 extraResources: [{
-                    from: '../../../node_modules/@dianlight/tightcnc',
-                    to: 'node_modules/@dianlight/tightcnc',
+                    from: '../../tightcnc',
+                    to: 'tightcnc',
                     filter: ['!.git']
-                }]
-                */
-
+                }],
+                mac: {
+                    category: 'public.app-category.utilities',
+                    target: 'dmg'
+                },
+                win: {
+                    target: 'nsis'
+                },
+                linux: {
+                    target: 'AppImage'
+                }
             },
 
             // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
