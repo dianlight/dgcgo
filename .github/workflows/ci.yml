@@ -96,9 +96,12 @@ jobs:
       - name: Upload artifact (electron)
         uses: actions/upload-artifact@v2
         with:
-          name: nightly_${{ runner.os }}_{{ matrix.arch }}
+          name: nightly_${{ runner.os }}_${{ matrix.arch }}
           path: |
-            packages/gcodego/gcodego/dist/electron/Packaged
+            packages/gcodego/gcodego/dist/electron/Packaged/**/*.dmg
+            packages/gcodego/gcodego/dist/electron/Packaged/**/*.AppImage
+            packages/gcodego/gcodego/dist/electron/Packaged/**/*.exe
+
 
       #- name: Deploy
       #  uses: JamesIves/github-pages-deploy-action@master

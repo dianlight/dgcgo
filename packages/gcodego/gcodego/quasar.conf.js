@@ -260,12 +260,24 @@ module.exports = configure(function(ctx) {
 
             builder: {
                 // https://www.electron.build/configuration/configuration
-                appId: 'org.dianlight.${name}',
-                fileAssociations: [{
-                    ext: ['gcode', 'nc', 'ncc'],
-                    name: 'Gcode files',
-                    role: 'Viewer',
-                }],
+                appId: 'org.dianlight.gcodego',
+                fileAssociations: [
+                    {
+                        ext: 'gcode',
+                        name: 'Gcode files',
+                        role: 'Viewer',
+                    },
+                    {
+                        ext: 'nc',
+                        name: 'Gcode NC files',
+                        role: 'Viewer',
+                    },
+                    {
+                        ext: 'ncc',
+                        name: 'Gcode NCC files',
+                        role: 'Viewer',
+                    }
+                ],
                 extraResources: [{
                     from: '../../tightcnc',
                     to: 'tightcnc',
