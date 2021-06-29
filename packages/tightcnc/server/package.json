@@ -67,7 +67,7 @@
     "_type": "commonjs",
     "repository": {
         "type": "git",
-        "url": "https://github.com/dianlight/tightcnc.git"
+        "url": "git@github.com:dianlight/dgcgo.git"
     },
     "engines": {
         "node": "14"
