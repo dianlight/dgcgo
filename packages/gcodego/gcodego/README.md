@@ -28,7 +28,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
 
 - [ ] Builder
   - [x] Patch package
-  - [x] offline-github-changelog
+  - [ ] offline-github-changelog
   - [x] quasar icongenie
   - [ ] Automatic release (github)
 - [ ] Quasar
@@ -73,29 +73,29 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
       - [ ] SVG upload
     - [ ] Import/Export configuration
       - [ ] Import/Eport for Electron
-  - [ ] Home
-    - [ ] Welcome text
-    - [ ] Autohide on nc open
+  - [x] Home
+    - [x] ~~Welcome text~~
+    - [x] Autohide on nc open
   - [ ] Preferencies
     - [x] Base TightCNC connection params
-    - [ ] Plugins management
+    - [x] Plugins management
       - [x] GCodeGo plugin system ( tightcnc + visual)
-        - [ ] JSonForm support dialog
-      - [ ] Plugin dependencies
+        - [x] JSonForm support dialog
+      - [x] Plugin dependencies
       - [x] Internal Plugins
       - [ ] External Plugins
     - [x] Active Processor
     - [ ] Active Macros
   - [x] Terminal
     - [x] Global terminal
-      - [x] Bedge for unread line
-      - [ ] Bedge fro unread errors
+      - [x] Badge for unread line
+      - [ ] Badge for unread errors
     - [x] Autoscroll
     - [ ] @appliedengdesign/gcode-reference integration
   - [ ] WebControl Widget
     - [x] Keyboard support
-    - [ ] Got to position
-    - [ ] Remote Joystic / Joypad support
+    - [x] Got to position
+    - [ ] Remote Joystick / Joypad support
       - [ ] grbl offline controller
       - [ ] PS4 Joypad support
   - [x] Status Widget
@@ -107,8 +107,8 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
         - [ ] QrCode based link
   - [ ] Autolever Widget
   - [x] ~~Change tool Widget~~ ToolChange Plugin
-  - [ ] Probe Widget
-    - [ ] Z-Probe
+  - [X] Probe Widget
+    - [X] Z-Probe
     - [ ] Auto Zero Camera
   - [ ] Work control Widget
     - [x] Home
@@ -123,7 +123,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
       - [ ] Tool change probe Workflow
   - [ ] GCode viewer
     - [x] Initial Viewer
-      - [ ] Machine plane view
+      - [x] Machine plane view
         - [ ] Graduate grid with dimension
           - [ ] Add detail on zoom-in
       - [x] G2/G3 Arch support
@@ -135,7 +135,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
           - [x] Sync with work
     - [ ] Follow Spindle View
     - [x] Job running v
-      - [ ] Job status in tab title as bedge
+      - [ ] Job status in tab title as badge
       - [ ] Start/Pause/Resume/Stop job control
       - [x] Timeframe vision
       - [ ] Job-status indicator

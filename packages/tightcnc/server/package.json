@@ -73,6 +73,7 @@
         "node": "14"
     },
     "devDependencies": {
+        "typescript": "^4.3.4",
         "@manuth/typescript-eslint-plugin": "^1.4.1",
         "@types/serialport": "^8.0.1",
         "@types/cors": "^2.8.10",
