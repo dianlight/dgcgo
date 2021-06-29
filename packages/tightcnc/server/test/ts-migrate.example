@@ -1,0 +1,1 @@
+npx -p ts-migrate -c "ts-migrate-full . --sources='lib/gcode-processor.js' --sources='node_modules/**/*.d.ts'"

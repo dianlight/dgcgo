@@ -1,0 +1,79 @@
+{
+    "name": "@dianlight/tightcnc",
+    "version": "0.3.1",
+    "description": "Backend-centric job-oriented server for hobby cnc controllers",
+    "keywords": [
+        "cnc",
+        "grbl",
+        "gcode",
+        "tinyg",
+        "g2core",
+        "typescript"
+    ],
+    "scripts": {
+        "_build": "webpack --progress --mode production",
+        "_build:dev": "webpack --mode development --stats-error-details",
+        "_watch": "webpack --mode development --watch --stats-error-details",
+        "watch": "tsc --watch --sourceMap --declaration --pretty --outDir ./dist",
+        "dev:default": "yarn run watch",
+        "build": "tsc --sourceMap --declaration --pretty --outDir ./dist",
+        "server:debug": "ts-node --inspect-brk ./src/server/server.ts",
+        "server": "ts-node ./src/server/server.ts",
+        "consoleui": "ts-node ./src/consoleui/consoleui.ts",
+        "server:bin": "node ./bin/tightcnc-server.js",
+        "consoleui:bin": "node ./bin/tightcnc-consoleui.js",
+        "cli:bin": "node ./bin/cli.js",
+        "server:js": "node ./dist/server/server.js",
+        "consoleui:js": "node ./dist/consoleui/consoleui.js"
+    },
+    "bin": {
+        "tightcnc": "./bin/cli.js",
+        "tightcnc-consoleui": "./bin/tightcnc-consoleui.js",
+        "tightcnc-server": "./bin/tightcnc-server.js"
+    },
+    "main": "dist/src/index.js",
+    "types": "types/src/index.d.ts",
+    "dependencies": {
+        "@jsonforms/core": "^2.5.2",
+        "@serialport/binding-abstract": "^9.0.7",
+        "@serialport/stream": "^9.0.7",
+        "ajv": "^8.6.0",
+        "axios": "^0.21.1",
+        "blessed": "^0.1.81",
+        "bluebird": "^3.7.2",
+        "catch-exit": "^1.1.0",
+        "common-schema": "^3.0.0",
+        "cors": "^2.8.5",
+        "crisphooks": "^2.0.1",
+        "cross": "^1.0.0",
+        "express": "^4.17.1",
+        "json-rpc-2.0": "^0.2.16",
+        "kd-tree-javascript": "^1.0.3",
+        "littleconf": "^1.0.1",
+        "mkdirp": "^1.0.4",
+        "moment": "^2.29.1",
+        "new-error": "^2.1.10",
+        "objtools": "^3.0.0",
+        "pasync": "^2.0.2",
+        "request": "^2.88.2",
+        "serialport": "^9.2.0",
+        "split2": "^3.2.2",
+        "stable": "^0.1.8",
+        "term.js": "^0.0.7",
+        "xhr2": "^0.2.1",
+        "yargs": "next"
+    },
+    "license": "Apache-2.0",
+    "_type": "commonjs",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dianlight/tightcnc.git"
+    },
+    "engines": {
+        "node": "14"
+    },
+    "devDependencies": {
+        "@manuth/typescript-eslint-plugin": "^1.4.1"
+    },
+    "gitHead": "bc9b5984a67e5c3aa9bbfa5a19fd3bdfe9fd502d"
+}

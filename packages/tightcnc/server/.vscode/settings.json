@@ -1,0 +1,7 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "eslint.packageManager": "yarn",
+    "sasslint.packageManager": "yarn",
+    "eslint-service.packageManager": "yarn",
+    "npm.packageManager": "yarn"
+}

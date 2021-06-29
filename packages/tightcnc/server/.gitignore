@@ -1,0 +1,40 @@
+tightcnc.conf
+
+# general
+bower_components
+dist
+docs
+node_modules
+tmp
+log
+types
+
+# environment
+.configurez.*
+
+# logs
+npm-debug.log
+
+# debug
+/test*.js
+
+# platform
+*.sublime-project
+*.sublime-workspace
+*.swp
+.DS_Store
+log/cnc-0001.log
+EEPROM.DAT
+
+#Yarn 2.x
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# Refactor
+data/simpletest.txt
+lib.no
