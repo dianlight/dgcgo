@@ -5,13 +5,19 @@
     "command": {
         "publish": {
             "ignoreChanges": ["lerna.json","**/*.lock","**/*.js"],
-            "message": "chore(release): publish",
+            "message": "chore(release): publish %s",
             "registry": "https://npm.pkg.github.com",
             "allowBranch": "main"            
         },
         "run": {
             "npmClient": "yarn"
-        }
+        },
+        "version": {
+            "ignoreChanges": ["lerna.json","**/*.lock","**/*.js"],
+            "allowBranch": "main",
+            "conventionalCommits": true,
+            "message": "chore(release): %s"
+        }        
     },
     "workspaces": [
         "packages/gcodego/*",
