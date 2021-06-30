@@ -181,5 +181,5 @@ Project Link: [https://github.com/dianlight/dgcgo](https://github.com/dianlight/
 [license-url]: https://github.com/dianlight/dgcgo/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/lucio-tarantino-8ab9a3
-[nigthly-shield]: https://github.com/dianlight/dgcgo/actions/workflows/ci.yml/badge.svg
+[nigthly-shield]: https://github.com/dianlight/dgcgo/actions/workflows/ci.yml/badge.svg?style=for-the-badge
 [nigthly-url]: https://github.com/dianlight/dgcgo/actions
