@@ -1,6 +1,7 @@
 ## Repotisory / Fork Scope
+NO MORE A FORK. Not tightCNC is integrated in DGCGO and is incompatible ad protocol level to the original TightCNC
 
-This fork scope is to upgrate TightCNC to better use in my GCODEGO project. 
+This fork scope is to upgrade TightCNC to better use in my GCODEGO project. 
 Planned task upgrade:
 - [x] Typescript Migration (ts-migrate)
  - [x] Generate dist with types
