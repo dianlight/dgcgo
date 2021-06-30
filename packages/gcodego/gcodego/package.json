@@ -1,6 +1,6 @@
 {
     "name": "gcodego",
-    "version": "0.2.0-alpha.0",
+    "version": "0.2.0-alpha.1",
     "description": "A GCode sender and application.",
     "productName": "GCode Go",
     "private": true,
@@ -23,7 +23,7 @@
         "check:update": "quasar upgrade"
     },
     "dependencies": {
-        "@dianlight/tightcnc": "^0.3.1",
+        "@dianlight/tightcnc": "^0.3.2-alpha.0",
         "@jsonforms/core": "^2.5.2",
         "@jsonforms/vue": "^2.5.2",
         "@jsonforms/vue-vanilla": "^2.5.2",
