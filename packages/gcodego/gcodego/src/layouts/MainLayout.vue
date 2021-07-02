@@ -116,7 +116,7 @@ import { SerializedError } from 'new-error'
     '$store.state.tightcnc.lastStatus.controller.errorData'(errorData?:SerializedError) {
 //      console.log(errorData)
       if(errorData){
-          const color = errorData.logLevel === 'error'?'accent':'warning';
+          const color = errorData.logLevel === 'error'?'negative':'warning';
 //          console.error(errorData);
 
 
@@ -124,8 +124,9 @@ import { SerializedError } from 'new-error'
 //          case 'GG' /* ERRORCODES.LIMIT_HIT.subCode*/:
             (this as MainLayout).$q.notify({
               caption: errorData.name,
-              message: errorData.message,
+              message: `${errorData.message} <br/> ${JSON.stringify(errorData.meta,undefined,'<br/>')}`,
               color: color,
+              html: true,
               icon: 'announcement',
 //              actions: [
 //                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },

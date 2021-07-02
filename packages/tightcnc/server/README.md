@@ -16,7 +16,7 @@ Planned task upgrade:
   - [ ] Use import not required
  - [ ] Remove not Typescript friendly dependencies 
  - [x] ~~Typescript Migration for lib ( ts-migrate )~~ rewrited lib content
-  - [ ] Remove ts-migrate dependecy
+  - [x] Remove ts-migrate dependecy
  - [x] Clientlib migration
   - [x] Expose clientlib d.ts
 - [x] Upgrade to serialport 9.x 

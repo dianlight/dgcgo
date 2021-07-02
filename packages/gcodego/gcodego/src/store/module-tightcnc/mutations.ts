@@ -2,6 +2,7 @@ import { MutationTree } from 'vuex';
 import { TightCNCStateInterface } from './state';
 import { ControllerStatus, StatusObject, JobStatus } from '@dianlight/tightcnc'
 import { LogLine } from '../../tightcnc/TightCNCClient';
+import { Notify } from 'quasar'
 
 
 const mutation: MutationTree<TightCNCStateInterface> = {
@@ -90,6 +91,16 @@ const mutation: MutationTree<TightCNCStateInterface> = {
         return previousValue;
       }, [] as LogLine[])
       .filter((log) => {
+        if (log.direction === '<' && log.data.startsWith('[MSG:')) {
+          Notify.create({
+            type: 'info',
+            multiLine: true,
+            message: log.data.match(/\[MSG:(.*)]/ig) as unknown as string,
+            position: 'top-right',
+            timeout: 30000
+          })
+        }
+
         if (state.logs.options.filterStatus) {
           return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)
         }

@@ -28,7 +28,7 @@ Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with
 
 - [ ] Builder
   - [x] Patch package
-  - [ ] offline-github-changelog
+  - [x] offline-github-changelog
   - [x] quasar icongenie
   - [ ] Automatic release (github)
 - [ ] Quasar

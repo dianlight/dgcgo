@@ -41,7 +41,10 @@
             "packages/tightcnc/*"
         ],
         "nohoist": [
-            "packages/gcodego/electron","**/electron","**/electron/**","**/electron-rebuild"
+            "packages/gcodego/electron",
+            "**/electron",
+            "**/electron/**",
+            "**/electron-rebuild"
         ]
     },
     "scripts": {
@@ -53,8 +56,7 @@
         "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/",
         "ncu": "lerna exec -- ncu"
     },
-    "dependencies": {
-    },
+    "dependencies": {},
     "engines": {
         "node": "14"
     },
