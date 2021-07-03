@@ -55,7 +55,6 @@
         "new-error": "^2.1.10",
         "objtools": "^3.0.0",
         "pasync": "^2.0.2",
-        "request": "^2.88.2",
         "serialport": "^9.2.0",
         "split2": "^3.2.2",
         "stable": "^0.1.8",

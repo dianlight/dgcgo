@@ -323,6 +323,7 @@ ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
 
 /** Tight CNC Server */
 
+//console.log(`TightCNC Path: ${require.resolve('@dianlight/tightcnc')}`)
 //console.log(`Resouce Path is: "${process.resourcesPath}" "${__dirname}"`);
 let tight_path = path.join(process.resourcesPath, 'tightcnc', 'server', 'bin', 'tightcnc-server.js')
 if (!fs.existsSync(tight_path)) {
