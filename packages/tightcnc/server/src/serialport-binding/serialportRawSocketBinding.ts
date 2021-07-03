@@ -67,7 +67,7 @@ export default class SerialportRawSocketBinding extends AbstractBinding {
             if (!this.socket) return reject(new Error('no socket to close!'))
             return super.close().then(() => {
                 this.socket?.end(() => {
-                    this.socket = undefined;
+                    delete this.socket;
                     this.isOpen = false;
                     resolve()
                 })

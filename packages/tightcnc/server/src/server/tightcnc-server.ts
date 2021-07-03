@@ -35,8 +35,8 @@ import Ajv from 'ajv'
 import * as _ from "lodash";
 
 export interface StatusObject {
-    controller?: ControllerStatus
-    job?: JobStatus
+    controller?: ControllerStatus | undefined
+    job?: JobStatus | undefined
     requestInput?: {
         prompt: any
         schema: any
@@ -46,8 +46,8 @@ export interface StatusObject {
 }
 
 export interface JobSourceOptions {
-    filename?: string,
-    macro?: string,
+    filename?: string | undefined,
+    macro?: string | undefined,
     macroParams?: any,
     rawFile?: boolean,
     gcodeProcessors?: {
@@ -58,7 +58,7 @@ export interface JobSourceOptions {
         },
         order?: number
         inst?: GcodeProcessor
-    }[]
+    }[] | undefined 
     data?: string[],
     rawStrings?: boolean,
     dryRun?: boolean,
@@ -303,7 +303,7 @@ export default class TightCNCServer extends EventEmitter {
         }
         else {
             console.log('WARNING: Initializing without a controller enabled.  For testing only.');
-            this.controller = undefined;
+            delete this.controller;
         }
         // Set up the job manager
         this.jobManager = new JobManager(this);
@@ -430,7 +430,7 @@ export default class TightCNCServer extends EventEmitter {
         catch (err) {
             console.error('Error running operation ' + opname);
             console.error(err);
-            if (err.stack)
+            if (err instanceof Error)
                 console.error(err.stack);
             throw err;
         }
@@ -598,7 +598,7 @@ export default class TightCNCServer extends EventEmitter {
         if (!this.waitingForInput)
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Not currently waiting for input');
         let w = this.waitingForInput;
-        this.waitingForInput = undefined;
+        delete this.waitingForInput;
         w.waiter.resolve(value);
     }
     cancelInput(err?:BaseRegistryError) {
@@ -607,7 +607,7 @@ export default class TightCNCServer extends EventEmitter {
         if (!this.waitingForInput)
             return;
         let w = this.waitingForInput;
-        this.waitingForInput = undefined;
+        delete this.waitingForInput;
         w.waiter.reject(err);
     }
 }

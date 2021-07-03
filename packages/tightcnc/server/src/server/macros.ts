@@ -14,12 +14,13 @@ import GcodeLine from './new-gcode-processor/GcodeLine';
 import { GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
 import { BaseRegistryError } from 'new-error';
 
+interface MacroMetaData {
+    params: unknown;
+    mergeParams: boolean[];
+}
 interface MacroData {
         name: string;
-        metadata?: {
-            params: unknown;
-            mergeParams: boolean[];
-        };
+        metadata?: MacroMetaData|void
         absPath: string;
         stat: fs.Stats;
 }
@@ -193,7 +194,7 @@ export default class Macros {
         return ret;
     }
 
-    async _loadMacroMetadata(code: string) {
+    async _loadMacroMetadata(code: string):Promise<MacroMetaData|void> {
         /* Macro metadata (parameters) is specified inside the macro file itself.  It looks like this:
          * macroMeta({ value: 'number', pos: [ 'number' ] })
          * The parameter to macroMeta is a commonSchema-style object specifying the macro parameters.
@@ -211,30 +212,29 @@ export default class Macros {
             }
         }
         if (!hasMacroMeta)
-            return null;
+            return;
         // Construct the function to call and the macroMeta function
         let fn = new AsyncFunction('tightcnc', 'macroMeta', code);
-        // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'metadata' implicitly has an 'any' type.
-        const macroMeta = (metadata) => {
+        const macroMeta = (metadata:MacroMetaData) => {
             throw { metadata, isMacroMetadata: true };
         };
         // Run the macro and trap the exception containing metadata
-        let gotMacroMetadata = null;
+        let gotMacroMetadata:MacroMetaData;
         try {
             await fn(this.tightcnc, macroMeta);
             throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Expected call to macroMeta() in macro');
         }
         catch (err) {
-            if (err && err.isMacroMetadata) {
-                gotMacroMetadata = err;
+            if (err && (err as any).isMacroMetadata) {
+                gotMacroMetadata = err as MacroMetaData;
                // TODO: what is? --> any.metadata;
             }
             else {
-                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error getting macro metadata').withMetadata(err);
+                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error getting macro metadata').withMetadata(err as any);
             }
         }
         if (!gotMacroMetadata)
-            return null;
+            return;
         // Return the metadata
         let metadata = gotMacroMetadata;
         if (metadata.params) {
@@ -334,10 +334,10 @@ export default class Macros {
             macroMeta: () => { } // this function is a no-op in normal operation
         };
         let meta = await this._loadMacroMetadata(code);
-        let schema = meta && meta.params;
+        let schema = meta?meta.params:undefined;
         let pkeys;
-        if (schema && schema.type === 'object' && schema.properties) {
-            pkeys = Object.keys(schema.properties);
+        if (schema && (schema as any).type === 'object' && (schema as any).properties) {
+            pkeys = Object.keys((schema as any).properties);
         }
         else {
             pkeys = Object.keys(params);

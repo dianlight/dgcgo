@@ -248,7 +248,7 @@ export abstract class GcodeProcessor extends GcodeLineReadableStream {
         if (this.gcodeProcessorChainIdx === this.gcodeProcessorChain.length - 1) {
             gline.hookSync('sent', () => {
                 if (gline === this.syncWaitingForLine) {
-                    this.syncWaitingForLine = undefined;
+                    delete this.syncWaitingForLine;
                     this.emit('_gcpFlushed');
                 }
             });
@@ -262,7 +262,7 @@ export abstract class GcodeProcessor extends GcodeLineReadableStream {
         if (!prevProcessor) return;
         if (prevProcessor.syncWaitingForLine === gline) {
             // previous processor's write buffer, and this processor's read buffer, have now been flushed
-            prevProcessor.syncWaitingForLine = undefined;
+            delete prevProcessor.syncWaitingForLine;
             prevProcessor.emit('_gcpFlushed');
         }
     }

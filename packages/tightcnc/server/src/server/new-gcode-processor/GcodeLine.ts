@@ -54,10 +54,10 @@ export class GcodeLine extends CrispHooks {
 	modified = false
 	isGcodeLine = true
 	words?: (string | [string,number])[]
-	comment?:string
-	commentStyle?:string
-	origLine?: string
-	origLineNumber?: number
+	comment?:string | undefined
+	commentStyle?:string | undefined
+	origLine?: string | undefined
+	origLineNumber?: number | undefined
 	
 	before?: VMState
 	after?: VMState
@@ -77,7 +77,7 @@ export class GcodeLine extends CrispHooks {
 			this.words = [];
 			this.comment = '';
 			this.commentStyle = '(';
-			this.origLine = undefined;
+			delete this.origLine;
 			this.origLineNumber = origLineNumber;
 		} else if (typeof arg === 'string') {
 			this.origLine = arg;
@@ -93,13 +93,13 @@ export class GcodeLine extends CrispHooks {
 			this.commentStyle = '(';
 			this.origLine = this.toString();
 			this.origLineNumber = origLineNumber
-		} else if (arg && typeof arg === 'object') {
-			this.words = objtools.deepCopy((arg as GcodeLine).words);
-			this.comment = (arg as GcodeLine).comment;
-			this.commentStyle = (arg as GcodeLine).commentStyle;
-			this.origLine = (arg as GcodeLine).origLine;
-			this.modified = (arg as GcodeLine).modified;
-			this.origLineNumber = (arg as GcodeLine).origLineNumber || origLineNumber
+		} else if (arg && arg instanceof GcodeLine) {
+			this.words = objtools.deepCopy(arg.words);
+			this.comment = arg.comment;
+			this.commentStyle = arg .commentStyle;
+			this.origLine = arg.origLine;
+			this.modified = arg.modified;
+			this.origLineNumber = arg.origLineNumber || origLineNumber
 		} else {
 			throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Invalid call to GcodeLine constructor');
 		}

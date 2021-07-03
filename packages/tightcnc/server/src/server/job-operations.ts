@@ -76,12 +76,12 @@ class OpStartJob extends Operation {
     }
     
     async run(params: JobSourceOptions) {
-        let jobOptions = {
+        let jobOptions: JobSourceOptions = {
             filename: params.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
             macro: params.macro,
             macroParams: params.macroParams,
             gcodeProcessors: params.gcodeProcessors,
-            rawFile: params.rawFile
+            rawFile: params.rawFile || false
         };
         return await this.tightcnc!.jobManager?.startJob(jobOptions);
     }
@@ -103,12 +103,12 @@ class OpJobDryRun extends Operation {
     
 
     async run(params: JobOptionsDryRun) {
-        let jobOptions = {
+        let jobOptions:JobSourceOptions = {
             filename: params.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
             macro: params.macro,
             macroParams: params.macroParams,
             gcodeProcessors: params.gcodeProcessors,
-            rawFile: params.rawFile
+            rawFile: params.rawFile || false
         };
         return await this.tightcnc!.jobManager?.dryRunJob(jobOptions, params.outputFilename ? this.tightcnc?.getFilename(params.outputFilename, 'data') : undefined);
     }

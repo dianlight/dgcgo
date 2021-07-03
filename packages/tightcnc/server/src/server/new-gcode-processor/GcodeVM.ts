@@ -27,20 +27,20 @@ export interface VMState {
     seenWordSet: {
         [key:string]:boolean
     }; // a mapping from word letters to boolean true if that word has been seen at least once
-    tool?:number;
+    tool?:number | undefined;
     countT:number;
     countM6: number;
-    feed?: number
-    motionMode?: 'G0' | 'G1' | 'G2' | 'G3'
+    feed?: number | undefined
+    motionMode?: 'G0' | 'G1' | 'G2' | 'G3' | undefined
     arcPlane?: number
     incremental?: boolean
     inverseFeed?: boolean
     units?: 'in' | 'mm'
     spindle?: boolean
     spindleDirection?: -1 | 1
-    spindleSpeed?: number
+    spindleSpeed?: number | undefined
     coolant?: false | 1 | 2 | 3
-    activeCoordSys?: number
+    activeCoordSys?: number | undefined
     pos: number[],
     mpos: number[]
     coordSysOffsets: number[][]
@@ -96,7 +96,6 @@ export default class GcodeVM {
         lineCounter:0,
         hasMovedToAxes: [], // true for each axis that we've moved on, and have a definite position for
         seenWordSet: {},// a mapping from word letters to boolean true if that word has been seen at least once
-        tool:undefined,
         countT:0,
         countM6: 0,
         storedPositions: [],
@@ -155,7 +154,6 @@ export default class GcodeVM {
             lineCounter:0,
             hasMovedToAxes: this.zerocoord<boolean>(false), // true for each axis that we've moved on, and have a definite position for
             seenWordSet: {},// a mapping from word letters to boolean true if that word has been seen at least once
-            tool:undefined,
             countT:0,
             countM6: 0,
             storedPositions: [],

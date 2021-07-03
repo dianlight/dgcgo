@@ -88,7 +88,7 @@ export default abstract class Controller  extends EventEmitter implements VMStat
     axisMaxFeeds = [500, 500, 500];
     axisMaxTravel:number[] = []
     mpos = [0, 0, 0];
-    activeCoordSys?:number = 0;
+    activeCoordSys?:number|undefined = 0;
     coordSysOffsets = [[0, 0, 0]];
     offset = [0, 0, 0];
     offsetEnabled = false;
@@ -112,10 +112,10 @@ export default abstract class Controller  extends EventEmitter implements VMStat
     spindleSpeedMin?: number
     homeDirection?: ('+'|'-')[]
 
-    coord?: ((coords: number[], axis: string | number, value?: number | undefined) => number | undefined) | undefined;
+    coord?: (coords: number[], axis: string | number, value?: number | undefined) => number | undefined;
     totalTime: number = 0;
-    bounds?: [(number | null)[], (number | null)[]] | undefined;
-    mbounds?: [(number | null)[], (number | null)[]] | undefined;
+    bounds?: [(number | null)[], (number | null)[]];
+    mbounds?: [(number | null)[], (number | null)[]];
     lineCounter: number = 0;
     hasMovedToAxes: boolean[] = [false,false,false];
     seenWordSet: {
@@ -124,8 +124,8 @@ export default abstract class Controller  extends EventEmitter implements VMStat
     tool?: number;
     countT: number = 0;
     countM6: number = 0;
-    motionMode?: 'G0' | 'G1' | undefined;
-    arcPlane?: number | undefined;
+    motionMode?: 'G0' | 'G1' ;
+    arcPlane?: number;
     pos: number[] = [0,0,0];
 
 
@@ -246,19 +246,19 @@ export default abstract class Controller  extends EventEmitter implements VMStat
         // true if the machine is in an error/alarm state
         this.error = false;
         // Additional information about the error.  Must be an XError object.
-        this.errorData = undefined;
+        delete this.errorData;
         // true if a program is running
         this.programRunning = false;
         // 1 for CW, -1 for CCW
         this.spindleDirection = 1;
         // Speed of spindle, if known
-        this.spindleSpeed = undefined;
+        delete this.spindleSpeed;
         // True for inverse feedrate mode
         this.inverseFeed = false;
         // Spindle
-        this.spindleSpeedMax = undefined
-        this.spindleSpeedMin = undefined
-        this.homeDirection = undefined
+        delete this.spindleSpeedMax
+        delete this.spindleSpeedMin
+        delete this.homeDirection
     }
     /**
      * Initialize and connect to CNC machine.  Should update machine state properties as much as is possible.

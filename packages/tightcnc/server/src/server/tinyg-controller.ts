@@ -65,7 +65,7 @@ export  class TinyGController extends Controller {
     // Counter storing the next free line id to use
     lineIdCounter = 1;
     resetOnConnect = false;
-    synced?:boolean = true;
+    synced?:boolean|undefined = true;
     _waitingForSync = false;
     _disableSending = false; // flag to disable sending data using normal channels (_sendImmediate still works)
     _disableResponseErrorEvent = false; // flag to disable error events in cases where errors are expected
@@ -145,9 +145,9 @@ export  class TinyGController extends Controller {
         this.sendQueueIdxToRecvAtLastQr = 0;
         this.lastQrNumFree = 28;
         this.receivedLineCounter = 0;
-        this.lastResponseReceivedCounter = undefined;
-        this.lastStatusReportCounter = undefined;
-        this.lastResponseReceivedTime = undefined;
+        delete this.lastResponseReceivedCounter;
+        delete this.lastStatusReportCounter;
+        delete this.lastResponseReceivedTime;
         this.sendImmediateCounter = 0;
     }
     // Calls executing hooks corresponding to front entry in planner mirror
@@ -868,7 +868,9 @@ export  class TinyGController extends Controller {
                         catch (err) {
                             if (!this._initializing)
                                 this.emit('error', err);
-                            this.close(err);
+                            if (err instanceof BaseRegistryError) {
+                                this.close(err);
+                            }
                             this._retryConnect();
                             break;
                         }

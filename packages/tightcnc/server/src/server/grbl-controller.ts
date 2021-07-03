@@ -113,7 +113,7 @@ export class GRBLController extends Controller {
     _waitingToRetry?: boolean
     _welcomeMessageWaiter?: any
     _statusUpdateLoops?: number[] /* NodeJS.Timeout[]*/ 
-    serialReceiveBuf?:string
+    serialReceiveBuf?:string | undefined
     _retryConnectFlag?:boolean
 
     /** REGEXP */
@@ -197,7 +197,7 @@ export class GRBLController extends Controller {
         this.sendImmediateCounter = 0;
         if (this._checkExecutedLoopTimeout) {
             clearTimeout(this._checkExecutedLoopTimeout);
-            this._checkExecutedLoopTimeout = undefined;
+            delete this._checkExecutedLoopTimeout;
         }
         this.emit('_sendQueueDrain');
     }
@@ -303,7 +303,7 @@ export class GRBLController extends Controller {
             held?: boolean,
             moving?: boolean
             error?: boolean,
-            errorData?: BaseRegistryError
+            errorData?: BaseRegistryError | undefined
             programRunning?: boolean
             line?: number
             feed?: number
@@ -325,7 +325,7 @@ export class GRBLController extends Controller {
                         obj.held = false;
                         obj.moving = false;
                         obj.error = false;
-                        obj.errorData = undefined;
+                        delete obj.errorData;
                         obj.programRunning = false;
                         break;
                     case 'run':
@@ -333,7 +333,7 @@ export class GRBLController extends Controller {
                         obj.held = false;
                         obj.moving = true;
                         obj.error = false;
-                        obj.errorData = undefined;
+                        delete obj.errorData;
                         obj.programRunning = true;
                         break;
                     case 'hold':
@@ -341,7 +341,7 @@ export class GRBLController extends Controller {
                         obj.held = true;
                         obj.moving = false;
                         obj.error = false;
-                        obj.errorData = undefined;
+                        delete obj.errorData;
                         obj.programRunning = true;
                         break;
                     case 'alarm':
@@ -462,7 +462,7 @@ export class GRBLController extends Controller {
             }
             else if (!('WPos' in statusReport)) {
                 // no work position present, so clear this._wpos so position is calculated from mpos
-                obj._wpos = undefined;
+                delete obj._wpos;
             }
         }
         if ('WPos' in statusReport) {
@@ -766,8 +766,8 @@ export class GRBLController extends Controller {
         if (matches) {
             this.grblDeviceVersion = matches[1];
             this.error = false;
-            this.errorData = undefined;
-            this.lastMessage = undefined;
+            delete this.errorData;
+            delete this.lastMessage;
             if (this._initializing && this._welcomeMessageWaiter) {
                 // Complete initialization
                 this._welcomeMessageWaiter.resolve();
@@ -1154,7 +1154,9 @@ export class GRBLController extends Controller {
                         catch (err) {
                             if (!this._initializing)
                                 this.emit('error', err);
-                            this.close(err);
+                            if (err instanceof BaseRegistryError) {
+                                this.close(err);
+                            }
                             this._retryConnect();
                             break;
                         }
@@ -1417,7 +1419,7 @@ export class GRBLController extends Controller {
             //this.debug('_commsCheckExecutedLoop() scheduling another loop in ' + twait);
             this._checkExecutedLoopTimeout = setTimeout(() => {
                 //this.debug('Retrying _commsCheckExecutedLoop');
-                this._checkExecutedLoopTimeout = undefined;
+                delete this._checkExecutedLoopTimeout;
                 this._commsCheckExecutedLoop();
             }, twait) as unknown as number;
         }
@@ -1690,7 +1692,6 @@ export class GRBLController extends Controller {
         let block = {
             str: str,
             hooks: hooks,
-            gcode: undefined,
             goesToPlanner: 0,
             fullSync: true
         };

@@ -172,7 +172,7 @@ export default class JobManager {
             macro: jobOptions.macro,
             macroParams: jobOptions.macroParams,
             gcodeProcessors: jobOptions.gcodeProcessors,
-            rawStrings: jobOptions.rawFile,
+            rawStrings: jobOptions.rawFile || false,
             job: job
         });
         job.sourceStream = source;
@@ -257,7 +257,7 @@ export default class JobManager {
             macro: _jobOptions.macro,
             macroParams: _jobOptions.macroParams,
             gcodeProcessors: _jobOptions.gcodeProcessors,
-            rawStrings: _jobOptions.rawFile,
+            rawStrings: _jobOptions.rawFile || false,
             dryRun: true,
             job: job
         });

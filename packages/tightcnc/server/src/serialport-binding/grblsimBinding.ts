@@ -55,7 +55,7 @@ export default class GrblsimBinding extends AbstractBinding {
             this.process.on('exit', (code,signal) => {
                 console.error("<grbl>Exit:", code,'Signal:',signal)
                 this.isOpen = false
-                this.process = undefined
+                delete this.process
                 if(!signal)this.open(_path,options)
             })
             process.on('beforeExit', (code) => {
@@ -89,7 +89,7 @@ export default class GrblsimBinding extends AbstractBinding {
         console.error("Process Alive. Kill it!")
         this.process?.kill('SIGINT')
         console.error("Process closed?", !this.process?.connected);
-        this.process = undefined;
+        delete this.process;
         this.isOpen = false;
     }
     /**
