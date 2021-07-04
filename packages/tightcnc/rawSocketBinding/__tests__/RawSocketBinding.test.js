@@ -2,6 +2,6 @@
 
 const serialportrawsocketbinding = require('..');
 
-describe('@dianlight/serialportRawSocketBinding', () => {
+describe('@dianlight/rawSocketBinding', () => {
     it('needs tests');
 });

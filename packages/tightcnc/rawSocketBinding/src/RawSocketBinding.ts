@@ -2,7 +2,7 @@ import AbstractBinding from "@serialport/binding-abstract"
 import { OpenOptions, PortInfo } from "serialport"
 import * as net from 'net'
 
-export default class SerialportRawSocketBinding extends AbstractBinding {
+export default class RawSocketBinding extends AbstractBinding {
 
     socket?: net.Socket;
     _buffer: Buffer[] = []

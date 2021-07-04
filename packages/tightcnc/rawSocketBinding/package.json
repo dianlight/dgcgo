@@ -1,5 +1,5 @@
 {
-  "name": "@dianlight/serialportrawsocketbinding",
+  "name": "@dianlight/rawsocketbinding",
   "version": "1.0.0",
   "description": "Raw Socket Binding for SerialPort package",
   "keywords": [
@@ -9,8 +9,8 @@
   "author": "dianlight <lucio.tarantino@gmail.com>",
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
-  "main": "dist/src/serialportRawSocketBinding.js",
-  "types": "types/src/serialportRawSocketBinding.d.ts",
+  "main": "dist/src/RawSocketBinding.js",
+  "types": "types/src/RawSocketBinding.d.ts",
   "directories": {
     "lib": "dist/src",
     "test": "__tests__"
