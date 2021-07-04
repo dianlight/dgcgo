@@ -4,9 +4,9 @@
         "src/**/*.ts",
       ],
     "compilerOptions": {
+        "sourceMap": true,
         "declaration": true,
         "declarationDir": "./types",
-        "sourceMap": true,
         "sourceRoot": "./src"   
     }
 }

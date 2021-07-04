@@ -2,8 +2,8 @@ import AbstractBinding from "@serialport/binding-abstract"
 import { OpenOptions, PortInfo } from "serialport"
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { addExitCallback } from 'catch-exit';
-import path from 'path'
-import os from 'os'
+import * as path from 'path'
+import * as os from 'os'
 
 export default class GrblsimBinding extends AbstractBinding {
 
@@ -179,7 +179,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * @param {Boolean} [options.rts=true] flag for rts
      * @returns {Promise} Resolves once the port's flags are set.
      */
-    override async set(options: { brk: boolean, cts: boolean, dst: boolean, dtr: boolean, rts: boolean }): Promise<void> {
+    override async set(options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }): Promise<void> {
         //console.log('S>',options)
         return Promise.resolve()
     }

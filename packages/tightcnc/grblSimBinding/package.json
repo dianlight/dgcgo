@@ -1,0 +1,44 @@
+{
+  "name": "@dianlight/grblsimbinding",
+  "version": "1.0.0",
+  "description": "GrblSim Binding for SerialPort package",
+  "keywords": [
+    "serialport",
+    "socket"
+  ],
+  "author": "dianlight <lucio.tarantino@gmail.com>",
+  "homepage": "https://github.com/dianlight/dgcgo#readme",
+  "license": "GPL-3.0-or-later",
+  "main": "dist/src/grblSimBinding.js",
+  "types": "types/src/grblSimBinding.d.ts",
+  "directories": {
+    "lib": "dist/src",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist/src"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dianlight/dgcgo.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "watch": "tsc --watch --sourceMap --declaration --pretty --outDir ./dist",
+    "build": "tsc --sourceMap --declaration --pretty --outDir ./dist"
+  },
+  "bugs": {
+    "url": "https://github.com/dianlight/dgcgo/issues"
+  },
+  "devDependencies": {
+    "@manuth/typescript-eslint-plugin": "^1.4.1",
+    "@types/serialport": "^8.0.1",
+    "typescript": "^4.4.0-dev.20210702"
+ },
+ "dependencies": {
+  "@serialport/binding-abstract": "^9.0.7"
+ }
+}

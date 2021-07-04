@@ -7,7 +7,7 @@ import CrispHooks from 'crisphooks';
 import objtools from 'objtools';
 import TightCNCServer from './tightcnc-server';
 import SerialportRawSocketBinding from '@dianlight/serialportrawsocketbinding';
-import GrblsimBinding from '../serialport-binding/grblsimBinding';
+import GrblsimBinding from '@dianlight/grblsimbinding';
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
 import GcodeVM from './new-gcode-processor/GcodeVM';
 import * as node_stream from 'stream'

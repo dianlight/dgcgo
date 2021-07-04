@@ -2,7 +2,7 @@ declare module '@serialport/binding-abstract' {
     import { OpenOptions, PortInfo } from "serialport"
 
     export default class AbstractBinding {
-        static async list(): Promise<PortInfo[]>
+        static list(): Promise<PortInfo[]>
   
         constructor(opt: OpenOptions)
   
@@ -13,12 +13,12 @@ declare module '@serialport/binding-abstract' {
          * @param {openOptions} options openOptions for the serialport
          * @returns {Promise} Resolves after the port is opened and configured.
          */
-        async open(path: string, options: OpenOptions): Promise<void>
+         open(path: string, options: OpenOptions): Promise<void>
   
         /**
          * Closes an open port
          */
-        async close(): Promise<void>
+         close(): Promise<void>
   
         /**
          * Request a number of bytes from the SerialPort. This function is similar to Node's
@@ -33,7 +33,7 @@ declare module '@serialport/binding-abstract' {
          * @param {integer} length Specifies the maximum number of bytes to read.
          * @returns {Promise} Resolves with the number of bytes read after a read operation.
          */
-        async read(buffer: Buffer, offset: number, length: number): Promise<{ bytesRead: number, buffer: Buffer }>
+         read(buffer: Buffer, offset: number, length: number): Promise<{ bytesRead: number, buffer: Buffer }>
   
         /**
          * Write bytes to the SerialPort. Only called when there is no pending write operation.
@@ -44,13 +44,13 @@ declare module '@serialport/binding-abstract' {
          * @param {buffer} buffer - Accepts a [`Buffer`](http://nodejs.org/api/buffer.html) object.
          * @returns {Promise} Resolves after the data is passed to the operating system for writing.
          */
-        async write(buffer: Buffer): Promise<void>
+         write(buffer: Buffer): Promise<void>
   
         /**
          * Changes connection settings on an open port. Only `baudRate` is supported.
          * @returns {Promise} Resolves once the port's baud rate changes.
          */
-        async update(options: { baudRate: number }): Promise<void>
+         update(options: { baudRate: number }): Promise<void>
   
         /**
          * Set control flags on an open port.
@@ -63,30 +63,40 @@ declare module '@serialport/binding-abstract' {
          * @param {Boolean} [options.rts=true] flag for rts
          * @returns {Promise} Resolves once the port's flags are set.
          */
-        async set(options): Promise<void>
+        set(options: {
+            brk: boolean,
+            cts: boolean,
+            dsr: boolean,
+            dtr: boolean,
+            rts: boolean
+         }): Promise<void>
   
         /**
          * Get the control flags (CTS, DSR, DCD) on the open port.
          * @returns {Promise} Resolves with the retrieved flags.
          */
-        async get(): Promise<Flags>
+        get(): Promise<{
+            cts: boolean,
+            dsr: boolean,
+            dcd: boolean
+        }>
   
         /**
          * Get the OS reported baud rate for the open port. Used mostly for debugging custom baud rates.
          */
-        async getBaudRate(): Promise<number>
+        getBaudRate(): Promise<number>
   
         /**
          * Flush (discard) data received but not read, and written but not transmitted.
          * @returns {Promise} Resolves once the flush operation finishes.
          */
-        async flush(): Promise<void>
+        flush(): Promise<void>
   
         /**
          * Drain waits until all output data is transmitted to the serial port. An in-progress write
          * should be completed before this returns.
          * @returns {Promise} Resolves once the drain operation finishes.
          */
-        async drain(): Promise<void>
+        drain(): Promise<void>
     }
 }
