@@ -1,11 +1,14 @@
 # `@dianlight/serialportRawSocketBinding`
 
-> TODO: description
+> A RawSocket Binding for serialport.
 
 ## Usage
 
 ```
-const serialportrawsocketbinding = require('@dianlight/serialportRawSocketBinding');
+import SerialportRawSocketBinding from '@dianlight/serialportrawsocketbinding';
 
-// TODO: DEMONSTRATE API
+new SerialPort("socket://<server>:<port>", {
+    binding:SerialportRawSocketBinding 
+}, (err) => {});
+  
 ```
