@@ -1,5 +1,6 @@
 {
     "i18n-ally.localesPaths": [
         "packages/gcodego/gcodego/src/i18n"
-    ]
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

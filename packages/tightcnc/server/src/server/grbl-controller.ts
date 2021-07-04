@@ -6,7 +6,7 @@ import GcodeLine from './new-gcode-processor/GcodeLine';
 import CrispHooks from 'crisphooks';
 import objtools from 'objtools';
 import TightCNCServer from './tightcnc-server';
-import SerialportRawSocketBinding from '../serialport-binding/serialportRawSocketBinding';
+import SerialportRawSocketBinding from '@dianlight/serialportrawsocketbinding';
 import GrblsimBinding from '../serialport-binding/grblsimBinding';
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
 import GcodeVM from './new-gcode-processor/GcodeVM';

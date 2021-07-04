@@ -1,6 +1,6 @@
 import AbstractBinding from "@serialport/binding-abstract"
 import { OpenOptions, PortInfo } from "serialport"
-import net from 'net'
+import * as net from 'net'
 
 export default class SerialportRawSocketBinding extends AbstractBinding {
 
@@ -158,7 +158,7 @@ export default class SerialportRawSocketBinding extends AbstractBinding {
      * @param {Boolean} [options.rts=true] flag for rts
      * @returns {Promise} Resolves once the port's flags are set.
      */
-    override async set(options: { brk: boolean, cts: boolean, dst: boolean, dtr: boolean, rts: boolean }): Promise<void> {
+    override async set(options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }): Promise<void> {
         //console.log('S>',options)
         return Promise.resolve()
     }

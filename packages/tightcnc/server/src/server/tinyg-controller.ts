@@ -6,7 +6,7 @@ import pasync from 'pasync';
 import GcodeLine from './new-gcode-processor/GcodeLine';
 const AbbrJSON = require('./tinyg-abbr-json');
 import CrispHooks from 'crisphooks';
-import SerialportRawSocketBinding  from '../serialport-binding/serialportRawSocketBinding';
+import SerialportRawSocketBinding  from '@dianlight/serialportrawsocketbinding';
 import { BaseRegistryError } from 'new-error';
 /**
  * This is the controller interface class for TinyG.
