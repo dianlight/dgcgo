@@ -1064,10 +1064,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.0.tgz#87de7af9c231826fdd68ac7258f77c429e0e5fcf"
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
-"@intlify/cli@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@intlify/cli/-/cli-0.4.0.tgz#4370ddab24a295c89925f3abd447bbeda09bb0e7"
-  integrity sha512-kJxJaLb2DgOmaqQxy26Ick1GTBLFrO8CEdbmtDiOeO82JR2dmyDvCOz2iLP9zELzl0WHTJ958IMHbSC5c6xN2g==
+"@intlify/cli@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@intlify/cli/-/cli-0.5.0.tgz#230b3c8c470c7a305a27bbc58782ce62ba3cc34a"
+  integrity sha512-FKPL2Avs+X7+Poer+XHbXBMNYVdFCYvTpuMr8OqnCkHlLtKgCrskeUzLyryelT4G8JG9ZZXOE9AZkiqo/AWYyg==
   dependencies:
     "@intlify/core" "^9.1.0"
     "@intlify/core-base" "^9.1.0"
@@ -1130,7 +1130,7 @@
     "@intlify/message-resolver" "9.1.6"
     "@intlify/shared" "9.1.6"
 
-"@intlify/shared@9.1.6", "@intlify/shared@^9.1.0", "@intlify/shared@^9.1.1":
+"@intlify/shared@9.1.6", "@intlify/shared@^9.1.0", "@intlify/shared@^9.1.6":
   version "9.1.6"
   resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-9.1.6.tgz#d03c9301898d6ddffe2a54c03e7664174fbcdfd9"
   integrity sha512-6MtsKulyfZxdD7OuxjaODjj8QWoHCnLFAk4wkWiHqBCa6UCTC0qXjtEeZ1MxpQihvFmmJZauBUu25EvtngW5qQ==
@@ -1145,12 +1145,12 @@
     "@intlify/shared" "9.1.6"
 
 "@intlify/vue-i18n-loader@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@intlify/vue-i18n-loader/-/vue-i18n-loader-2.1.0.tgz#978d7025f33e8732205419e030e685a7146e031f"
-  integrity sha512-eDWpSktVmyfj7UxSYO4YWT4EKdeLsVMSoKu4MBZaX3RMcOcZeIuHaLY4hDL5bndgyaxkcqfbOo1SxJ5bPR0SKw==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@intlify/vue-i18n-loader/-/vue-i18n-loader-2.1.1.tgz#f9d5e5fd747cbcd6e365ba850ec788e410db4a51"
+  integrity sha512-uv6rZcq0LfnS2qlIBqFyQ+dX1CuGYyCuhjHso4bnCCOfbdHn+pLVfWMhHs6YUyWMj3NG/rn6VBTjDqhuXZ/amA==
   dependencies:
-    "@intlify/cli" "^0.4.0"
-    "@intlify/shared" "^9.1.1"
+    "@intlify/cli" "^0.5.0"
+    "@intlify/shared" "^9.1.6"
     loader-utils "^2.0.0"
 
 "@jimp/bmp@^0.14.0":
@@ -3653,10 +3653,20 @@ ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.0, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, aj
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^8.0.1, ajv@^8.6.0:
+ajv@^8.0.1:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.6.0.tgz#60cc45d9c46a477d80d92c48076d972c342e5720"
   integrity sha512-cnUG4NSBiM4YFBxgZIj/In3/6KX+rQ2l2YPRVcvAMQGWEPKuXoPIhxzwqh31jA3IPbI4qEOp/5ILI4ynioXsGQ==
+  dependencies:
+    fast-deep-equal "^3.1.1"
+    json-schema-traverse "^1.0.0"
+    require-from-string "^2.0.2"
+    uri-js "^4.2.2"
+
+ajv@^8.6.0:
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.6.1.tgz#ae65764bf1edde8cd861281cda5057852364a295"
+  integrity sha512-42VLtQUOLefAvKFAQIxIZDaThq6om/PrfP0CYk3/vn+y4BMNkKnbli8ON2QCiHov4KkzOSJ/xSoBJdayiiYvVQ==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
@@ -5681,7 +5691,7 @@ debug@3.1.0:
   dependencies:
     ms "2.0.0"
 
-debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1:
+debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
   integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
@@ -5695,7 +5705,7 @@ debug@^3.1.0, debug@^3.1.1, debug@^3.2.6:
   dependencies:
     ms "^2.1.1"
 
-debug@^4.3.2:
+debug@^4.3.1, debug@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.2.tgz#f0a49c18ac8779e31d4a0c6029dfb76873c7428b"
   integrity sha512-mOp8wKcvj7XxC78zLgw/ZA+6TSgkoE2C/ienthhRD298T7UNwAg9diBpLRxC0mOezLl4B0xV7M0cCO6P/O0Xhw==
@@ -6638,6 +6648,11 @@ eslint-visitor-keys@^2.0.0, eslint-visitor-keys@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-2.1.0.tgz#f65328259305927392c938ed44eb0a5c9b2bd303"
   integrity sha512-0rSmRBzXgDzIsD6mGdJgevzgezI534Cer5L/vyMX0kHzT/jiB43jRhd9YUlMGYLQy2zprNmoT8qasCGtY+QaKw==
+
+eslint-visitor-keys@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.0.0.tgz#e32e99c6cdc2eb063f204eda5db67bfe58bb4186"
+  integrity sha512-mJOZa35trBTb3IyRmo8xmKBZlxf+N7OnUl4+ZhJHs/r+0770Wh/LEACE2pqMGMe27G/4y8P2bYGk4J70IC5k1Q==
 
 eslint@^7.29.0:
   version "7.30.0"
@@ -9087,13 +9102,14 @@ json5@^2.1.2, json5@^2.2.0:
     minimist "^1.2.5"
 
 jsonc-eslint-parser@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/jsonc-eslint-parser/-/jsonc-eslint-parser-1.0.1.tgz#fbbedad0875c79e1e15d0ed6877ebe43f18a52e3"
-  integrity sha512-mh5LY5byThmc692EqJS3Ss9sViNoNeCLNG5VQUgJLoAFFM3FzdIetd99qEiiQ+NXBVAIUgX5sWeK9leniS8RbQ==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/jsonc-eslint-parser/-/jsonc-eslint-parser-1.1.0.tgz#1c3eb81fdb8f1e0de1a9bf150f3155a14ec5d744"
+  integrity sha512-FA3oS+8V0Mz4vv19YpY4TuZZi2ecR0RHTua9SjbCYb4+e35MWKIi7jn17zdGi6jxE7Cv7Vk61ml376MmMENieA==
   dependencies:
-    eslint-utils "^2.1.0"
-    eslint-visitor-keys "^2.0.0"
+    eslint-utils "^3.0.0"
+    eslint-visitor-keys "^3.0.0"
     espree "^6.0.0 || ^7.2.0"
+    semver "^6.3.0"
 
 jsonfile@^2.1.0:
   version "2.4.0"
@@ -13951,9 +13967,9 @@ typescript@4.2.2:
   integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 typescript@^4.4.0-dev.20210702:
-  version "4.4.0-dev.20210702"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210702.tgz#7e3fdf60071baf2f5e9a7603707afff7f993bd7a"
-  integrity sha512-M6rwczCm6X/0exbCYxki+Xe2+Kvn2aLeAPUE8n7EuuB3ul0ag2NnUlqG9NQAu97kT4oKwPemtQcbMkthtj2vBg==
+  version "4.4.0-dev.20210704"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210704.tgz#9165faeb783179080212572b60417d12df5f043a"
+  integrity sha512-5Z/frymux4gcEWlBxBtxDNAXDezbwKEXue9ZPOG1mL/6fqanC88qRuf7SRP8QzJNR8i9fSSj5AD+dwsDt3XKCQ==
 
 uglify-js@^3.1.4, uglify-js@^3.5.1:
   version "3.13.10"
