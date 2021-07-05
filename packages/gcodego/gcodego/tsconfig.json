@@ -19,7 +19,8 @@
     "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
   },
   "references": [
-    { "path": "../../tightcnc/server"}
+    { "path": "../../tightcnc/server"},
+    { "path": "../core"}
   ],
   "plugins": [
     {

@@ -49,7 +49,7 @@ import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
 import { Options, Vue } from 'vue-class-component';
 //import { Watch } from 'vue-property-decorator'
 import { uid } from 'quasar'
-import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
+import { GcodeGoConfig } from '@dianlight/gcodego-core';
 import * as _ from 'lodash';
 import { WorkBenchSessionData } from './WorkBenchSessionData'
 

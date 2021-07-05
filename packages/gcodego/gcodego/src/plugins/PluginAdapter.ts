@@ -1,17 +1,19 @@
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core';
-import { TightCNCClient, JobStatusUpdateHookCallback, ClientEvents } from '../tightcnc/TightCNCClient';
-import { GcPlugin } from './GcPlugin';
+import { JobStatusUpdateHookCallback, ClientEvents } from '../tightcnc/TightCNCClient';
+import { GcPlugin, AbstractPluginAdapter } from '@dianlight/gcodego-core';
 import { Notify, Dialog } from 'quasar'
 import JsonFormDialog from '../dialogs/JsonFormDialog.vue'
 
 
-export class PluginAdapter {
+export class PluginAdapter extends AbstractPluginAdapter {
 
-    _pluginRegister: Record<string, GcPlugin> = {}
+    //_pluginRegister: Record<string, GcPlugin> = {}
 
-    constructor(public tightcnc: TightCNCClient) { }
+    //constructor(tightcnc: TightCNCClient) {
+    //    super(tightcnc)
+    //}
 
-    async reloadPlugins(): Promise<boolean> {
+    override async reloadPlugins(): Promise<boolean> {
         return new Promise((resolve) => {
             for (const kplugin of Object.keys(this._pluginRegister)) {
                 this._pluginRegister[kplugin].deactivatePlugin()
@@ -23,15 +25,15 @@ export class PluginAdapter {
         });
     }
 
-    addPluginToRegister(name: string, plugin: GcPlugin) {
+    override addPluginToRegister(name: string, plugin: GcPlugin) {
         this._pluginRegister[name] = plugin
     }
 
-    listPluginRegister(): string[] {
+    override listPluginRegister(): string[] {
         return Object.keys(this._pluginRegister)
     }
 
-    getPluginFromRegister(name: string): GcPlugin | undefined {
+    override getPluginFromRegister(name: string): GcPlugin | undefined {
         return this._pluginRegister[name]
     }
 
@@ -39,10 +41,10 @@ export class PluginAdapter {
      * Exposed API to register to events
      */
 
-    registerJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
+    override registerJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
         this.tightcnc.addListener('job-status-update' as ClientEvents, fn)
     }
-    unregisterJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
+    override unregisterJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
         this.tightcnc.removeListener('job-status-update' as ClientEvents, fn)
     }
 

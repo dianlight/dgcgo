@@ -160,7 +160,7 @@ import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo,GcodeP
 import { Options, Vue } from 'vue-class-component';
 import { markRaw } from 'vue'
 import URLParse from 'url-parse'
-import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
+import { GcodeGoConfig } from '@dianlight/gcodego-core';
 import { JSONSchema7 } from 'json-schema';
 import { JsonForms, JsonFormsChangeEvent } from '@jsonforms/vue';
 import {

@@ -1,5 +1,5 @@
 
-import { GcPlugin, GcPluginDependencies } from './GcPlugin'
+import { GcPlugin, GcPluginDependencies } from '@dianlight/gcodego-core'
 import { JobStatus } from '@dianlight/tightcnc';
 import * as objtools from 'objtools'
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core/lib';
@@ -25,7 +25,6 @@ export class ToolChange extends GcPlugin {
 
     statusHook = (state: JobStatus) => {
         //console.log('Nuovo stato job:', state)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const jobWaiting = (state.state === 'waiting')?state.waits[0]:undefined;
         if (jobWaiting === 'tool_change') {
             const toolNum = objtools.getPath(state, 'gcodeProcessors.toolchange.tool') as string;

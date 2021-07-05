@@ -7,12 +7,13 @@ import {
 } from '@dianlight/tightcnc';
 import { uid } from 'quasar';
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
-import { EventEmitter } from 'events';
 import objectHash from 'object-hash';
 import { timeout } from 'utils-decorators';
 import { Notify } from 'quasar'
 import objtools from 'objtools'
+import { AbstractTightCNCClient, GcodeGoConfig, LogLineDirection, LogLine } from '@dianlight/gcodego-core'
 
+/*
 export interface GcodeGoConfig extends TightCNCConfig {
     selectedProcessors: string[];
     selectedPlugins: string[];
@@ -35,8 +36,9 @@ export interface LogLine {
     result?: string;
     error?: string;
 }
+*/
 
-export class TightCNCClient extends EventEmitter {
+export class TightCNCClient extends AbstractTightCNCClient {
     jsonrpc: JSONRPCClient;
     serverUrl: Promise<string> = new Promise(() => {/* Infinite Promise */ })
 
@@ -160,11 +162,11 @@ export class TightCNCClient extends EventEmitter {
         });
     }
 
-    async stop(): Promise<void> {
+    override async stop(): Promise<void> {
         return window.api.invoke('StopTightCNC');
     }
 
-    async restart(): Promise<void> {
+    override async restart(): Promise<void> {
         return new Promise((resolve) => {
             void this.stop().then(() => {
                 console.debug('Restaring....');

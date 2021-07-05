@@ -1,7 +1,7 @@
 import { MutationTree } from 'vuex';
 import { TightCNCStateInterface } from './state';
 import { ControllerStatus, StatusObject, JobStatus } from '@dianlight/tightcnc'
-import { LogLine } from '../../tightcnc/TightCNCClient';
+import { LogLine } from '@dianlight/gcodego-core';
 import { Notify } from 'quasar'
 
 

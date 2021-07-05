@@ -1,4 +1,4 @@
-import { PluginAdapter } from './PluginAdapter';
+import { AbstractPluginAdapter } from './AbstractPluginAdapter';
 
 
 export interface GcPluginDependencies {
@@ -11,7 +11,7 @@ export interface GcPluginDependencies {
  */
 export abstract class GcPlugin {
 
-    constructor(public adapter: PluginAdapter) { }
+    constructor(public adapter: AbstractPluginAdapter) { }
 
     abstract activatePlugin(): boolean
     
