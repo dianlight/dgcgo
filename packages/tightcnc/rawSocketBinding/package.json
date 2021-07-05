@@ -37,8 +37,8 @@
     "@manuth/typescript-eslint-plugin": "^1.4.1",
     "@types/serialport": "^8.0.1",
     "typescript": "^4.4.0-dev.20210702"
- },
- "dependencies": {
-  "@serialport/binding-abstract": "^9.0.7"
- }
+  },
+  "dependencies": {
+    "@serialport/binding-abstract": "^9.0.7"
+  }
 }
