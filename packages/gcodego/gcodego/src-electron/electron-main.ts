@@ -350,7 +350,7 @@ async function startTightCNC(_event: unknown, ...args:unknown[]) {
   }
   config.host = host
 
-  return new Promise<{ pid?: number, host:string, serverPort: number,newInstance:boolean }>((resolve, reject) => {
+  return new Promise<{ pid?: number|undefined, host:string, serverPort: number,newInstance:boolean }>((resolve, reject) => {
     if (tightcnc && tightcnc.connected) {
       console.warn('Tight Server PID already running ', tightcnc.pid);
       resolve({ pid: tightcnc?.pid,host:host, serverPort: serverPort,newInstance:false });

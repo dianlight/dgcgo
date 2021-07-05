@@ -23,7 +23,9 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Vue, Options /*, Prop, Model, Emit*/ } from 'vue-property-decorator'
+
+
 import { markRaw } from 'vue';
 import { QDialog, useDialogPluginComponent } from 'quasar';
 import { JSONSchema7 } from 'json-schema';
@@ -39,7 +41,7 @@ class Props {
   text?: string;
   schema?: JSONSchema7;
   uischema?: UISchemaElement;
-  data?: Record<string, unknown>;
+  data?: Record<string, unknown> | undefined;
 }
 
 @Options({
@@ -51,6 +53,8 @@ class Props {
   ],
 })
 export default class JsonFormDialog extends Vue.with(Props) {
+
+  
   // Json Form
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   renderers = Object.freeze(

@@ -228,7 +228,7 @@ export default class CommandWidget extends Vue {
     void this.$tightcnc.op('reset',{})
   }
 
-  mounted(){
+  override mounted(){
     this.zprobe = this.$tightcnc.getConfigKey<number>('probe.z',-0.99999)
     this.probefeed = this.$tightcnc.getConfigKey<number>('probe.feed',25)
   //  console.log('Got Config Z',this.zprobe)

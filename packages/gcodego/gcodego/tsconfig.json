@@ -1,5 +1,13 @@
 {
-  "extends": "@quasar/app/tsconfig-preset",
+//  "extends": "@quasar/app/tsconfig-preset",
+  "extends": "../../../tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "babel.config.js"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "experimentalDecorators": true,

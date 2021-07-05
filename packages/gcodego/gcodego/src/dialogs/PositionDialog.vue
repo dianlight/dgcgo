@@ -11,7 +11,7 @@
             <q-item-section avatar>
                 {{ axis }}
             </q-item-section>
-            <q-item-section>
+            <q-item-section v-if="$store.state.tightcnc.lastStatus?.controller">
                 <q-slider 
                 color="teal" 
                 v-model="value.position[index]" 

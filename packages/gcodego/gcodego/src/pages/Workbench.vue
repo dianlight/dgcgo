@@ -51,15 +51,9 @@ import { Options, Vue } from 'vue-class-component';
 import { uid } from 'quasar'
 import { GcodeGoConfig } from '../tightcnc/TightCNCClient';
 import * as _ from 'lodash';
+import { WorkBenchSessionData } from './WorkBenchSessionData'
 
-export interface WorkBenchSessionData {
-    id:string,
-    name:string, // Tab Name
-    fileName: string,
-    fullPath: string,
-    gcode?:string,
-    tmpFileName?:string
-}
+
 
 @Options({
   components: { Vue3GcodeViewer },
@@ -86,7 +80,7 @@ export default class WorkBench extends Vue {
 
   gcode = ''
 
-  mounted(): void {
+  override mounted(): void {
      console.log('File Opened:',this.$route.params.id)
      //console.log('Data from LocalSession', this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles'))
      this.wdata = this.$q.sessionStorage.getItem<WorkBenchSessionData[]>('openFiles')?.find( (value)=>value.id === this.$route.params.id)|| {}

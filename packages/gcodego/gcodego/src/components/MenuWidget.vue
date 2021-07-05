@@ -51,7 +51,7 @@ import { Options, Vue } from 'vue-class-component';
 import { useI18n  } from 'vue-i18n'
 import path from 'path'
 import { uid } from 'quasar'
-import { WorkBenchSessionData } from 'pages/Workbench.vue';
+import { WorkBenchSessionData } from '../pages/WorkBenchSessionData';
 
 interface JsonLocale {
   [key:string]: string | JsonLocale
@@ -99,7 +99,7 @@ export default class ManuWidget extends Vue {
     }
   }
 
-  mounted(){
+  override mounted(){
     //console.log(this.$q.platform)
     if(this.$q.platform.is.electron){
       window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
@@ -122,7 +122,7 @@ export default class ManuWidget extends Vue {
     this.wbTabs = this.$q.sessionStorage.getItem('openFiles') || []
   }
 
-  updated(){
+  override updated(){
      if(this.$q.platform.is.electron){
        window.api.send('PopulateApplicationMenu',this.i18nToObject('menu'))
      }

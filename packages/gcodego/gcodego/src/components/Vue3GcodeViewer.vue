@@ -186,7 +186,7 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
   chight = 10
 
 
-  created(){
+  override created(){
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer();
     this.camera = new THREE.PerspectiveCamera(
@@ -201,14 +201,14 @@ export default class Vue3GcodeViewer extends Vue.with(Props) {
   }
   
 
-  mounted() {
+  override mounted() {
     this.init();
     this.chight = dom.height(this.$refs.container) 
     //console.log(dom.height(this.$refs.container))
     //this.animate();
   }
 
-  updated(): void {
+  override updated(): void {
     this.motionColor.darkMode = this.darkMode || false
     //  console.log("GCODE UPDATE EVENT!", this.gcodedata, this.reload);
     if (!this.gcode && this.reload) {

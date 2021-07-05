@@ -152,7 +152,7 @@ export default class Terminal extends Vue {
       return hljs.highlight(l, { language: 'gcode' }).value;
   }
 
-  mounted(){
+  override mounted(){
     console.log('Scroll to:',this.$store.state.tightcnc.logs.lastVisualizedLine)
     this.$refs.terminal.scrollTo(this.$store.state.tightcnc.logs.lastVisualizedLine,'start')
 //    this.logs=[]

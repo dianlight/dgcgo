@@ -19,7 +19,6 @@ export interface TightCNCStateInterface {
 
 function state(): TightCNCStateInterface {
   return {
-    lastStatus: undefined,
     logs: {
       options: {
         bufferSize: 1000,

@@ -234,7 +234,7 @@ export default class ControlWidget extends Vue {
 
 
 
-  mounted(){
+  override mounted(){
     //console.log(this.$store.getters)
     /*
     this.keyboardEvent = (e:KeyboardEvent) => {
@@ -265,7 +265,7 @@ export default class ControlWidget extends Vue {
     //document.addEventListener('keydown',this.keyboardEvent)
   }
 
-  unmounted(){
+  override unmounted(){
    //if(this.keyboardEvent){
    //  document.removeEventListener('keydown',this.keyboardEvent)
    //  delete this.keyboardEvent

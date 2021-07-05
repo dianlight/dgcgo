@@ -180,7 +180,7 @@ export default class MainLayout extends Vue {
     this.leftDrawerOpen = !this.leftDrawerOpen
   }
 
-  mounted(){
+  override mounted(){
       const starter = setInterval(()=>{
         if(this.$tightcnc){
           void this.$store.dispatch('tightcnc/clientStatus', this.$tightcnc)
