@@ -50,15 +50,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-     
 
-      - name: Submodule
-        uses: Mushus/checkout-submodule@v1.0.1
-        with:
-          # A path to execute git operation
-          #basePath: # optional, default is .
-          # A path of submodule directory
-          submodulePath: ./packages/tightcnc/server
-          # A identifier secret key to used checkout the submodule
-          identifierFile: ${{ secrets.DEPLOY_KEY_TIGHTCNC }}
+#      - name: Submodule
+#        uses: Mushus/checkout-submodule@v1.0.1
+#        with:
+#          # A path to execute git operation
+#          #basePath: # optional, default is .
+#          # A path of submodule directory
+#          submodulePath: ./packages/tightcnc/server
+#          # A identifier secret key to used checkout the submodule
+#          identifierFile: ${{ secrets.DEPLOY_KEY_TIGHTCNC }}
 
       - name: Install
         run: |
@@ -67,7 +67,7 @@ jobs:
       
       - name: Publish Packages
         run: |
-          lerna run --scope @dianlight/tightcnc  build --stream
+          lerna run --scope "@dianlight/*"  build --stream
           lerna publish --no-git-tag-version --no-push from-package --registry https://npm.pkg.github.com -y
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
