@@ -36,6 +36,5 @@
     "@manuth/typescript-eslint-plugin": "^1.4.1",
     "typescript": "^4.4.0-dev.20210702"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
