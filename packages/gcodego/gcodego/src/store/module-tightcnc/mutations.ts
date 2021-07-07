@@ -91,6 +91,7 @@ const mutation: MutationTree<TightCNCStateInterface> = {
         return previousValue;
       }, [] as LogLine[])
       .filter((log) => {
+        /*
         if (log.direction === '<' && log.data.startsWith('[MSG:')) {
           Notify.create({
             type: 'info',
@@ -100,6 +101,7 @@ const mutation: MutationTree<TightCNCStateInterface> = {
             timeout: 30000
           })
         }
+        */
 
         if (state.logs.options.filterStatus) {
           return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)

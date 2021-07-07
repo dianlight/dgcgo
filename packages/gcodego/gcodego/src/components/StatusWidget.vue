@@ -75,7 +75,7 @@
               color="warning"
               name="error"
             >
-              <q-tooltip>CNC not ready!</q-tooltip>
+              <q-tooltip>{{$store.state.tightcnc.lastStatus?.controller?.errorData?.message}}</q-tooltip>
             </q-icon>
             <q-icon
               v-if="lastStatus?.controller?.moving"

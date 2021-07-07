@@ -37,14 +37,14 @@
 
         <q-separator vertical inset />
 
-        <q-badge rounded :color="lastStatus?.controller?.ready?'green':'yellow'" v-if="lastStatus?.controller">
+        <q-badge rounded :color="lastStatus?.controller?.ready?'green':'yellow'" v-if="lastStatus?.controller && !lastStatus?.controller?.error">
           <!--q-tooltip>
           {{ lastStatus?.controller }}
           </!--q-tooltip-->
         </q-badge> 
         <q-badge rounded color="red" v-if="lastStatus?.controller?.error">
-          <q-tooltip>
-          {{ lastStatus?.controller?.errorData/*.message*/ }}
+          <q-tooltip >
+          {{ lastStatus?.controller?.errorData?.message || lastStatus?.controller?.errorData}}
           </q-tooltip>
         </q-badge> 
         <q-badge rounded :color="clientExists?'yellow':'red'" v-if="!lastStatus?.controller">
@@ -106,6 +106,7 @@ import MenuWidget from '../components/MenuWidget.vue'
 
 import { Vue, Options } from 'vue-class-component'
 import { SerializedError } from 'new-error'
+import * as _ from 'lodash'
 
 
 @Options({
@@ -119,9 +120,9 @@ import { SerializedError } from 'new-error'
         (this as MainLayout).clientExists=true
       }
     },
-    '$store.state.tightcnc.lastStatus.controller.errorData'(errorData?:SerializedError) {
-//      console.log(errorData)
-      if(errorData){
+    '$store.state.tightcnc.lastStatus.controller.errorData'(errorData?:SerializedError,oldErrorData?:SerializedError) {
+      if(errorData && JSON.stringify(errorData) !== JSON.stringify(oldErrorData)){
+ //         console.log(JSON.stringify(errorData),JSON.stringify(oldErrorData))
           const color = errorData.logLevel === 'error'?'negative':'warning';
 //          console.error(errorData);
 
@@ -132,6 +133,7 @@ import { SerializedError } from 'new-error'
               caption: errorData.name,
               message: `${errorData.message} <br/> ${JSON.stringify(errorData.meta,undefined,'<br/>')}`,
               color: color,
+              position: 'bottom-right',
               html: true,
               icon: 'announcement',
 //              actions: [
@@ -155,13 +157,14 @@ import { SerializedError } from 'new-error'
         */
       }
     }, 
-    '$store.state.tightcnc.lastStatus.job.error'(error?:string) {
+    '$store.state.tightcnc.lastStatus.job.error'(error?:string,oldError?:string) {
 //      console.log(errorData)
-      if(error){
+      if(error && error !== oldError){
             (this as MainLayout).$q.notify({
               caption: 'Job Error',
               message: error,
               color: 'accent',
+              position: 'bottom-right',
               icon: 'announcement',
 //              actions: [
 //                { label: 'Reply', color: 'yellow', handler: () => { /* ... */ } },

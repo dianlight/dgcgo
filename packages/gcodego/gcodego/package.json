@@ -31,7 +31,7 @@
         "@quasar/extras": "^1.10.7",
         "axios": "^0.21.1",
         "bluebird": "^3.7.2",
-        "camera-controls": "^1.28.4",
+        "camera-controls": "^1.29.0",
         "colornames": "^1.1.1",
         "core-js": "^3.15.1",
         "electron-cfg": "^1.2.6",
