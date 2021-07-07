@@ -245,7 +245,7 @@ export default abstract class Controller  extends EventEmitter implements VMStat
         this.line = 0;
         // true if the machine is in an error/alarm state
         this.error = false;
-        // Additional information about the error.  Must be an XError object.
+        // Additional information about the error.  Must be an newError object.
         delete this.errorData;
         // true if a program is running
         this.programRunning = false;

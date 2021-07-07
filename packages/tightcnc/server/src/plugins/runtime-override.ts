@@ -1,13 +1,11 @@
-//import XError from 'xerror';
 import { errRegistry } from '../server/errRegistry';
 import { GcodeProcessor } from '../server/new-gcode-processor/GcodeProcessor';
 import GcodeLine from '../server/new-gcode-processor/GcodeLine';
 import GcodeVM from '../server/new-gcode-processor/GcodeVM';
-import objtools from 'objtools';
+//import objtools from 'objtools';
 import pasync from 'pasync';
 import Operation from '../server/operation';
-//import ListForm from '../consoleui/list-form';
-import commonSchema from 'common-schema';
+//import commonSchema from 'common-schema';
 import { JSONSchema7 } from 'json-schema';
 import TightCNCServer from '../server/tightcnc-server';
 /**

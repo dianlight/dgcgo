@@ -16,5 +16,9 @@
     "declarationDir": "./types",
     "sourceMap": true,
     "sourceRoot": "./src"   
-  }
+  },
+  "references": [
+    { "path": "../grblSimBinding"},
+    { "path": "../rawSocketBinding"}
+  ],
 }

@@ -3,6 +3,7 @@
   "extends": "../../../tsconfig.json",
   "include": [
     "src/**/*.ts",
+    "src-electron/**/*.ts",
     "src/**/*.vue"
   ],
   "exclude": [
@@ -17,6 +18,16 @@
     "allowSyntheticDefaultImports": true,
     "types": ["quasar", "webpack-env"],
     "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
+    "paths": {
+      "src/*": ["src/*"],
+      "app/*": ["*"],
+      "components/*": ["src/components/*"],
+      "layouts/*": ["src/layouts/*"],
+      "pages/*": ["src/pages/*"],
+      "assets/*": ["src/assets/*"],
+      "boot/*": ["src/boot/*"],
+      "dialogs/*": ["src/dialogs/*"],
+    },
   },
   "references": [
     { "path": "../../tightcnc/server"},

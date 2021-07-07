@@ -1,9 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 import log from 'electron-log';
 
-//window.log = log.functions;
-//window.ipcRenderer = ipcRenderer
-
 contextBridge.exposeInMainWorld('log', {
     ...log.functions,
     //    runOne(member: Exclude<keyof ElectronLog.LogFunctions, 'runOne'>, ...params:any) {
@@ -12,33 +9,53 @@ contextBridge.exposeInMainWorld('log', {
     }
 });
 
+;
+;
+;
+
+function invoke<T,R>(channel: string, data?:T): Promise<R> {
+    return new Promise<R>((resolve, reject) => {
+        const validChannels = ['StartTightCNC', 'StopTightCNC', 'LoadTightCNCConfig'];
+        if (validChannels.includes(channel)) {
+            ipcRenderer.invoke(channel, data)
+                .then(data => resolve(data))
+                .catch(err => reject(err))
+        } else {
+            reject(new Error(`Invoke Invalid Channel: ${channel}`))
+        }
+    })
+}
+
+function send<T>(channel: string, data?:T): void {
+    const validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
+    if (validChannels.includes(channel)) {
+        ipcRenderer.send(channel, data)
+    } else {
+        throw new Error(`Send Invalid Channel: ${channel}`) 
+    }
+}
+
+function receive<T>(channel: string, func: (data: T) => void): Promise < T > {
+    return new Promise<T>((resolve, reject) => {
+        const validChannels = ['MenuEvent', 'OpenEvent'];
+        if (validChannels.includes(channel)) {
+            ipcRenderer.on(channel, (event, ...args: unknown[]) => {
+                if(func)func({...args} as unknown as T)
+                resolve({ ...args } as unknown as T)
+            } );
+        } else {
+            reject( new Error(`Receive Invalid Channel: ${channel}`)) 
+        }
+    })
+}
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     'api', {
-        invoke: (channel:string, data:never) => {
-            const validChannels = ['StartTightCNC', 'StopTightCNC', 'LoadTightCNCConfig'];
-            if (validChannels.includes(channel)) {
-                return ipcRenderer.invoke(channel, data);
-            }
-        },
-        send: (channel:string, data:never) => {
-            // whitelist channels
-            const validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
-            if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel, data);
-            }
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        receive: (channel:string, func:(...args:any[])=>void) => {
-            const validChannels = ['MenuEvent', 'OpenEvent'];
-            if (validChannels.includes(channel)) {
-                // Deliberately strip event as it includes `sender` 
-                //console.log('mount listener for', channel);
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ipcRenderer.on(channel, (event, ...args:any[]) => func(...args));
-            }
-        }
+        invoke: invoke,
+        send: send,
+        receive: receive
     }
 );
 

@@ -1,11 +1,8 @@
-//import XError from 'xerror';
-//const GcodeLine = require('../../lib/gcode-line');
 import { errRegistry } from './errRegistry';
 import pasync from 'pasync';
 const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
 import fs from 'fs';
 import path from 'path';
-//import zstreams from 'zstreams';
 import * as node_stream from 'stream'
 import objtools from 'objtools';
 import { createSchema } from 'common-schema';

@@ -1,6 +1,5 @@
 import Controller, { ControllerConfig } from './controller';
 import SerialPort from 'serialport';
-//import XError from 'xerror';
 import { errRegistry } from './errRegistry';
 import pasync from 'pasync';
 import GcodeLine from './new-gcode-processor/GcodeLine';

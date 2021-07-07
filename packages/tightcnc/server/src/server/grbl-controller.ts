@@ -592,7 +592,7 @@ export class GRBLController extends Controller {
                 return errRegistry.newError('MACHINE_ERROR','MACHINE_ERROR').formatMessage('GRBL Alarm: ' + alarm).withMetadata({ grblAlarm: alarm });
         }
     }
-    // Converts the grbl message to an XError
+    // Converts the grbl message to an newError
     // Returns null if the message does not indicate an error
     // Note that just receiving a message that can be interpreted as an error doesn't mean the machine is alarmed; that should be checked separately
     _msgToError(str:string):BaseRegistryError|undefined {
@@ -617,7 +617,7 @@ export class GRBLController extends Controller {
                 return errRegistry.newError('MACHINE_ERROR','GENERIC').formatMessage('GRBL: ' + str).withMetadata({ grblMsg: str });
         }
     }
-    // Converts an error code from an "error:x" message to an XError
+    // Converts an error code from an "error:x" message to an NewError
     _responseCodeToError(ecode:number|string) {
         if (ecode && typeof ecode !== "number" && !isNaN(+ecode))
             ecode = parseInt(ecode as string);
@@ -1849,7 +1849,6 @@ export class GRBLController extends Controller {
         this._stopStatusUpdateLoops();
         if (err && !this.error) {
             this.error = true;
-//            this.errorData = XError.isXError(err) ? err : errRegistry.newError('MACHINE_ERROR','MACHINE_ERROR').formatMessage(err);
             this.errorData = err
         }
         this.ready = false;

@@ -15,5 +15,8 @@ export default boot(async ({ app,/* router, store*/ }) => {
   //       so you won't necessarily have to import axios in each vue file
   const client = new TightCNCClient()
   app.config.globalProperties.$tightcnc = client
-  await client.loadConfig().then(() => client.start())
+  await client.loadConfig()
+  client.start().catch(err => {
+    console.error('Error in starting Server',err)
+  })
 });
