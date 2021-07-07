@@ -27,6 +27,12 @@
         <q-separator vertical inset />
 
         <div>Quasar <q-badge>v{{ $q.version }}</q-badge></div>
+         <q-toggle
+            v-model="debug"
+            color="green"
+            icon="adb"
+            size="xs"
+          />
 
 
         <q-separator vertical inset />
@@ -71,7 +77,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer elevated class="bg-secondary">
+    <q-footer elevated class="bg-secondary" v-if="debug">
       <code class='mini text-white'>{{ $store.state.tightcnc?.lastStatus}}</code>
       <!--
       <q-toolbar>
@@ -169,6 +175,7 @@ import { SerializedError } from 'new-error'
 export default class MainLayout extends Vue {
 
   clientExists = false
+  debug = false
 
 //  locale = useI18n({useScope: 'global'}).locale
    get lastStatus(){
