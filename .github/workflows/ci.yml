@@ -63,7 +63,7 @@ jobs:
       - name: Install
         run: |
           npm install --global yarn lerna
-          lerna bootstrap --no-ci --include-dependencies
+          lerna bootstrap --include-dependencies
       
       - name: Publish Packages
         run: |
