@@ -19,7 +19,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: ['windows-latest','ubuntu-latest','macos-latest']
+        os: ['macos-latest','ubuntu-latest','windows-latest']
         arch: [x64, arm64]
         include:
         - os: ubuntu-latest
@@ -63,11 +63,11 @@ jobs:
       - name: Install
         run: |
           npm install --global yarn lerna
-          lerna bootstrap
+          lerna bootstrap --no-ci --include-dependencies
       
       - name: Publish Packages
         run: |
-          lerna run --scope "@dianlight/*"  build --stream
+          lerna run --scope "@dianlight/*" --include-dependencies build --stream
           lerna publish --no-git-tag-version --no-push from-package --registry https://npm.pkg.github.com -y
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
@@ -75,7 +75,8 @@ jobs:
       - name: Build (spa)
         if: ${{ startsWith(runner.os, 'macos') }}
         run: |
-          lerna run --scope gcodego build --stream
+          echo ${runner.os} ${runner}
+          lerna run --scope gcodego --include-dependencies build --stream
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
@@ -89,7 +90,7 @@ jobs:
 
       - name: Build (electron)
         run: |
-          lerna run --scope gcodego build:electron --stream
+          lerna run --scope gcodego --include-dependencies build:electron --stream
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
