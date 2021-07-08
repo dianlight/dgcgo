@@ -1,19 +1,25 @@
 {
-    "extends": "../../../tsconfig.json",
-    "include": [
-        "src/**/*.ts",
-      ],
-    "compilerOptions": {
-        "noEmit": false,
-        "baseUrl": ".",
-        "sourceMap": true,
-        "declaration": true,
-        "declarationDir": "./types",
-        "sourceRoot": "./src"   
-    },
+  "extends": "../../../tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist" /* Redirect output structure to the directory. */,
+    //"baseUrl": ".",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "./types",
+    "sourceRoot": "./src",
+    "paths": {
+      "src/*": ["./src/*"],
+      "app/*": ["./*"],
+      "components/*": ["./src/components/*"],
+      "layouts/*": ["./src/layouts/*"],
+      "pages/*": ["./src/pages/*"],
+      "assets/*": ["./src/assets/*"],
+      "boot/*": ["./src/boot/*"],
+      "dialogs/*": ["./src/dialogs/*"]
+    }
+  },
 
-    "references": [
-    { "path": "../../tightcnc/server"}
-    ]
-
+  "references": [{ "path": "../../tightcnc/server" }]
 }

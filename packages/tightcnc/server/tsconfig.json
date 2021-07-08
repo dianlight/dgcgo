@@ -10,8 +10,9 @@
     "src/**/*.ts",
   ],
   "compilerOptions": {
+    "outDir": "./dist",                              /* Redirect output structure to the directory. */
     "noEmit": false,
-    "baseUrl": ".",
+    //"baseUrl": ".",
     "declaration": true,
     "declarationDir": "./types",
     "sourceMap": true,

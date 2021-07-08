@@ -4,20 +4,14 @@ import { GcPlugin, AbstractPluginAdapter } from '@dianlight/gcodego-core';
 import { Notify, Dialog } from 'quasar'
 import JsonFormDialog from '../dialogs/JsonFormDialog.vue'
 
-
 export class PluginAdapter extends AbstractPluginAdapter {
 
-    //_pluginRegister: Record<string, GcPlugin> = {}
-
-    //constructor(tightcnc: TightCNCClient) {
-    //    super(tightcnc)
-    //}
 
     override async reloadPlugins(): Promise<boolean> {
         return new Promise((resolve) => {
             for (const kplugin of Object.keys(this._pluginRegister)) {
                 this._pluginRegister[kplugin].deactivatePlugin()
-                if ((this.tightcnc.getConfig().selectedPlugins || []).includes(kplugin)) {
+                if ( this.tightcnc.getConfig().selectedPlugins?.includes(kplugin)) {
                     this._pluginRegister[kplugin].activatePlugin()
                 }
             }

@@ -4732,7 +4732,7 @@ camelcase@^6.2.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.2.0.tgz#924af881c9d525ac9d87f40d964e5cea982a1809"
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
-camera-controls@^1.28.4:
+camera-controls@^1.29.0:
   version "1.29.0"
   resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.29.0.tgz#d980b93ad0ac3bc2ba9fa44f155d5239f5f4e91d"
   integrity sha512-Da7IY5gn/7oWLde+0zq5PtNXUAPzyS+H9cKK+BENI4AoPQr+C+EYPnurfPZ9YCFBtzxxE6sNcnqp3l2QFZnaBQ==
@@ -14037,9 +14037,9 @@ typescript@4.2.2:
   integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 typescript@^4.4.0-dev.20210702:
-  version "4.4.0-dev.20210707"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210707.tgz#d4673f0e6e8bdb672f68b8a7b0ea3dc8851e844b"
-  integrity sha512-9TUj0DFOChKsftdRqeSdhuSa0m/POKDguX3Xw/7fMUftdbQPS0d1dmuN5bTXl4bQPESzBrNW+yBPnFxM1Kfhqw==
+  version "4.4.0-dev.20210708"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210708.tgz#0043aa6d3b81c111c6215477a31774b5a864e7e1"
+  integrity sha512-jGNamsvrU8F8KjMawCauI7bQeUPKYdyIp4yiEsKv8Uk1gt494FN09wgtH9wbbT0qK7a7lel7A/N/DodpPWK/6Q==
 
 uglify-js@^3.1.4, uglify-js@^3.5.1:
   version "3.13.10"

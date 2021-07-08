@@ -10,7 +10,9 @@
     "babel.config.js"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "outDir": "./dist",                              /* Redirect output structure to the directory. */
+    "declaration": true,
+    "declarationDir": "./types",
     "experimentalDecorators": true,
     "useDefineForClassFields": true,
     "esModuleInterop": true,
@@ -19,14 +21,14 @@
     "types": ["quasar", "webpack-env"],
     "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
     "paths": {
-      "src/*": ["src/*"],
-      "app/*": ["*"],
-      "components/*": ["src/components/*"],
-      "layouts/*": ["src/layouts/*"],
-      "pages/*": ["src/pages/*"],
-      "assets/*": ["src/assets/*"],
-      "boot/*": ["src/boot/*"],
-      "dialogs/*": ["src/dialogs/*"],
+      "src/*": ["./src/*"],
+      "app/*": ["./*"],
+      "components/*": ["./src/components/*"],
+      "layouts/*": ["./src/layouts/*"],
+      "pages/*": ["./src/pages/*"],
+      "assets/*": ["./src/assets/*"],
+      "boot/*": ["./src/boot/*"],
+      "dialogs/*": ["./src/dialogs/*"],
     },
   },
   "references": [

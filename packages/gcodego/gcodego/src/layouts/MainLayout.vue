@@ -106,7 +106,7 @@ import MenuWidget from '../components/MenuWidget.vue'
 
 import { Vue, Options } from 'vue-class-component'
 import { SerializedError } from 'new-error'
-import * as _ from 'lodash'
+//import * as _ from 'lodash'
 
 
 @Options({

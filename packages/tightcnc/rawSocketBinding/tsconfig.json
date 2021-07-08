@@ -4,11 +4,12 @@
         "src/**/*.ts",
       ],
     "compilerOptions": {
+        "outDir": "./dist",                              /* Redirect output structure to the directory. */
         "noEmit": false,
         "baseUrl": ".",
         "declaration": true,
         "declarationDir": "./types",
-        "sourceMap": true,
+        "sourceMap": true,        
         "sourceRoot": "./src"   
     }
 }

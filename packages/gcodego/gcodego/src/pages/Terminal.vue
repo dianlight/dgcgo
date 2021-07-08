@@ -3,19 +3,19 @@
   <div class="fit row wrap justify-start items-start content-start" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
       <q-virtual-scroll
         ref="terminal"
-        style="height:70vh;width:100%"
+        style="height:82vh;width:100%"
         :items="$store.state.tightcnc.logs.lines"
         @virtual-scroll="scrolling"
         >
           <template v-slot="{item}">
-            <q-item :key="item.line" dense class='row q-gutter-xs q-pa-none'>
+            <q-item :key="item.line" dense class='row q-gutter-xs q-pa-none logline'>
               <q-item-section side class="linenumber">
                 {{item.line}} <!-- {{index}} -->
               </q-item-section>
               <q-item-section side class="linedirection">
                 {{' '+item.direction}}
               </q-item-section>
-              <q-item-section>
+              <q-item-section class="line">
                   <code :class="item.result?.startsWith('error')?'error':''" v-html="colorGcode(item.data)"></code>
                   <q-item-label v-if="item.result !== undefined" :class="item.result?.startsWith('error')?'error-message':''" caption>{{item.result}} {{item.error}}</q-item-label>
               </q-item-section>
@@ -31,7 +31,7 @@
     outlined 
     dense
     v-model="command" 
-    style="width: 100$;" 
+    style="width: 100%;" 
     label="#>" 
     @keyup="sendCommand" 
     >
@@ -58,17 +58,17 @@
     />
     -->
     <q-toggle
-        size="sx"
+        size="xs"
         v-model="autoScroll"
         label="Autoscroll"
     />
     <q-toggle
-        size="sx"
+        size="xs"
         v-model="filterStatus"
         label="Filter Status Lines"
     />
     <q-toggle
-        size="sx"
+        size="xs"
         v-model="matchStatus"
         label="Inline response"
     />
@@ -205,18 +205,30 @@ label {
 }
 
 .linenumber {
-  font-size: smaller;
+  font-size: x-small;
   color: $secondary;
   background-color: $dark;
   padding-right: 0px;
 }
 
 .linedirection {
-  font-size: smaller;
+  font-size: x-small;
   color: $primary;
   background-color: $dark;
   padding-right: 0px;
   margin-left: 0px;
+}
+
+.line {
+  font-size: x-small;
+}
+
+.logline {
+  min-height: 10px
+}
+
+.logline:hover {
+  background-color: aqua;
 }
 
 .error {
