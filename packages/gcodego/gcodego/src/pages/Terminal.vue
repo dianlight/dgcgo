@@ -17,7 +17,7 @@
               </q-item-section>
               <q-item-section class="line">
                   <code :class="item.result?.startsWith('error')?'error':''" v-html="colorGcode(item.data)"></code>
-                  <q-item-label v-if="item.result !== undefined" :class="item.result?.startsWith('error')?'error-message':''" caption>{{item.result}} {{item.error}}</q-item-label>
+                  <q-item-label v-if="item.result !== undefined" :class="item.result?.startsWith('error')?'error-message':'line'" caption>{{item.result}} {{item.error}}</q-item-label>
               </q-item-section>
             </q-item>
           </template>
@@ -237,6 +237,7 @@ label {
 
 .error-message {
   color: $negative;
+  font-size: x-small;
 }
 
 </style>
