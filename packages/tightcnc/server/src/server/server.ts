@@ -6,7 +6,7 @@ import Operation from './operation';
 import cors from 'cors'
 import { addExitCallback, CatchSignals } from 'catch-exit';
 //import { JSONSchema7 } from 'json-schema';
-import Ajv from 'ajv'
+import Ajv, { Schema } from 'ajv'
 
 const config = littleconf.getConfig()
 
@@ -98,7 +98,7 @@ async function startServer() {
 			object: Operation
 		): JSONRPCMethod {
 			return (request: JSONRPCRequest): JSONRPCResponsePromise => {
-				const validator = ajv.getSchema(object.getParamSchema().$id || '') || ajv.compile(object.getParamSchema())				
+				const validator = ajv.getSchema(object.getParamSchema().$id || '') || ajv.compile(object.getParamSchema() as Schema)				
 				const valid = validator(request.params)
 				if (!valid) {
 					console.warn(request.params,object.getParamSchema().$id, validator.errors)
