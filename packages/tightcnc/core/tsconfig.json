@@ -1,0 +1,15 @@
+{
+    "extends": "../../../tsconfig.json",
+    "include": [
+        "src/**/*.ts",
+      ],
+    "compilerOptions": {
+        "outDir": "./dist",                              /* Redirect output structure to the directory. */
+        "noEmit": false,
+        "baseUrl": ".",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "./types",
+        "sourceRoot": "./src"   
+    }
+}

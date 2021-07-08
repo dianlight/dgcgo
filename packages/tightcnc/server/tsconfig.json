@@ -18,8 +18,8 @@
     "sourceMap": true,
     "sourceRoot": "./src"   
   },
-  "references": [
-    { "path": "../grblSimBinding"},
-    { "path": "../rawSocketBinding"}
-  ],
+//  "references": [
+//    { "path": "../grblSimBinding"},
+//    { "path": "../rawSocketBinding"}
+//  ],
 }

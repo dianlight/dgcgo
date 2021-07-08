@@ -1,5 +1,5 @@
 
-import { errRegistry } from './errRegistry';
+import { errRegistry } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
 

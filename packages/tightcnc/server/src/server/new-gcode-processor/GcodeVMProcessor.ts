@@ -1,9 +1,7 @@
-import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from './GcodeProcessor';
+import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
-import GcodeVM, { VMState } from './GcodeVM';
-import GcodeLine from './GcodeLine';
-import Controller from '../controller';
-import TightCNCServer from '../tightcnc-server';
+import  {Controller, GcodeVM ,VMState,GcodeLine } from '@dianlight/tightcnc-core';
+//import TightCNCServer from '../tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
 
 interface GcodeVMProcessorOptions extends GcodeProcessorOptions{

@@ -3,8 +3,8 @@ import {
     PortInfo,
     StatusObject,
     JobSourceOptions,
-    JobStatus,
 } from '@dianlight/tightcnc';
+import { JobStatus } from '@dianlight/tightcnc-core'
 import { uid } from 'quasar';
 import { JSONRPCClient, JSONRPCParams } from 'json-rpc-2.0';
 import objectHash from 'object-hash';

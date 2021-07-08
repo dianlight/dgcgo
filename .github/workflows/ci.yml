@@ -67,7 +67,7 @@ jobs:
       
       - name: Publish Packages
         run: |
-          lerna run --scope "@dianlight/*" --include-dependencies build --stream
+          lerna run --scope "@dianlight/*" --include-dependencies build --stream --concurrency 1
           lerna publish --no-git-tag-version --no-push from-package --registry https://npm.pkg.github.com -y
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  

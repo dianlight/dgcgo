@@ -1,12 +1,9 @@
 import  Operation from './operation';
 import  TightCNCServer, { TightCNCConfig } from './tightcnc-server';
 import  SerialPort, { PortInfo } from 'serialport';
-//import { resolve } from 'path/posix';
-//import { GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
-import { errRegistry } from './errRegistry';
-import { GcodeProcessorLifeCycle } from './new-gcode-processor/GcodeProcessor';
+import { GcodeProcessorLifeCycle, errRegistry } from '@dianlight/tightcnc-core';
 
 
 

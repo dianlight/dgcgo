@@ -1,15 +1,16 @@
+/*
 import objtools from 'objtools';
-import { ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
+import { ERRORCODES, errRegistry } from './errRegistry';
 import * as node_stream from 'stream'
-import { callLineHooks, GcodeProcessor } from '@dianlight/tightcnc-core';
+//import GcodeProcessor, {callLineHooks, ExReadableStream} from '../../lib/gcode-processor';
+import { callLineHooks, GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
 import JobState from './job-state';
 import  TightCNCServer, {JobSourceOptions } from './tightcnc-server';
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
-import { GcodeLine } from '@dianlight/tightcnc-core';
+import GcodeLine from './new-gcode-processor/GcodeLine';
 import fs from 'fs'
-import { GcodeLineReadableStream, JobStatus } from '@dianlight/tightcnc-core';
-
-/*
+import { GcodeLineReadableStream } from './new-gcode-processor/GcodeLineReadableStream';
+*/
 export interface JobStatus {
     state: string,
     jobOptions: Record<string,any>,
@@ -27,7 +28,7 @@ export interface JobStatus {
     },
     waits: string[]
 };
-*/
+/*
 export default class JobManager {
 
     currentJob?:any;
@@ -115,7 +116,7 @@ export default class JobManager {
      *     @param {Number} options.gcodeProcessors.#.order - Optional order number
      *   @param {Boolean} [options.rawFile=false] - If true, pass the file unaltered to the controller, without running
      *     any gcode processors.  (Will disable status reports)
-     */
+     * /
     async startJob(_jobOptions:Readonly<JobSourceOptions>):Promise<JobStatus> {
         this.tightcnc.debug('Begin startJob');
         let job:JobState;
@@ -313,3 +314,4 @@ export default class JobManager {
         })
     }
 }
+*/

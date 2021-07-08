@@ -1,8 +1,8 @@
-import Controller, { ControllerConfig } from './controller';
+import  { Controller, ControllerConfig } from '@dianlight/tightcnc-core';
 import SerialPort from 'serialport';
-import { errRegistry } from './errRegistry';
+import { errRegistry } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
-import GcodeLine from './new-gcode-processor/GcodeLine';
+import { GcodeLine } from '@dianlight/tightcnc-core';
 const AbbrJSON = require('./tinyg-abbr-json');
 import CrispHooks from 'crisphooks';
 import SerialportRawSocketBinding  from '@dianlight/rawsocketbinding';

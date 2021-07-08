@@ -1,12 +1,25 @@
+import { Controller, ControllerStatus } from './controller';
+import { JobStatus } from './job-status';
+import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+import EventEmitter from 'events';
+import { AbtractJobState } from './job-state';
+
+/*
 import { registerOperations } from './file-operations';
-import { AbstractServer, errRegistry } from '@dianlight/tightcnc-core';
+*/
+import { errRegistry } from './errRegistry';
+/*
 import objtools from 'objtools';
-import { LoggerDisk,  LoggerMem, JobStatus }from '@dianlight/tightcnc-core';
+*/
+import { LoggerDisk } from './logger-disk';
+import { LoggerMem } from './logger-mem';
 import mkdirp from 'mkdirp';
+/*
 import * as node_stream from 'stream'
+*/
 import path from 'path';
 import fs from 'fs';
-import JobManager from './job-manager';
+/*
 import stable from 'stable';
 import Macros, { MacroOptions } from './macros';
 import pasync from 'pasync';
@@ -16,21 +29,22 @@ import joboperations from './job-operations'
 import macrooperation from './macro-operations'
 import basicoperation from './basic-operations'
 import systemoperation from './system-operations'
-import  { Controller, ControllerStatus } from '@dianlight/tightcnc-core';
+import Controller, { ControllerStatus } from './controller';
 import JobState from './job-state';
-import { GcodeLine } from '@dianlight/tightcnc-core';
+import GcodeLine from './new-gcode-processor/GcodeLine';
 import { BaseRegistryError } from 'new-error';
 import { addExitCallback, CatchSignals } from 'catch-exit';
 import { registerGcodeProcessors } from './new-gcode-processor'
-import { GcodeLineReadableStream } from '@dianlight/tightcnc-core';
-import { buildProcessorChain, GcodeProcessor } from '@dianlight/tightcnc-core';
+import { GcodeLineReadableStream } from './new-gcode-processor/GcodeLineReadableStream';
+import { buildProcessorChain, GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
 
 import { TinyGController } from './tinyg-controller'
-import { GRBLController } from '@dianlight/grbl-controller'
+import { GRBLController } from './grbl-controller'
 import { registerServerComponents } from '../plugins'
 import Operation from './operation';
 import Ajv, { Schema } from 'ajv'
 import * as _ from "lodash";
+*/
 
 export interface StatusObject {
     controller?: ControllerStatus | undefined
@@ -60,7 +74,7 @@ export interface JobSourceOptions {
     data?: string[],
     rawStrings?: boolean,
     dryRun?: boolean,
-    job?: JobState
+    job?: AbtractJobState
 }
 
 export type TightCNCGrblConfig = {
@@ -172,15 +186,19 @@ export interface TightCNCConfig {
  *
  * @class TightCNCServer
  */
-export default class TightCNCServer extends AbstractServer {
-
+export abstract class AbstractServer extends EventEmitter {
+/*
     operations: Record<string,Operation> = {}
-   // baseDir:string;
+    */
+    baseDir: string;
+    /*
     macros = new Macros(this);
     controllerClasses: {
         [key:string]:unknown
     } = {};
-    //controller?:Controller;
+    */
+    controller?: Controller;
+    /*
     gcodeProcessors:Record<string,typeof GcodeProcessor> = {};
     waitingForInput?:{
         prompt: any,
@@ -189,8 +207,10 @@ export default class TightCNCServer extends AbstractServer {
         id: number
     };
     waitingForInputCounter = 1;
-    //loggerDisk?: LoggerDisk;
-    //loggerMem?: LoggerMem;
+    */
+    loggerDisk?: LoggerDisk;
+    loggerMem?: LoggerMem;
+    /*
     messageLog?: LoggerMem;
     jobManager?: JobManager;
     
@@ -204,15 +224,18 @@ export default class TightCNCServer extends AbstractServer {
      * @constructor
      * @param {Object} config
      */
-    constructor(config?:TightCNCConfig) {
-        super(config);
+    constructor(public config?:TightCNCConfig) {
+        super();
+        /*
         if (!config) {
             config = littleconf.getConfig();
         }
         if (config!.enableServer === false) {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('enableServer config flag now found.  Ensure configuration is correct - check the documentation.');
         }
+        */
         this.baseDir = this.config!.baseDir;
+        /*
         // Register builtin modules
         //import('./tinyg-controller').then((namespace)=>this.registerController('TinyG',namespace.default))
         //import('./grbl-controller').then((namespace) => this.registerController('grbl', namespace.default));
@@ -247,7 +270,7 @@ export default class TightCNCServer extends AbstractServer {
      * Initialize class.  To be called after everything's registered.
      *
      * @method initServer
-     */
+     * /
     async initServer() {
         // Whether to suppress duplicate error messages from being output sequentially
         const suppressDuplicateErrors = this.config!.suppressDuplicateErrors === undefined ? true : this.config!.suppressDuplicateErrors;
@@ -326,7 +349,7 @@ export default class TightCNCServer extends AbstractServer {
 
     /**
      * Graceful shutwown server
-     */
+     * /
     async shutdown(): Promise<void>{
         return new Promise((resolve) => {
             if (this.controller) {
@@ -343,7 +366,7 @@ export default class TightCNCServer extends AbstractServer {
         this.loggerMem?.log('other', 'Message: ' + msg);
         this.loggerDisk?.log('other', 'Message: ' + msg);
     }
-    /*
+    */
     debug(str:string) {
         if (!this.config!.enableDebug)
             return;
@@ -354,6 +377,7 @@ export default class TightCNCServer extends AbstractServer {
             this.loggerDisk.log('other', 'Debug: ' + str);
         }
     }
+    
 
     getFilename(name?:string, place?:string, allowAbsolute = false, createParentsIfMissing = false, createAsDirIfMissing = false) {
         if (name && path.isAbsolute(name) && !allowAbsolute)
@@ -381,8 +405,8 @@ export default class TightCNCServer extends AbstractServer {
         }
         return absPath;
     }
+    /*
 
-    */
     getDirectory(place?:string, createParentsIfMissing = false, createAsDirIfMissing = false) {
         let base = this.baseDir;
         if (place) {
@@ -440,7 +464,7 @@ export default class TightCNCServer extends AbstractServer {
      *
      * @method getStatus
      * @return {Promise{Object}}
-     */
+     * /
     async getStatus():Promise<StatusObject> {
         let statusObj: StatusObject = {};
         // Fetch controller status
@@ -482,7 +506,7 @@ export default class TightCNCServer extends AbstractServer {
      * @return {ReadableStream} - a readable object stream of GcodeLine instances.  The stream will have
      *   the additional property 'gcodeProcessorChain' containing an array of all GcodeProcessor's in the chain.  This property
      *   is only available once the 'processorChainReady' event is fired on the returned stream;
-     */
+     * /
     getGcodeSourceStream(options: Readonly<JobSourceOptions> ): GcodeLineReadableStream {
         // Handle case where returning raw strings
         if (options.rawStrings) {
@@ -610,4 +634,5 @@ export default class TightCNCServer extends AbstractServer {
         delete this.waitingForInput;
         w.waiter.reject(err);
     }
+    */
 }

@@ -1,16 +1,15 @@
 {
-  "name": "@dianlight/grblsimbinding",
-  "version": "1.0.0",
-  "description": "GrblSim Binding for SerialPort package",
+  "name": "@dianlight/tightcnc-core",
+  "version": "0.3.2-alpha.2",
+  "description": "Core Library from @dianlight/tightcnc",
   "keywords": [
-    "serialport",
-    "socket"
+    "cnc"
   ],
   "author": "dianlight <lucio.tarantino@gmail.com>",
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
-  "main": "dist/src/grblSimBinding.js",
-  "types": "types/src/grblSimBinding.d.ts",
+  "main": "dist/src/index.js",
+  "types": "types/src/index.d.ts",
   "directories": {
     "lib": "dist/src",
     "test": "__tests__"
@@ -40,6 +39,8 @@
     "typescript": "^4.4.0-dev.20210702"
   },
   "dependencies": {
-    "@serialport/binding-abstract": "^9.0.7"
+    "crisphooks": "^2.0.1",
+    "mkdirp": "^1.0.4",
+    "new-error": "^2.1.10"
   }
 }

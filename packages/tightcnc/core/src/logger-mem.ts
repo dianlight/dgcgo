@@ -1,4 +1,4 @@
-export default class LoggerMem {
+export class LoggerMem {
 
     linesToKeep: number
     shiftBatchSize: number

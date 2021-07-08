@@ -1,15 +1,13 @@
 import  cross from 'cross';
 import  Operation from '../server/operation';
-import { errRegistry } from '../server/errRegistry';
+import { errRegistry } from '@dianlight/tightcnc-core';
 import  objtools from'objtools';
 import { kdTree } from 'kd-tree-javascript';
 import fs from 'fs';
-import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '../server/new-gcode-processor/GcodeProcessor';
-import  GcodeVM  from '../server/new-gcode-processor/GcodeVM'
+import { GcodeLine, GcodeVM, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import { MoveSplitter } from './move-splitter';
 import TightCNCServer from '../server/tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
-import GcodeLine from '../server/new-gcode-processor/GcodeLine';
 import { UISchemaElement } from '@jsonforms/core'
 
 

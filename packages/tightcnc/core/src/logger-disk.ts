@@ -1,17 +1,17 @@
 import mkdirp from 'mkdirp';
 import fs from 'fs';
 import path from 'path';
-import { TightCNCServer } from '..'; // Avoid Circular dependency issue
+import { AbstractServer } from './abstract-server';
 
 
-export default class LoggerDisk {
+export class LoggerDisk {
     logDir: string
     maxFileSize: number
     keepFiles: number
     curFiles: { filename: string, num: number, size: number }[] = []
     curStream?: fs.WriteStream
 
-    constructor(config:{ maxFileSize: number, keepFiles : number}, tightcnc:TightCNCServer) {
+    constructor(config:{ maxFileSize: number, keepFiles : number}, tightcnc:AbstractServer) {
         this.logDir = tightcnc.getFilename(undefined, 'log', true, true, true);
         this.maxFileSize = config.maxFileSize || 1000000;
         this.keepFiles = config.keepFiles || 2;

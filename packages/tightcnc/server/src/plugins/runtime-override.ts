@@ -1,11 +1,6 @@
-import { errRegistry } from '../server/errRegistry';
-import { GcodeProcessor } from '../server/new-gcode-processor/GcodeProcessor';
-import GcodeLine from '../server/new-gcode-processor/GcodeLine';
-import GcodeVM from '../server/new-gcode-processor/GcodeVM';
-//import objtools from 'objtools';
+import { GcodeVM, GcodeLine,errRegistry,GcodeProcessor } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 import Operation from '../server/operation';
-//import commonSchema from 'common-schema';
 import { JSONSchema7 } from 'json-schema';
 import TightCNCServer from '../server/tightcnc-server';
 /**

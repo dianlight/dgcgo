@@ -1,4 +1,4 @@
-import { errRegistry } from './errRegistry';
+import { GcodeLine,errRegistry,GcodeProcessor } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
 import fs from 'fs';
@@ -7,8 +7,6 @@ import * as node_stream from 'stream'
 import objtools from 'objtools';
 import { createSchema } from 'common-schema';
 import { TightCNCServer } from '..'; // Avoid Circular dependency issue
-import GcodeLine from './new-gcode-processor/GcodeLine';
-import { GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
 import { BaseRegistryError } from 'new-error';
 
 interface MacroMetaData {

@@ -1,15 +1,15 @@
-import  Controller, { ControllerConfig, ControllerStatus } from './controller';
+import   { Controller, ControllerConfig, ControllerStatus } from '@dianlight/tightcnc-core';
 import  SerialPort, { OpenOptions } from 'serialport';
-import { ERRORCODES, errRegistry } from './errRegistry';
+import { ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
 import  pasync from 'pasync';
-import GcodeLine from './new-gcode-processor/GcodeLine';
+import { GcodeLine } from '@dianlight/tightcnc-core';
 import CrispHooks from 'crisphooks';
 import objtools from 'objtools';
-import TightCNCServer from './tightcnc-server';
+import { AbstractServer} from '@dianlight/tightcnc-core';
 import SerialportRawSocketBinding from '@dianlight/rawsocketbinding';
 import GrblsimBinding from '@dianlight/grblsimbinding';
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
-import GcodeVM from './new-gcode-processor/GcodeVM';
+import { GcodeVM } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
 
 export interface GrblControllerConfig extends ControllerConfig {
@@ -105,7 +105,7 @@ export class GRBLController extends Controller {
     realTimeMovesTimeStart = [0, 0, 0, 0, 0, 0];
     realTimeMovesCounter = [0, 0, 0, 0, 0, 0];
     lastMessage?:string;
-    tightcnc?: TightCNCServer;
+    tightcnc?: AbstractServer;
     _wpos?: number[]
     grblReportInches?: any
     _ignoreUnlockedMessage?: boolean

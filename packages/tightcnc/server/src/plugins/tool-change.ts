@@ -1,7 +1,5 @@
-import { errRegistry } from '../server/errRegistry';
-import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '../server/new-gcode-processor/GcodeProcessor';
-import GcodeLine from '../server/new-gcode-processor/GcodeLine';
-import GcodeVM from '../server/new-gcode-processor/GcodeVM';
+import { errRegistry } from '@dianlight/tightcnc-core';
+import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
 import Operation from '../server/operation';
 import pasync from 'pasync';

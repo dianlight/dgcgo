@@ -1,5 +1,4 @@
 import TightCNCServer from "../tightcnc-server";
-import { GcodeProcessor } from "./GcodeProcessor";
 import GcodeVMProcessor from "./GcodeVMProcessor";
 
 

@@ -1,6 +1,4 @@
-import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '../server/new-gcode-processor/GcodeProcessor'
-import GcodeLine from '../server/new-gcode-processor/GcodeLine';
-import GcodeVM  from '../server/new-gcode-processor/GcodeVM';
+import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core'
 import  objtools from 'objtools';
 import TightCNCServer from '../server/tightcnc-server';
 import { JSONSchema7 } from 'json-schema'

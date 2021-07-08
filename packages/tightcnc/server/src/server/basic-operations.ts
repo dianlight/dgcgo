@@ -1,9 +1,8 @@
 import  Operation from './operation';
 import objtools from 'objtools';
-import { errRegistry } from './errRegistry';
+import { errRegistry } from '@dianlight/tightcnc-core';
 import TightCNCServer, { StatusObject } from './tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
-import { number } from 'yargs';
 
 class OpGetStatus extends Operation {
 

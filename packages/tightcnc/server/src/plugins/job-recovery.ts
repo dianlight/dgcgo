@@ -12,10 +12,8 @@
  * for these clearance movements, including the ability to use different axes.  The default assumes a typical x, y, z
  * axis configuration with clearance on Z at machine position 0 (ie, G53 G0 Z0).
  */
-import { errRegistry } from '../server/errRegistry';
-import { GcodeProcessor } from '../server/new-gcode-processor/GcodeProcessor';
-import GcodeLine from '../server/new-gcode-processor/GcodeLine';
-import GcodeVM from '../server/new-gcode-processor/GcodeVM';
+import { errRegistry } from '@dianlight/tightcnc-core';
+import {GcodeVM, GcodeLine, GcodeProcessor } from '@dianlight/tightcnc-core';
 import Operation from '../server/operation';
 import objtools from 'objtools';
 import pasync from 'pasync';

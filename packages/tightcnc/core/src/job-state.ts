@@ -1,13 +1,14 @@
 import EventEmitter from 'events';
 import objtools from 'objtools';
-import { GcodeProcessor } from '@dianlight/tightcnc-core';
+import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
 /**
  * This class tracks the state of a running job or dry run.  It's mostly just a collection of properties
  * managed by JobManager.  It can also emit the events 'start', 'complete' and 'error' (also managed by JobManager).
  *
  * @class JobState
  */
-export default class JobState extends EventEmitter {
+export abstract class AbtractJobState extends EventEmitter {
+    /*
     [x: string]: any;
 
     state:'initializing'|'complete'|'cancelled'|'error'|'running' = 'initializing';
@@ -53,4 +54,5 @@ export default class JobState extends EventEmitter {
     removeWait(val: never) {
         this.waitList = this.waitList.filter((a) => !objtools.deepEquals(a, val));
     }
+    */
 }

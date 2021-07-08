@@ -7,13 +7,13 @@ import stable, { inplace } from 'stable'
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
 import * as _ from "lodash";
-import TightCNCServer from '../tightcnc-server';
+import { AbstractServer } from '../abstract-server';
 
 export type GcodeProcessorLifeCycle = 'server-only' | 'need-ui' | 'optional-ui' | 'internal'
 
 export interface GcodeProcessorOptions {
     id?: string
-    tightcnc?: TightCNCServer 
+    tightcnc?: AbstractServer 
     job?: unknown    
 }
 

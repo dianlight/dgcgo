@@ -1,10 +1,10 @@
 import EventEmitter from 'events';
 import * as node_stream from 'stream'
-import { GcodeLine } from './new-gcode-processor/GcodeLine';
+import { GcodeLine } from './gcode-processor/GcodeLine';
 import { BaseRegistryError } from 'new-error';
 import fs from 'fs'
-import { VMState } from './new-gcode-processor/GcodeVM'
-import CrispHooks from 'crisphooks'
+import { VMState } from './gcode-processor/GcodeVM'
+//import CrispHooks from 'crisphooks'
 import { errRegistry } from './errRegistry';
 
 export interface ControllerConfig {
@@ -79,7 +79,7 @@ export interface ControllerStatus extends VMState {
     spindleSpeedMin?: number
 }
 
-export default abstract class Controller  extends EventEmitter implements VMState  {
+export abstract class Controller  extends EventEmitter implements VMState  {
 
     axisLabels=['x', 'y', 'z'];
     ready = false;

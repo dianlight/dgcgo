@@ -1,6 +1,6 @@
 
 import { GcPlugin, GcPluginDependencies } from '@dianlight/gcodego-core'
-import { JobStatus } from '@dianlight/tightcnc';
+import { JobStatus } from '@dianlight/tightcnc-core';
 import * as objtools from 'objtools'
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core/lib';
 

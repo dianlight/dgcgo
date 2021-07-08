@@ -1,13 +1,13 @@
 import { errRegistry } from '../errRegistry'
 import GcodeLine from './GcodeLine';
 import objtools from 'objtools' 
-import Controller from '../controller';
-import TightCNCServer from '../tightcnc-server';
+import { Controller } from '../controller';
+import { AbstractServer } from '../abstract-server';
 
 
 export interface GcodeVMOptions {
     controller?: Controller,
-    tightcnc?: TightCNCServer,
+    tightcnc?: AbstractServer,
     axisLabels?: string[],
     maxFeed?: number | number[],
     acceleration?: number | number[],
@@ -83,7 +83,7 @@ export interface VMState {
  *   @param {Number} minMoveTime - Minimum time to count for a move.  Can be set to a low value to compensate for delays if lots
  *     of small moves aren't filling the controller's buffer.
  */
-export default class GcodeVM {
+export class GcodeVM {
 
     vmState: VMState = {
         pos: [],
