@@ -10,5 +10,10 @@
         "declaration": true,
         "declarationDir": "./types",
         "sourceRoot": "./src"   
-    }
+    },
+
+    "references": [
+    { "path": "../../tightcnc/server"}
+    ]
+
 }
