@@ -258,8 +258,7 @@ function parseInternal() {
 	}
 }
 
-// @ts-expect-error ts-migrate(7006) FIXME: Parameter 's' implicitly has an 'any' type.
-function parse(s) {
+export function parse(s:string) {
 	idx = 0;
 	str = s;
 	l = s.length;
@@ -272,8 +271,7 @@ function parse(s) {
 
 let validShortKeyRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 
-// @ts-expect-error ts-migrate(7006) FIXME: Parameter 'data' implicitly has an 'any' type.
-function stringify(data, precision = 5) {
+export function stringify(data:any, precision = 5) {
 	if (data === undefined) return 'n';
 	if (data === null) return 'n';
 	if (data === true) return 't';
@@ -313,8 +311,10 @@ function stringify(data, precision = 5) {
 	throw new Error('Unsupported data type stringifying TinyG JSON');
 }
 
+/*
 module.exports = {
 	parse,
 	stringify
 };
+*/
 

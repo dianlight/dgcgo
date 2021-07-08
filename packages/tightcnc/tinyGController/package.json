@@ -1,16 +1,17 @@
 {
-  "name": "@dianlight/grbl-controller",
-  "version": "1.0.0",
-  "description": "Grbl Controller from @dianlight/tightcnc",
+  "name": "@dianlight/tinyg-controller",
+  "version": "1.0.0-alpha.1",
+  "description": "TinyG Controller from @dianlight/tightcnc",
   "keywords": [
     "serialport",
-    "socket"
+    "socket",
+    "tinyg"
   ],
   "author": "dianlight <lucio.tarantino@gmail.com>",
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
-  "main": "dist/src/grbl-controller.js",
-  "types": "types/src/grbl-controller.d.ts",
+  "main": "dist/src/tinyg-controller.js",
+  "types": "types/src/tinyg-controller.d.ts",
   "directories": {
     "lib": "dist/src",
     "test": "__tests__"
@@ -41,7 +42,6 @@
   },
   "dependencies": {
     "@dianlight/tightcnc-core": "0.3.2-alpha.2",
-    "@dianlight/grblsimbinding": "^1.0.0",
     "pasync": "^2.0.2",
     "serialport": "^9.2.0"
   }

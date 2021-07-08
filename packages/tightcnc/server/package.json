@@ -36,6 +36,8 @@
     "dependencies": {
         "@dianlight/rawsocketbinding": "^1.0.0",
         "@dianlight/tightcnc-core": "^0.3.2-alpha.2",
+        "@dianlight/tinyg-controller": "^1.0.0-alpha.1",
+        "@dianlight/grbl-controller": "^1.0.0",
         "@jsonforms/core": "^2.5.2",
         "@serialport/stream": "^9.0.7",
         "ajv": "^8.6.0",
@@ -53,7 +55,6 @@
         "moment": "^2.29.1",
         "objtools": "^3.0.0",
         "pasync": "^2.0.2",
-        "serialport": "^9.2.0",
         "split2": "^3.2.2",
         "stable": "^0.1.8",
         "term.js": "^0.0.7",

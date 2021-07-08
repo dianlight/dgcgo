@@ -25,7 +25,7 @@ import { registerGcodeProcessors } from './new-gcode-processor'
 import { GcodeLineReadableStream } from '@dianlight/tightcnc-core';
 import { buildProcessorChain, GcodeProcessor } from '@dianlight/tightcnc-core';
 
-import { TinyGController } from './tinyg-controller'
+import { TinyGController } from '@dianlight/tinyg-controller'
 import { GRBLController } from '@dianlight/grbl-controller'
 import { registerServerComponents } from '../plugins'
 import Operation from './operation';

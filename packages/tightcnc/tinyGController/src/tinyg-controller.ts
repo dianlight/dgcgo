@@ -3,7 +3,7 @@ import SerialPort from 'serialport';
 import { errRegistry } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 import { GcodeLine } from '@dianlight/tightcnc-core';
-const AbbrJSON = require('./tinyg-abbr-json');
+import * as  AbbrJSON from './tinyg-abbr-json';
 import CrispHooks from 'crisphooks';
 import SerialportRawSocketBinding  from '@dianlight/rawsocketbinding';
 import { BaseRegistryError } from 'new-error';
