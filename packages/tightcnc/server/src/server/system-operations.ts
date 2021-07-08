@@ -1,5 +1,6 @@
 import  Operation from './operation';
-import  TightCNCServer, { TightCNCConfig } from './tightcnc-server';
+import  TightCNCServer from './tightcnc-server';
+import { TightCNCConfig } from "@dianlight/tightcnc-core";
 import  SerialPort, { PortInfo } from 'serialport';
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'

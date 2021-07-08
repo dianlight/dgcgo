@@ -1,5 +1,5 @@
 import { LogLine } from '@dianlight/gcodego-core';
-import { StatusObject } from '@dianlight/tightcnc'
+import { StatusObject } from '@dianlight/tightcnc-core'
 
 
 export interface TightCNCStateInterface {

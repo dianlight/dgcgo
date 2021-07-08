@@ -1,7 +1,7 @@
 import { registerOperations } from './file-operations';
 import { AbstractServer, errRegistry } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
-import { LoggerDisk,  LoggerMem, JobStatus }from '@dianlight/tightcnc-core';
+import { LoggerDisk,  LoggerMem }from '@dianlight/tightcnc-core';
 import mkdirp from 'mkdirp';
 import * as node_stream from 'stream'
 import path from 'path';
@@ -16,8 +16,6 @@ import joboperations from './job-operations'
 import macrooperation from './macro-operations'
 import basicoperation from './basic-operations'
 import systemoperation from './system-operations'
-import  { Controller, ControllerStatus } from '@dianlight/tightcnc-core';
-import JobState from './job-state';
 import { GcodeLine } from '@dianlight/tightcnc-core';
 import { BaseRegistryError } from 'new-error';
 import { addExitCallback, CatchSignals } from 'catch-exit';
@@ -31,140 +29,9 @@ import { registerServerComponents } from '../plugins'
 import Operation from './operation';
 import Ajv, { Schema } from 'ajv'
 import * as _ from "lodash";
-
-export interface StatusObject {
-    controller?: ControllerStatus | undefined
-    job?: JobStatus | undefined
-    requestInput?: {
-        prompt: any
-        schema: any
-        id: number
-    }
-    units?: 'mm' | 'in'
-}
-
-export interface JobSourceOptions {
-    filename?: string | undefined,
-    macro?: string | undefined,
-    macroParams?: any,
-    rawFile?: boolean,
-    gcodeProcessors?: {
-        name: string,
-        options: {
-            id: string
-            updateOnHook?: string
-        },
-        order?: number
-        inst?: GcodeProcessor
-    }[] | undefined 
-    data?: string[],
-    rawStrings?: boolean,
-    dryRun?: boolean,
-    job?: JobState
-}
-
-export type TightCNCGrblConfig = {
-            // serial port settings
-            port: string, // '/dev/ttyACM1',
-            baudRate: number,
-            dataBits: number,
-            stopBits: 1|0,
-            parity: 'none',
-
-            usedAxes: [boolean, boolean, boolean],
-            homableAxes: [boolean, boolean, boolean]
-}
-
-export type TightCNCTinyGConfig = {
-            // serial port settings
-            port: string,
-            baudRate: number,
-            dataBits: number,
-            stopBits: 1|0,
-            parity: 'none',
-            rtscts: boolean,
-            xany: boolean,
-
-            usedAxes: [ boolean, boolean, boolean, boolean, boolean, boolean ], // which axes of xyzabc are actually used
-            homableAxes: [ boolean, boolean, boolean ], // which axes can be homed
-
-            // This parameter governs how "aggressive" we can be with queueing data to the device.  The tightcnc controller
-            // software already adjusts data queueing to make sure front-panel commands can be immediately handled, but
-            // sometimes the tinyg seems to get desynced, and on occasion, it seems to crash under these circumstances
-            // (with an error similar to "cannot get planner buffer").  If this is happening to you, try reducing this number.
-            // The possible negative side effect is that setting this number too low may cause stuttering with lots of fast
-            // moves.  Setting this to 4 is the equivalent of the tinyg "line mode" protocol.
-            maxUnackedRequests: number
-}
-
-export type TightCNCControllers = {
-        TinyG?: TightCNCTinyGConfig,
-        grbl?: TightCNCGrblConfig
-}
-
-export interface TightCNCConfig {
-    enableServer: boolean,
-    baseDir: string,
-    authKey: string, //'abc123',
-    serverPort: number, // 2363,
-    host: string, //'http://localhost',
-    controller: keyof TightCNCControllers,
-    controllers: TightCNCControllers,
-    paths: {
-        [key:string]:string,
-        data: string,
-        log: string,
-        macro: string
-    },
-    plugins: string[],
-    operations: {
-        probeSurface: {
-            defaultOptions: {
-                probeSpacing: number,
-                probeFeed: number,
-                clearanceHeight: number,
-                autoClearance: boolean,
-                autoClearanceMin: number,
-                probeMinZ: number,
-                numProbeSamples: number,
-                extraProbeSampleClearance: number
-            }
-        }
-    },
-    logger: {
-        maxFileSize: number,
-        keepFiles: number
-    },
-    loggerMem:{
-        size: number;
-        shiftBatchSize: number;
-    }
-    messageLog:{
-        size: number;
-        shiftBatchSize: number;
-    }
-    recovery: {
-        // rewind this number of seconds before the point where the job stopped
-        backUpTime: number,
-        // additionall back up for this number of lines before that (to account for uncertainty in which lines have been executed)
-        backUpLines: number,
-        // This is a list of gcode lines to execute to move the machine into a clearance position where it won't hit the workpiece
-        // The values {x}, {y}, etc. are replaced with the coordinates of the position (touching the workpiece) to resume the job.
-        moveToClearance: string[],
-        // List of gcode lines to execute to move from the clearance position to the position to restart the job.
-        moveToWorkpiece: string[]
-    },
-    toolChange: {
-        preToolChange: string[],
-        postToolChange: string[],
-        // Which axis number tool offsets apply to (in standard config, Z=2)
-        toolOffsetAxis: number,
-        negateToolOffset: boolean
-    },
-    enableDebug: boolean,
-    debugToStdout: boolean,
-    suppressDuplicateErrors?: boolean
-}
+import { TightCNCConfig } from '@dianlight/tightcnc-core';
+import { JobSourceOptions } from '@dianlight/tightcnc-core'
+import { StatusObject } from '@dianlight/tightcnc-core';
 
 /**
  * This is the central class for the application server.  Operations, gcode processors, and controllers

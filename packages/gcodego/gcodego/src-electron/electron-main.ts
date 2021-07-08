@@ -16,7 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import yaml from 'yaml';
 import { ChildProcess, fork } from 'child_process';
 import findFreePorts from 'find-free-ports';
-import { TightCNCConfig } from '@dianlight/tightcnc';
+import { TightCNCConfig } from '@dianlight/tightcnc-core';
 import defaultMenu from 'electron-default-menu';
 import {
   MenuItemConstructorOptions,

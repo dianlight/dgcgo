@@ -3,7 +3,8 @@ import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProce
 import objtools from 'objtools';
 import Operation from '../server/operation';
 import pasync from 'pasync';
-import TightCNCServer, { StatusObject } from '../server/tightcnc-server';
+import TightCNCServer from '../server/tightcnc-server';
+//import { StatusObject } from "@dianlight/tightcnc-core";
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core';
 

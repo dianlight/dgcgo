@@ -156,7 +156,7 @@
 </template>
 
 <script lang="ts">
-import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from '@dianlight/tightcnc'
+import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from '@dianlight/tightcnc-core'
 import { GcodeProcessorLifeCycle } from '@dianlight/tightcnc-core'
 import { Options, Vue } from 'vue-class-component';
 import { markRaw } from 'vue'

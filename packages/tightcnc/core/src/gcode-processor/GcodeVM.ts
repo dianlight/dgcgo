@@ -2,7 +2,7 @@ import { errRegistry } from '../errRegistry'
 import GcodeLine from './GcodeLine';
 import objtools from 'objtools' 
 import { Controller } from '../controller';
-import { AbstractServer } from '../abstract-server';
+import { AbstractServer } from '../AbstractServer';
 
 
 export interface GcodeVMOptions {

@@ -3,7 +3,7 @@ import {
     PortInfo,
     StatusObject,
     JobSourceOptions,
-} from '@dianlight/tightcnc';
+} from '@dianlight/tightcnc-core';
 import { JobStatus } from '@dianlight/tightcnc-core';
 import { EventEmitter } from 'events';
 import { JSONRPCParams } from 'json-rpc-2.0';

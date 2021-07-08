@@ -3,7 +3,8 @@ import { ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
 import { callLineHooks, GcodeProcessor } from '@dianlight/tightcnc-core';
 import JobState from './job-state';
-import  TightCNCServer, {JobSourceOptions } from './tightcnc-server';
+import  TightCNCServer from './tightcnc-server';
+import { JobSourceOptions } from "@dianlight/tightcnc-core";
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
 import { GcodeLine } from '@dianlight/tightcnc-core';
 import fs from 'fs'

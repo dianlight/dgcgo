@@ -7,7 +7,7 @@ import stable, { inplace } from 'stable'
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
 import * as _ from "lodash";
-import { AbstractServer } from '../abstract-server';
+import { AbstractServer } from '../AbstractServer';
 
 export type GcodeProcessorLifeCycle = 'server-only' | 'need-ui' | 'optional-ui' | 'internal'
 

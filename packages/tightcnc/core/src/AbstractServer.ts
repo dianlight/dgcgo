@@ -1,8 +1,6 @@
 import { Controller, ControllerStatus } from './controller';
-import { JobStatus } from './job-status';
-import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
 import EventEmitter from 'events';
-import { AbtractJobState } from './job-state';
+import { TightCNCConfig } from './TightCNCConfig';
 
 /*
 import { registerOperations } from './file-operations';
@@ -45,6 +43,7 @@ import Operation from './operation';
 import Ajv, { Schema } from 'ajv'
 import * as _ from "lodash";
 */
+/*
 
 export interface StatusObject {
     controller?: ControllerStatus | undefined
@@ -179,6 +178,7 @@ export interface TightCNCConfig {
     debugToStdout: boolean,
     suppressDuplicateErrors?: boolean
 }
+*/
 
 /**
  * This is the central class for the application server.  Operations, gcode processors, and controllers

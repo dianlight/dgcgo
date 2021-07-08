@@ -1,7 +1,7 @@
 import mkdirp from 'mkdirp';
 import fs from 'fs';
 import path from 'path';
-import { AbstractServer } from './abstract-server';
+import { AbstractServer } from './AbstractServer';
 
 
 export class LoggerDisk {

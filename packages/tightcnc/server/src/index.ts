@@ -1,7 +1,6 @@
 // Server
 export * as server from './server/server'
-export { default as TightCNCServer, JobSourceOptions, TightCNCControllers, TightCNCTinyGConfig, TightCNCGrblConfig, TightCNCConfig, StatusObject } from './server/tightcnc-server'
-export { PortInfo } from 'serialport'
+export { default as TightCNCServer } from './server/tightcnc-server'
 
 // ConsoleUI
 //export { default as ConsoleUIMode } from './consoleui/consoleui-mode'
