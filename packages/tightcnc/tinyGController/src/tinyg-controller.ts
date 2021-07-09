@@ -7,6 +7,9 @@ import * as  AbbrJSON from './tinyg-abbr-json';
 import CrispHooks from 'crisphooks';
 import SerialportRawSocketBinding  from '@dianlight/rawsocketbinding';
 import { BaseRegistryError } from 'new-error';
+
+export * from './TinyGConfig'
+
 /**
  * This is the controller interface class for TinyG.
  *

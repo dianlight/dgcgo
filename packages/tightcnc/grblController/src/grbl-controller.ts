@@ -11,10 +11,9 @@ import GrblsimBinding from '@dianlight/grblsimbinding';
 import { BaseRegistryError, ErrorRegistry } from 'new-error';
 import { GcodeVM } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
+import { GrblConfig } from './GrblConfig';
 
-export interface GrblControllerConfig extends ControllerConfig {
-    statusUpdateInterval?: number    
-}
+export * from './GrblConfig'
 
 export interface GrblControllerStatus extends ControllerStatus {
     comms:{
@@ -141,7 +140,7 @@ export class GRBLController extends Controller {
             _regexRstCommand = /^\$RST=(.*)$/;
     
 
-    constructor(config:GrblControllerConfig) {
+    constructor(config:GrblConfig) {
         super(config);
         this.axisLabels = ['x', 'y', 'z'];
         this.usedAxes = (config as any).usedAxes || [true, true, true];
@@ -171,7 +170,7 @@ export class GRBLController extends Controller {
     }
 
     debug(str: string) {
-        const enableDebug = false; // FIXME: Remmove debug linr
+        const enableDebug = false; 
         if (this.tightcnc)
             this.tightcnc.debug('GRBL: ' + str);
         else if (enableDebug)
@@ -457,7 +456,6 @@ export class GRBLController extends Controller {
                 obj._wpos = [];
                 for (let i = 0; i < (statusReport as any).MPos.length; i++) {
                     obj._wpos.push((statusReport as any).MPos[i] - (statusReport as any).WCO[i]);
-                    // FIXME: ? Settare l'ffest appena letto!
                 }
             }
             else if (!('WPos' in statusReport)) {
@@ -1301,7 +1299,7 @@ export class GRBLController extends Controller {
             }, interval);
             this._statusUpdateLoops?.push(ival as unknown as number);
         };
-        startUpdateLoop((this.config as GrblControllerConfig).statusUpdateInterval || 250, async () => {
+        startUpdateLoop((this.config as GrblConfig).statusUpdateInterval || 250, async () => {
             if (this.serial)
                 this.send('?');
         });
@@ -1877,8 +1875,8 @@ export class GRBLController extends Controller {
         let waiter = pasync.waiter();
         // Bounds within which to stop and start reading from the stream.  These correspond to the number of queued lines
         // not yet sent to the controller.
-        let sendQueueHighWater = (this.config as GrblControllerConfig).streamSendQueueHighWaterMark || 20;
-        let sendQueueLowWater = (this.config as GrblControllerConfig).streamSendQueueLowWaterMark || Math.min(10, Math.floor(sendQueueHighWater / 5));
+        let sendQueueHighWater = (this.config as GrblConfig).streamSendQueueHighWaterMark || 20;
+        let sendQueueLowWater = (this.config as GrblConfig).streamSendQueueLowWaterMark || Math.min(10, Math.floor(sendQueueHighWater / 5));
         let streamPaused = false;
         let canceled = false;
         const numUnsentLines = () => {
@@ -2104,7 +2102,7 @@ export class GRBLController extends Controller {
 
     override realTimeMove(axisNum:number, inc:number) {
         // Make sure there aren't too many requests in the queue
-        if (this._numInFlightRequests() > ((this.config as GrblControllerConfig).realTimeMovesMaxQueued || 4)) {
+        if (this._numInFlightRequests() > ((this.config as GrblConfig).realTimeMovesMaxQueued || 4)) {
             console.debug("Skip Realtime Request ",this._numInFlightRequests())
             return false;            
         }
@@ -2116,7 +2114,7 @@ export class GRBLController extends Controller {
             this.realTimeMovesCounter[axisNum] = 0;
         }
         this.realTimeMovesTimeStart[axisNum] = new Date().getTime();
-        let maxOvershoot = ((this.config as GrblControllerConfig).realTimeMovesMaxOvershootFactor || 2) * Math.abs(inc);
+        let maxOvershoot = ((this.config as GrblConfig).realTimeMovesMaxOvershootFactor || 2) * Math.abs(inc);
         if (this.realTimeMovesCounter[axisNum] > maxOvershoot)
             return false;
         this.realTimeMovesCounter[axisNum] += Math.abs(inc);

@@ -1,8 +1,7 @@
-import { TightCNCTinyGConfig } from './TightCNCTinyGConfig';
-import { TightCNCGrblConfig } from './TightCNCGrblConfig';
+import { ControllerConfig } from "./ControllerConfig";
 
-
-export type TightCNCControllers = {
-    TinyG?: TightCNCTinyGConfig;
-    grbl?: TightCNCGrblConfig;
+export interface TightCNCControllers {
+    [key:string]:ControllerConfig
+//   TinyG?: TightCNCTinyGConfig;
+//    grbl?: TightCNCGrblConfig;
 };

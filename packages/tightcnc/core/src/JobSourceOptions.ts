@@ -1,5 +1,5 @@
-import { AbtractJobState } from './AbstractJobState';
 import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+import { JobState } from './job-state';
 
 
 export interface JobSourceOptions {
@@ -19,5 +19,5 @@ export interface JobSourceOptions {
     data?: string[];
     rawStrings?: boolean;
     dryRun?: boolean;
-    job?: AbtractJobState;
+    job?: JobState;
 }

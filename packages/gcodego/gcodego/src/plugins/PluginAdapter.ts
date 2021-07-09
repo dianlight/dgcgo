@@ -1,5 +1,6 @@
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core';
-import { JobStatusUpdateHookCallback, ClientEvents } from '../tightcnc/TightCNCClient';
+import { JobStatusUpdateHookCallback } from '../tightcnc/TightCNCClient';
+import { ClientEvents } from '@dianlight/gcodego-core'
 import { GcPlugin, AbstractPluginAdapter } from '@dianlight/gcodego-core';
 import { Notify, Dialog } from 'quasar'
 import JsonFormDialog from '../dialogs/JsonFormDialog.vue'

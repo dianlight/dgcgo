@@ -11,32 +11,7 @@ import objectHash from 'object-hash';
 import { timeout } from 'utils-decorators';
 import { Notify } from 'quasar'
 import objtools from 'objtools'
-import { AbstractTightCNCClient, GcodeGoConfig, LogLineDirection, LogLine } from '@dianlight/gcodego-core'
-
-/*
-export interface GcodeGoConfig extends TightCNCConfig {
-    selectedProcessors: string[];
-    selectedPlugins: string[];
-    probe: {
-        bookmarkPositions: { x: number, y: number }[],
-        z: number,
-        feed: number
-    },
-    machine: {
-        zsafe: number
-    }
-}
-
-export type LogLineDirection = '<' | '>' | '@' | '%';
-
-export interface LogLine {
-    line: number;
-    direction: LogLineDirection;
-    data: string;
-    result?: string;
-    error?: string;
-}
-*/
+import { AbstractTightCNCClient, GcodeGoConfig, LogLineDirection, LogLine, ClientEvents } from '@dianlight/gcodego-core'
 
 export class TightCNCClient extends AbstractTightCNCClient {
     jsonrpc: JSONRPCClient;
@@ -59,8 +34,7 @@ export class TightCNCClient extends AbstractTightCNCClient {
                 parity: 'none',
                 port: '/dev/null',
                 stopBits: 1,
-                usedAxes: [true, true, true],
-                homableAxes: [true, true, true],
+                homableAxes: [true, true, true]
             },
         },
         probe: {
@@ -389,9 +363,12 @@ export class TightCNCClient extends AbstractTightCNCClient {
     }
 }
 
+
 export type JobStatusUpdateHookCallback = (newstate: JobStatus) => void;
 
+/*
 export type ClientEvents =
     'job-status-update' |
     'client-config-updated' | 'client-connection-error' | 'op-error'
     ;
+*/

@@ -80,10 +80,7 @@ export default class TightCNCServer extends AbstractServer {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('enableServer config flag now found.  Ensure configuration is correct - check the documentation.');
         }
         this.baseDir = this.config!.baseDir;
-        // Register builtin modules
-        //import('./tinyg-controller').then((namespace)=>this.registerController('TinyG',namespace.default))
-        //import('./grbl-controller').then((namespace) => this.registerController('grbl', namespace.default));
-        
+        // Register builtin modules        
         this.registerController('TinyG',TinyGController)
         this.registerController('grbl',GRBLController)
 

@@ -4,18 +4,8 @@ import { GcodeLine } from './gcode-processor/GcodeLine';
 import { BaseRegistryError } from 'new-error';
 import fs from 'fs'
 import { VMState } from './gcode-processor/GcodeVM'
-//import CrispHooks from 'crisphooks'
 import { errRegistry } from './errRegistry';
-
-export interface ControllerConfig {
-    port: string
-    homableAxes?: [boolean, boolean, boolean]
-    streamSendQueueHighWaterMark?: number
-    streamSendQueueLowWaterMark?: number
-    realTimeMovesMaxQueued?: number
-    realTimeMovesMaxOvershootFactor?:number
-
-}
+import { ControllerConfig } from './ControllerConfig';
 
 export interface ControllerCapabilities {
         variableSpindle:boolean // 'V': 'variableSpindle',

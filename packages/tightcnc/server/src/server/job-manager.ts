@@ -1,11 +1,10 @@
 import objtools from 'objtools';
-import { ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
+import { JobState, ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
 import { callLineHooks, GcodeProcessor } from '@dianlight/tightcnc-core';
-import JobState from './job-state';
 import  TightCNCServer from './tightcnc-server';
 import { JobSourceOptions } from "@dianlight/tightcnc-core";
-import { BaseRegistryError, ErrorRegistry } from 'new-error';
+import { BaseRegistryError } from 'new-error';
 import { GcodeLine } from '@dianlight/tightcnc-core';
 import fs from 'fs'
 import { GcodeLineReadableStream, JobStatus } from '@dianlight/tightcnc-core';

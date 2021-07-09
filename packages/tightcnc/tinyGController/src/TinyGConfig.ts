@@ -1,11 +1,12 @@
+import { ControllerConfig } from "@dianlight/tightcnc-core";
 
-export type TightCNCTinyGConfig = {
+export interface TinyGConfig extends ControllerConfig {
     // serial port settings
-    port: string;
-    baudRate: number;
-    dataBits: number;
-    stopBits: 1 | 0;
-    parity: 'none';
+ //   port: string;
+ //   baudRate: number;
+ //   dataBits: number;
+ //   stopBits: 1 | 0;
+ //   parity: 'none';
     rtscts: boolean;
     xany: boolean;
 

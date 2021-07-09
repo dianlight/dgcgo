@@ -166,7 +166,7 @@
 </template>
 
 <script lang="ts">
-import { TightCNCConfig, TightCNCControllers,TightCNCGrblConfig, PortInfo } from '@dianlight/tightcnc-core'
+import { TightCNCConfig, TightCNCControllers, ControllerConfig, PortInfo } from '@dianlight/tightcnc-core'
 import { GcodeProcessorLifeCycle } from '@dianlight/tightcnc-core'
 import { Options, Vue } from 'vue-class-component';
 import { markRaw } from 'vue'
@@ -372,7 +372,8 @@ export default class Preferences extends Vue {
           case 'grbl':
             if(!this.config.controllers)this.config.controllers = {} as TightCNCControllers
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const acontrol = this.config.controllers[this.config.controller] as TightCNCGrblConfig
+            const acontrol = this.config.controllers[this.config.controller]
+            if(acontrol)
             switch(this.portType){
               case 'serial':
                 acontrol.port = this.port
