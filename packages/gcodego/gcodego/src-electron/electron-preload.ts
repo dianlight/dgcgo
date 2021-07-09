@@ -40,8 +40,8 @@ function receive<T>(channel: string, func: (data: T) => void): Promise < T > {
         const validChannels = ['MenuEvent', 'OpenEvent'];
         if (validChannels.includes(channel)) {
             ipcRenderer.on(channel, (event, ...args: unknown[]) => {
-                if(func)func({...args} as unknown as T)
-                resolve({ ...args } as unknown as T)
+                if(func)func(args[0]  as T)
+                resolve( args[0] as  T)
             } );
         } else {
             reject( new Error(`Receive Invalid Channel: ${channel}`)) 
