@@ -1,14 +1,9 @@
-# `@dianlight/grblSimBinding`
+# `@dianlight/tinyg-controller`
 
-> A RawSocket Binding for GrblSim.
+> TinyG controller for @dianlight/tightcnc
 
 ## Usage
 
 ```
-import GrblSimBinding from '@dianlight/grblsimbinding';
-
-new SerialPort("grblsim://<path to grbl_sim.exe>", {
-    binding:GrblSimBinding 
-}, (err) => {});
   
 ```
