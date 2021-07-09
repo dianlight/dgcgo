@@ -75,7 +75,7 @@ jobs:
       - name: Build (spa)
         if: ${{ startsWith(runner.os, 'macos') }}
         run: |
-          echo ${runner.os} ${runner}
+          echo ${{runner.os}} ${{runner}}
           lerna run --scope gcodego --include-dependencies build --stream
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
