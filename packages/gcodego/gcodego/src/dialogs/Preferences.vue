@@ -28,7 +28,17 @@
         <q-select dense outlined  v-model="portType" :options="['serial','socket','grblsim']" label="Port Type" />
 
         <template v-if="portType ==='serial'">
-          <q-select dense outlined v-model="port" @popup-show="refreshSerialList"  clearable :options="serials" label="Port" emit-value>
+          <q-select 
+          dense 
+          outlined 
+          v-model="port" 
+          @popup-show="refreshSerialList"  
+          @new-value="createNewSerial"
+          use-input
+          clearable 
+          :options="serials" 
+          label="Port" 
+          emit-value>
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
               <q-item-section>
@@ -259,6 +269,10 @@ export default class Preferences extends Vue {
               }
             })
         })
+      }
+
+      private createNewSerial(serial:string,done:(val:string)=>void){
+        done(serial)
       }
 
       private refreshGcodeProcessorsList(){
