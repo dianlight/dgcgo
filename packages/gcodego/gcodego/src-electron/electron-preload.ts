@@ -27,7 +27,7 @@ function invoke<T,R>(channel: string, data?:T): Promise<R> {
 }
 
 function send<T>(channel: string, data?:T): void {
-    const validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu'];
+    const validChannels = ['SaveTightCNCConfig', 'PopulateApplicationMenu','AddMenu','DelMenu'];
     if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, data)
     } else {

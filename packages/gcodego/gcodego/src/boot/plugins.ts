@@ -11,7 +11,7 @@ declare module '@vue/runtime-core' {
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
 export default boot(({ app, /*, router, ...*/ }) => {
-  const pluginAdapter = new PluginAdapter(app.config.globalProperties.$tightcnc);
+  const pluginAdapter = new PluginAdapter(app.config.globalProperties.$tightcnc,app.config.globalProperties.$globalEventBus);
   registerInternalPlugins(pluginAdapter)
   void pluginAdapter.reloadPlugins()
   app.config.globalProperties.$plugins = pluginAdapter

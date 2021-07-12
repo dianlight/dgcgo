@@ -1,6 +1,9 @@
 <template>
         <q-tabs dense  shrink stretch outside-arrows mobile-arrows>
-          <q-route-tab to="/" label="Machine" v-if="wbTabs.length === 0"/>
+          <q-route-tab to="/" icon="view_in_ar" v-if="wbTabs.length === 0">
+            <q-tooltip>{{ $t('menu.view.machine') }}</q-tooltip>
+          </q-route-tab>
+
           <q-route-tab v-for="(tab,index) in wbTabs" :to="`/workbench/${tab.id}`" :key="tab.id" v-bind="tab">
             <q-field dense stack-label>
               <template v-slot:append>
@@ -11,6 +14,7 @@
               </template>
             </q-field>
           </q-route-tab>
+
           <q-btn dense flat icon="add_circle_outline" @click="$store.commit('dialogs/showDialog','open')" disable>
             <q-tooltip>{{ $t('menu.file.open')}} **not yet implemented**</q-tooltip>
           </q-btn>
@@ -18,11 +22,18 @@
             <q-tooltip>{{ $t('menu.terminal')}}</q-tooltip>
             <q-badge color="positive" v-if="$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine > 1" floating>{{$store.state.tightcnc.logs.lines.length-$store.state.tightcnc.logs.lastVisualizedLine-1}}</q-badge>
           </q-route-tab>
-          <q-route-tab to="/pippo" label="404" />
-          <q-route-tab to="/testPage" label="Test" />
+          <!--q-route-tab to="/pippo" label="404" /-->
+          <!--q-route-tab to="/testPage" label="Test" /-->
+
+          <q-separator vertical inset />        
+          <q-route-tab v-for="tab in pluginsTabs" :to="`/plugins/${tab.to}`" :key="tab.menu" v-bind="tab"
+            :label="tab.icon?'':$t(tab.menu)" :icon="tab.icon">
+              <q-tooltip v-if="tab.tooltip">{{ tab.tooltip?$t(tab.tooltip):''}}</q-tooltip>
+          </q-route-tab>
+
         </q-tabs>
 
-        <q-separator vertical inset />
+
 
           <q-btn-group outline>
             <q-btn v-if="!$q.platform.is.electron" dense icon="settings" @click="$store.commit('dialogs/showDialog','preferences')">
@@ -52,6 +63,7 @@ import { useI18n  } from 'vue-i18n'
 import path from 'path'
 import { uid } from 'quasar'
 import { WorkBenchSessionData } from '../pages/WorkBenchSessionData';
+import { GlobalEventBus } from '@dianlight/gcodego-core'
 
 interface JsonLocale {
   [key:string]: string | JsonLocale
@@ -74,6 +86,31 @@ interface JsonLocale {
 export default class ManuWidget extends Vue {
 
   wbTabs:WorkBenchSessionData[] = []
+
+  pluginsTabs:{  
+    menu: string /*'menu.view.autolevel'*/, 
+    to: string /*'/autolevel'*/, 
+    icon?: string /*'level'*/, 
+    tooltip?: string /*'AutoLevel'*/ }[]  = [
+      /*
+      {
+        menu: 'test',
+        to: '/404',
+      },
+      {
+        menu: 'test2',
+        to: '/404',
+        icon: 'home'
+      },
+      {
+        menu: 'test3',
+        to: '/404',
+        icon: 'home',
+        tooltip:'pippo.pluto'
+      },
+      */
+
+    ]
 
   locale = useI18n({useScope: 'global'}).locale
   get lastStatus(){
@@ -99,6 +136,29 @@ export default class ManuWidget extends Vue {
     }
   }
 
+  override created(){
+    this.$globalEventBus.addListener(GlobalEventBus.NEW_MENU,(link: {  menu: string /*'menu.view.autolevel'*/, to: string /*'/autolevel'*/, icon?: string /*'level'*/, tooltip?: string /*'AutoLevel'*/ })=>{
+      link.to = '/plugins'+link.to;
+      if(this.$q.platform.is.electron){
+        window.api.send('AddMenu',link)
+      } else {
+        this.pluginsTabs.push(link)
+        this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs)
+      }
+    })
+    this.$globalEventBus.addListener(GlobalEventBus.DEL_MENU,(menuName: string)=>{
+      if(this.$q.platform.is.electron){
+        window.api.send('DelMenu',menuName)
+      } else {
+        this.pluginsTabs = this.pluginsTabs.filter( tab=> tab.menu !== menuName)
+        this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs)
+      }
+    })
+    // Reload plugins
+    void this.$plugins.reloadPlugins()
+  }
+
+
   override mounted(){
     //console.log(this.$q.platform)
     if(this.$q.platform.is.electron){
@@ -120,6 +180,7 @@ export default class ManuWidget extends Vue {
       })
     }
     this.wbTabs = this.$q.sessionStorage.getItem('openFiles') || []
+    this.pluginsTabs = this.$q.sessionStorage.getItem('pluginsTab') || []
   }
 
   override updated(){

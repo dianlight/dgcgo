@@ -1,10 +1,10 @@
 {
-//  "extends": "@quasar/app/tsconfig-preset",
-  "extends": "../../../tsconfig.json",
+  "extends": "@quasar/app/tsconfig-preset",
+//  "extends": "../../../tsconfig.json",
   "include": [
     "src/**/*.ts",
     "src-electron/**/*.ts",
-    "src/**/*.vue"
+    "src/**/*.vue",
   ],
   "exclude": [
     "babel.config.js"
@@ -31,10 +31,12 @@
       "dialogs/*": ["./src/dialogs/*"],
     },
   },
+  /*
   "references": [
     { "path": "../../tightcnc/server"},
     { "path": "../core"}
   ],
+  */
   "plugins": [
     {
         "name": "@manuth/typescript-eslint-plugin",

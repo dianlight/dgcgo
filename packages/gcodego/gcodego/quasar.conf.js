@@ -35,7 +35,8 @@ module.exports = configure(function(ctx) {
             // 'axios',
             'tightcnc',
             'shortkey',
-            'plugins'
+            'globalEventBus',
+            'plugins',
         ],
 
         // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

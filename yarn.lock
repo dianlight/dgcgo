@@ -4726,9 +4726,9 @@ camelcase@^6.2.0:
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
 camera-controls@^1.29.0:
-  version "1.29.0"
-  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.29.0.tgz#d980b93ad0ac3bc2ba9fa44f155d5239f5f4e91d"
-  integrity sha512-Da7IY5gn/7oWLde+0zq5PtNXUAPzyS+H9cKK+BENI4AoPQr+C+EYPnurfPZ9YCFBtzxxE6sNcnqp3l2QFZnaBQ==
+  version "1.29.1"
+  resolved "https://registry.yarnpkg.com/camera-controls/-/camera-controls-1.29.1.tgz#9b442932831e33d71f004abb36fa4623c32dfdbd"
+  integrity sha512-G+HtYqoyTykpMPYVP1SMBtH3XCTxW47w2BF1gG1fs077cHpzcpeFxecCAjiMy25wPmG91q/Sypq1NufGHCd+ug==
 
 caniuse-api@^3.0.0:
   version "3.0.0"
@@ -7237,11 +7237,6 @@ find-cache-dir@^3.3.1:
     commondir "^1.0.1"
     make-dir "^3.0.2"
     pkg-dir "^4.1.0"
-
-find-free-ports@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/find-free-ports/-/find-free-ports-2.0.3.tgz#14072bb2fddf00612c91a7a71625d44b45c97d71"
-  integrity sha512-r8R4ieGTixDMDMHBit0WabrWDc/XeK35kyt8Fp6FToXEDqe1iVujqQlTTlrV5VN0Nor1ydH+vsvB0vTl7VgifA==
 
 find-up@^1.0.0:
   version "1.1.2"
@@ -13903,9 +13898,9 @@ ts-loader@^9.2.3:
     semver "^7.3.4"
 
 ts-node@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.0.0.tgz#05f10b9a716b0b624129ad44f0ea05dac84ba3be"
-  integrity sha512-ROWeOIUvfFbPZkoDis0L/55Fk+6gFQNZwwKPLinacRl6tsxstTF1DbAcLKkovwnpKMVvOMHP1TIbnwXwtLg1gg==
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.1.0.tgz#e656d8ad3b61106938a867f69c39a8ba6efc966e"
+  integrity sha512-6szn3+J9WyG2hE+5W8e0ruZrzyk1uFLYye6IGMBadnOzDh8aP7t8CbFpsfCiEx2+wMixAhjFt7lOZC4+l+WbEA==
   dependencies:
     "@tsconfig/node10" "^1.0.7"
     "@tsconfig/node12" "^1.0.7"
@@ -14030,9 +14025,9 @@ typescript@4.2.2:
   integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 typescript@^4.4.0-dev.20210702:
-  version "4.4.0-dev.20210709"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210709.tgz#1744f92e64e1821fcdf1606fa0812d485192ba3f"
-  integrity sha512-MQpbXilLwJc94+tEK0Ah+y2anG05bW7+uvsDi77yZKiL6dHCu8cwUNc1TfM3DRs/bomDsU8wz41mAQGxnxYddQ==
+  version "4.4.0-dev.20210712"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210712.tgz#87d9f9452bcb70a8d357f8a1b8c749fc809b202b"
+  integrity sha512-Xrg0x8qrW9MCu2HmDHzBL9vTtlT+rEkp5l19ceZR5zMgHQIBWisxiB0/0tlESK0ZPsk7tN6Y/zr3pqSY6DTOAA==
 
 uglify-js@^3.1.4, uglify-js@^3.5.1:
   version "3.13.10"
@@ -14319,9 +14314,9 @@ utila@~0.4:
   integrity sha1-ihagXURWV6Oupe7MWxKk+lN5dyw=
 
 utils-decorators@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/utils-decorators/-/utils-decorators-1.10.0.tgz#eb9208ccbb7fbb7488d5d04b2611df62c2fcaf4d"
-  integrity sha512-wlNRoPCFdxSReLfmhNqkZsg8FqsKu9d5trdSELxBZCtmK4KPtSidxRg24+bpZQjEBBF0hUIQEFz2uM7sBDVG2Q==
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/utils-decorators/-/utils-decorators-1.10.1.tgz#e2e619f5e0b9d69219ca18664fd1ef26a7e0482a"
+  integrity sha512-XIHZTEs/Y8pThCk/ttOGrXN/m73qiYgFF0hlm2XFqTyK/iR/KFXl1G4aoK7+hdw/5ziBV+KBfhEYpq7hq6R9Ew==
   dependencies:
     tinyqueue "^2.0.3"
 
@@ -15006,10 +15001,10 @@ yargs@^17.0.1:
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
 
-yargs@next:
-  version "17.0.0-candidate.13"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.0.0-candidate.13.tgz#91f3394d45fb282127d6d5a35109de44d2da0664"
-  integrity sha512-DClGCPA+Q7l0fKuqdAE6+YETxsC6rbp0NLA8lOzipOFokG3Pvr5e8SaZJv1wQcfICnJnlbcF2OoPaqC6nNHwfA==
+yargs@^17.0.2-candidate:
+  version "17.0.2-candidate"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.0.2-candidate.tgz#97b90c7d9d46cc70c5538c120398ebee67f22b19"
+  integrity sha512-I8f9MSJr+dUZynHZ57fn5GFfFm2JVjiT/cdZHUgN35Hz6Pt99gQaHmx3IEryWCZefK722TrT40zD7rHIBLI5Zw==
   dependencies:
     cliui "^7.0.2"
     escalade "^3.1.1"

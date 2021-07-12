@@ -59,7 +59,7 @@
         "stable": "^0.1.8",
         "term.js": "^0.0.7",
         "xhr2": "^0.2.1",
-        "yargs": "next"
+        "yargs": "^17.0.2-candidate"
     },
     "license": "Apache-2.0",
     "_type": "commonjs",

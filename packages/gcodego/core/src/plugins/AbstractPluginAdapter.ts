@@ -1,13 +1,16 @@
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core';
-import { AbstractTightCNCClient, ClientEvents, JobStatusUpdateHookCallback } from 'src/tightcnc/AbstractTightCNCClient';
+import { AbstractTightCNCClient, JobStatusUpdateHookCallback } from '../tightcnc/AbstractTightCNCClient';
 import { GcPlugin } from './GcPlugin';
+import { RouteRecordRaw } from 'vue-router';
+import { GlobalEventBus } from '../GlobalEventBus';
+
 
 
 export abstract class AbstractPluginAdapter {
 
     _pluginRegister: Record<string, GcPlugin> = {}
 
-    constructor(public tightcnc: AbstractTightCNCClient) { }
+    constructor(public tightcnc: AbstractTightCNCClient,public bus:GlobalEventBus) { }
 
     async reloadPlugins(): Promise<boolean> {
         return new Promise((resolve) => {
@@ -37,12 +40,53 @@ export abstract class AbstractPluginAdapter {
      * Exposed API to register to events
      */
 
-    registerJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
-        this.tightcnc.addListener('job-status-update' as ClientEvents, fn)
-    }
-    unregisterJobStatusUpdateHook(fn: JobStatusUpdateHookCallback) {
-        this.tightcnc.removeListener('job-status-update' as ClientEvents, fn)
-    }
+    /**
+     * Set a Status Update event hook
+     * @param fn the callback function
+     */
+    abstract registerJobStatusUpdateHook(fn: JobStatusUpdateHookCallback): void
+    
+    /**
+     * Remove a Status Update event hook
+     * @param fn the callback function
+     */
+    abstract unregisterJobStatusUpdateHook(fn: JobStatusUpdateHookCallback): void
+
+    /**
+     * Exposed API to add Menu Functions and Pages
+     */
+
+    /**
+     * Add a new Menu
+     * @param link.menu the i18n key for the menu and the menu mosition for electron app. 
+     *              For example in Electron 'menu.view.autolevel' set a new submenu of view menu.
+     * @param link.to the vue route destination ( the path of the page to display )
+     * @param link.icon if is present is the icon to display in AppBar ( only if not Electron )
+     * @param link.tooltip if id present is the tooltip of thr AppBar menu ( only if not in Electron )
+     *   
+     */
+    abstract registerMenuFunction(       
+        link: {  menu: string /*'menu.view.autolevel'*/, to: string /*'/autolevel'*/, icon?: string /*'level'*/, tooltip?: string /*'AutoLevel'*/ }
+    ): void;
+
+    /**
+     * Register a new Vue Route. Useful to add Vue Pages
+     * @param route the RouteRecordRaw to add
+     */
+    abstract registerRoute(route: RouteRecordRaw):void 
+
+    /**
+     * Remove a menu
+     * @param menu the menu to remove.
+     * @see registerMenuFunction
+     */
+    abstract unregisterMenuFunction(menu: string): void
+    
+    /**
+     * Remove a Vuew Route p
+     * @param name the RouteRecordRaw name to remove
+     */
+    abstract unregisterRoute(name: string):void 
 
 
     /**
