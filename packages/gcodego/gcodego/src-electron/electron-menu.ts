@@ -33,7 +33,7 @@ export class ElectronMenu {
                 2,
                 0,
                 {
-                    label:'preferences',
+                    label:'menu.preferences',
                     //            label: 'Preferencies',
                     click: () =>
                         this.mainWindow?.webContents.send('MenuEvent', { dialog: 'preferences' }),
@@ -64,7 +64,7 @@ export class ElectronMenu {
                       { type: 'separator' },
                       */
                 {
-                    label: 'file.open',
+                    label: 'menu.file.open',
                     click: async () => {
                         //if (!this.mainWindow) await createWindow();
                         void dialog
@@ -120,7 +120,7 @@ export class ElectronMenu {
                     : [
                         { type: 'separator' } as MenuItemConstructorOptions,
                         {
-                            label: 'menu.app.preferencies',
+                            label: 'menu.preferences',
                             click: () =>
                                 this.mainWindow?.webContents.send('MenuEvent', {
                                     dialog: 'preferences',
@@ -171,12 +171,13 @@ export class ElectronMenu {
 
         /** Application Menu */
         ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
-            //console.debug('Popupating Menu', args[0]);
+            console.debug('Popupating Menu', args[0]);
             this.createMenu((path: string) => {
+                console.log(path)
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
                 const tr = path.split('.').reduce<any>((prev, curr) => {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                    if (prev === undefined) return prev;
+                    if (prev === undefined || curr === 'menu') return prev;
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     const elem = prev[curr];
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -188,11 +189,14 @@ export class ElectronMenu {
         });
 
         ipcMain.on('AddMenu', (_event, ...args) => {
+            //console.log('AddMenu',args[0])
             const link = args[0] as { menu: string /*'menu.view.autolevel'*/, to: string /*'/autolevel'*/, icon?: string /*'level'*/, tooltip?: string /*'AutoLevel'*/ }
             const menuPath = link.menu.split('.')
             if (menuPath[0] === 'menu' && menuPath.length > 2) {
+                //console.log('Is A Menu!', menuPath)
                 this.menu.forEach(cmenu => {
-                    if (cmenu.role === menuPath[1] || cmenu.label == menuPath[1]) {
+                    console.log(menuPath[1],cmenu.role,cmenu.label)
+                    if (cmenu.role === menuPath[1] || cmenu.label?.toLowerCase() === menuPath[1].toLowerCase()) {
                         (cmenu.submenu as Electron.MenuItemConstructorOptions[]).push(
                             {
                                 label: link.menu,
@@ -207,10 +211,11 @@ export class ElectronMenu {
         });
 
         ipcMain.on('DelMenu', (_event, ...args) => {
+            //console.log('DelMenu',args[0])
             const menuPath = (args[0] as string).split('.')
             if (menuPath[0] === 'menu' && menuPath.length > 2) {
                 this.menu.forEach(cmenu => {
-                    if (cmenu.role === menuPath[1] || cmenu.label == menuPath[1]) {
+                    if (cmenu.role === menuPath[1] || cmenu.label?.toLowerCase() === menuPath[1].toLowerCase()) {
                         (cmenu.submenu as Electron.MenuItemConstructorOptions[]) = (cmenu.submenu as Electron.MenuItemConstructorOptions[])
                             .filter(sm => sm.label !== args[0])
                     }

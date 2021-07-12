@@ -141,18 +141,16 @@ export default class ManuWidget extends Vue {
       link.to = '/plugins'+link.to;
       if(this.$q.platform.is.electron){
         window.api.send('AddMenu',link)
-      } else {
-        this.pluginsTabs.push(link)
-        this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs)
       }
+      this.pluginsTabs.push(link)
+      this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs)
     })
     this.$globalEventBus.addListener(GlobalEventBus.DEL_MENU,(menuName: string)=>{
       if(this.$q.platform.is.electron){
         window.api.send('DelMenu',menuName)
-      } else {
-        this.pluginsTabs = this.pluginsTabs.filter( tab=> tab.menu !== menuName)
-        this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs)
-      }
+      } 
+      this.pluginsTabs = this.pluginsTabs.filter( tab=> tab.menu !== menuName)
+      this.$q.sessionStorage.set('pluginsTab',this.pluginsTabs) 
     })
     // Reload plugins
     void this.$plugins.reloadPlugins()

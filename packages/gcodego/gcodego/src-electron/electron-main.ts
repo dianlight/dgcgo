@@ -34,8 +34,6 @@ electron_cfg.logger(log);
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 let mainWindow: BrowserWindow | undefined;
-let electronMenu: ElectronMenu | undefined;
-
 
 
 async function createWindow(): Promise<BrowserWindow> {
@@ -66,6 +64,8 @@ async function createWindow(): Promise<BrowserWindow> {
       },
     });
     winCfg.assign(mainWindow);
+
+    new ElectronMenu(mainWindow)
 
     void mainWindow.loadURL(process.env.APP_URL as string)
       .then(() => resolve(mainWindow as BrowserWindow))
@@ -122,9 +122,7 @@ app.on('ready', async () => {
   }
   //registerLocalResourceProtocol()
   //void createMenu()
-  void createWindow().then(window => {
-    electronMenu = new ElectronMenu(window)
-  })
+  void createWindow()
   
   void autoUpdater.checkForUpdatesAndNotify();
 

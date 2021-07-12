@@ -5,11 +5,16 @@
   "menu": {
     "preferences": "Preferences...",
     "about": "about",
+    "action": "Action",
     "submenu": {
       "submenu1": "Questo!"
     },
     "file": {
       "open": "Open..."
+    },
+    "view":{
+      "terminal":"Serial console",
+      "autolevel":"Autolevel"
     },
     "terminal": "Serial console"
   }
