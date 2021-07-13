@@ -37,7 +37,8 @@
     "workspaces": {
         "packages": [
             "packages/gcodego/*",
-            "packages/tightcnc/*"
+            "packages/tightcnc/*",
+            "packages/plugins/*"
         ],
         "nohoist": [
             "packages/gcodego/electron",
@@ -47,12 +48,11 @@
         ]
     },
     "scripts": {
-        "git:update": "git submodule update --init --recursive",
+        "_git:update": "git submodule update --init --recursive",
         "build": "lerna run build --stream --concurrency 1",
-        "watch": "lerna run watch --stream",
-        "build:electron": "lerna run build:electron --stream",
+        "_watch": "lerna run watch --stream",
         "rebuild": "lerna run rebuild --stream",
-        "dev": "lerna run --parallel dev:default",
+        "dev": "lerna run dev --parallel --stream",
         "test:publish": "lerna publish --skip-git  --registry http://0.0.0.0:4873/",
         "ncu": "lerna exec -- ncu",
         "clean": "lerna clean -y && lerna exec -- rimraf dist types",

@@ -21,12 +21,11 @@ import { BaseRegistryError } from 'new-error';
 import { addExitCallback, CatchSignals } from 'catch-exit';
 import { registerGcodeProcessors } from './new-gcode-processor'
 import { GcodeLineReadableStream } from '@dianlight/tightcnc-core';
-import { buildProcessorChain, GcodeProcessor } from '@dianlight/tightcnc-core';
+import { buildProcessorChain, GcodeProcessor,Operation } from '@dianlight/tightcnc-core';
 
 import { TinyGController } from '@dianlight/tinyg-controller'
 import { GRBLController } from '@dianlight/grbl-controller'
 import { registerServerComponents } from '../plugins'
-import Operation from './operation';
 import Ajv, { Schema } from 'ajv'
 import * as _ from "lodash";
 import { TightCNCConfig } from '@dianlight/tightcnc-core';
@@ -41,25 +40,27 @@ import { StatusObject } from '@dianlight/tightcnc-core';
  */
 export default class TightCNCServer extends AbstractServer {
 
-    operations: Record<string,Operation> = {}
+   // operations: Record<string,Operation> = {}
    // baseDir:string;
     macros = new Macros(this);
     controllerClasses: {
         [key:string]:unknown
     } = {};
     //controller?:Controller;
-    gcodeProcessors:Record<string,typeof GcodeProcessor> = {};
+    //gcodeProcessors:Record<string,typeof GcodeProcessor> = {};
+    /*
     waitingForInput?:{
         prompt: any,
         schema: any,
         waiter: any,
         id: number
     };
+    */
     waitingForInputCounter = 1;
     //loggerDisk?: LoggerDisk;
     //loggerMem?: LoggerMem;
-    messageLog?: LoggerMem;
-    jobManager?: JobManager;
+    //messageLog?: LoggerMem;
+    //jobManager?: JobManager;
     
     ajv = new Ajv()
     

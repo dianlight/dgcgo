@@ -13,8 +13,7 @@
  * axis configuration with clearance on Z at machine position 0 (ie, G53 G0 Z0).
  */
 import { errRegistry } from '@dianlight/tightcnc-core';
-import {GcodeVM, GcodeLine, GcodeProcessor } from '@dianlight/tightcnc-core';
-import Operation from '../server/operation';
+import {GcodeVM, GcodeLine, GcodeProcessor,Operation } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
 import pasync from 'pasync';
 import fs from 'fs';

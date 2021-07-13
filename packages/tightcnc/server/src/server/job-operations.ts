@@ -1,6 +1,6 @@
-import Operation from './operation';
+//import Operation from './operation';
 import TightCNCServer from './tightcnc-server';
-import { JobSourceOptions } from "@dianlight/tightcnc-core";
+import { JobSourceOptions, Operation } from "@dianlight/tightcnc-core";
 import { JSONSchema7 } from 'json-schema';
 
 const jobOptionsSchema = {

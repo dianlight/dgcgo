@@ -1,10 +1,7 @@
-import { errRegistry } from '@dianlight/tightcnc-core';
-import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
+import { errRegistry,AbstractServer } from '@dianlight/tightcnc-core';
+import { Operation, GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
-import Operation from '../server/operation';
 import pasync from 'pasync';
-import TightCNCServer from '../server/tightcnc-server';
-//import { StatusObject } from "@dianlight/tightcnc-core";
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core';
 
@@ -349,7 +346,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
             // Flush downstream processors
             await this.flushDownstreamProcessorChain();
             // Wait for controller to sync
-            await (this.tightcnc as TightCNCServer).controller?.waitSync();
+            await (this.tightcnc as AbstractServer).controller?.waitSync();
             // Handle the operation
             if (isToolChange)
                 await this._doToolChange();
@@ -360,7 +357,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     }
 }
 
-function findCurrentJobGcodeProcessor(tightcnc: TightCNCServer, name:string, throwOnMissing = true) {
+function findCurrentJobGcodeProcessor(tightcnc: AbstractServer, name:string, throwOnMissing = true) {
     let currentJob = tightcnc.jobManager!.currentJob;
     if (!currentJob || currentJob.state === 'cancelled' || currentJob.state === 'error' || currentJob.state === 'complete') {
         throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('No currently running job');
@@ -442,7 +439,7 @@ class SetToolOffsetOperation extends Operation {
     }
 }
 
-export function registerServerComponents(tightcnc: TightCNCServer) {
+export function registerServerComponents(tightcnc: AbstractServer) {
     tightcnc.registerGcodeProcessor(/*'toolchange',*/ ToolChangeProcessor);
     tightcnc.registerOperation(/*'resumeFromStop',*/ ResumeFromStopOperation);
     tightcnc.registerOperation(/*'setToolOffset',*/ SetToolOffsetOperation);

@@ -21,10 +21,12 @@
     },
     "workspaces": [
         "packages/gcodego/*",
-        "packages/tightcnc/*"
+        "packages/tightcnc/*",
+        "packages/plugins/*"
     ],
     "packages": [
         "packages/gcodego/*",
-        "packages/tightcnc/*"
+        "packages/tightcnc/*",
+        "packages/plugins/*"
     ]      
 }

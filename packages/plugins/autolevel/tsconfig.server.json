@@ -1,0 +1,42 @@
+{
+//  "extends": "@quasar/app/tsconfig-preset",
+// "extends": "@tsconfig/node12/tsconfig.json",
+  "extends": "../../../tsconfig.json",
+//  "include": [
+//    "src/**/*.ts",
+//    "src/**/*.vue",
+//  ],
+  "exclude": [
+    "babel.config.js",
+    "src/ui/**/*.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./lib/src/server",                              /* Redirect output structure to the directory. */
+    "declaration": true,
+    "declarationDir": "./lib",
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["webpack-env"],
+    "lib": ["ESNext", "ScriptHost", "DOM"],
+    "paths": {
+      "src/*": ["./src/server/*"],
+    },
+  },
+  /*
+  "references": [
+    { "path": "../../tightcnc/server"},
+    { "path": "../core"}
+  ],
+  */
+  "plugins": [
+    {
+        "name": "@manuth/typescript-eslint-plugin",
+        "configFile": "./eslintrc.js"
+    }
+]
+}

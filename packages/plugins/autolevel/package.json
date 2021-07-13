@@ -1,0 +1,74 @@
+{
+  "name": "@dianlight/plugins-autolevel",
+  "version": "0.0.1",
+  "description": "An Autolevel Plugin for GCodeGo",
+  "keywords": [
+    "autolevel",
+    "cnc",
+    "plugin",
+    "gcodego"
+  ],
+  "author": "dianlight <lucio.tarantino@gmail.com>",
+  "homepage": "https://github.com/dianlight/dgcgo#readme",
+  "license": "GPL-3.0-or-later",
+  "main": "lib/src/server/index.js",
+  "browser": "lib/src/ui/index.js",
+  "_types": "types/src/ui/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dianlight/dgcgo.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "webpack --mode=production --config webpack.config.build.js",
+    "_build": "webpack --mode=production --config webpack.config.build.js && copyfiles -f ./src/*.vue lib",
+    "dev": "webpack --mode=development --config webpack.config.build.js"
+  },
+  "bugs": {
+    "url": "https://github.com/dianlight/dgcgo/issues"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Edge versions",
+    "last 2 Safari versions",
+    "last 2 Android versions",
+    "last 2 ChromeAndroid versions",
+    "last 2 FirefoxAndroid versions",
+    "last 2 iOS versions",
+    "last 1 Opera versions",
+    "not dead"
+  ],
+  "devDependencies": {
+    "@intlify/vue-i18n-loader": "^2.1.0",
+    "@manuth/typescript-eslint-plugin": "^1.4.1",
+    "@quasar/app": "^3.0.0",
+    "@vue/compiler-sfc": "^3.1.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
+    "eslint-plugin-vue": "^7.11.1",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.4.0-dev.20210702"
+  },
+  "peerDependencies": {
+    "vue-router": "^4.0.10"
+  },
+  "dependencies": {
+    "@dianlight/gcodego-core": "^0.2.0-alpha.1",
+    "@dianlight/tightcnc-core": "^0.3.2-alpha.1",
+    "@quasar/extras": "^1.10.7",
+    "cross": "^1.0.0",
+    "quasar": "^2.0.0",
+    "vue-class-component": "^8.0.0-rc.1",
+    "vue-i18n": "^9.1.6",
+    "vue-property-decorator": "10.0.0-rc.3"
+  }
+}

@@ -3,7 +3,7 @@ import { JobState, ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
 import { callLineHooks, GcodeProcessor } from '@dianlight/tightcnc-core';
 import  TightCNCServer from './tightcnc-server';
-import { JobSourceOptions } from "@dianlight/tightcnc-core";
+import { JobSourceOptions, AbstractJobManager } from "@dianlight/tightcnc-core";
 import { BaseRegistryError } from 'new-error';
 import { GcodeLine } from '@dianlight/tightcnc-core';
 import fs from 'fs'
@@ -28,17 +28,14 @@ export interface JobStatus {
     waits: string[]
 };
 */
-export default class JobManager {
+export default class JobManager extends AbstractJobManager {
 
-    currentJob?:any;
+    //currentJob?:any;
 
-    constructor(public tightcnc:TightCNCServer) {
+    override initialize() {
     }
 
-    initialize() {
-    }
-
-    getStatus(job?:JobState):JobStatus|undefined {
+    override getStatus(job?:JobState):JobStatus|undefined {
         if (!job)
             job = this.currentJob;
         if (!job)

@@ -1,5 +1,5 @@
 import { JSONSchema7 } from 'json-schema';
-import Operation from './operation';
+import { Operation } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 
 class OpListMacros extends Operation {

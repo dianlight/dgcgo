@@ -26,7 +26,7 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "watch": "tsc --watch --sourceMap --declaration --pretty --outDir ./dist",
+    "dev": "tsc --watch --sourceMap --declaration --pretty --outDir ./dist",
     "build": "tsc --sourceMap --declaration --pretty --outDir ./dist"
   },
   "bugs": {

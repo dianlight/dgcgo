@@ -1,0 +1,47 @@
+{
+  "extends": "@quasar/app/tsconfig-preset",
+//  "extends": "../../../tsconfig.json",
+//  "include": [
+//    "src/**/*.ts",
+//    "src/**/*.vue",
+//  ],
+  "exclude": [
+    "babel.config.js",
+    "src/server/**/*.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./lib/src/ui",                              /* Redirect output structure to the directory. */
+    "declaration": true,
+    "declarationDir": "./lib",
+    "declarationMap": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["quasar", "webpack-env"],
+    "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
+    "paths": {
+      "src/*": ["./src/ui/*"],
+      "components/*": ["./src/ui/components/*"],
+      "layouts/*": ["./src/ui/layouts/*"],
+      "pages/*": ["./src/ui/pages/*"],
+      "assets/*": ["./src/ui/assets/*"],
+      "boot/*": ["./src/ui/boot/*"],
+      "dialogs/*": ["./src/ui/dialogs/*"],
+    },
+  },
+  /*
+  "references": [
+    { "path": "../../tightcnc/server"},
+    { "path": "../core"}
+  ],
+  */
+  "plugins": [
+    {
+        "name": "@manuth/typescript-eslint-plugin",
+        "configFile": "./eslintrc.js"
+    }
+]
+}

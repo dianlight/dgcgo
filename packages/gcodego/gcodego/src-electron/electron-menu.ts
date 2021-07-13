@@ -171,9 +171,9 @@ export class ElectronMenu {
 
         /** Application Menu */
         ipcMain.on('PopulateApplicationMenu', (_event, ...args) => {
-            console.debug('Popupating Menu', args[0]);
+            //console.debug('Popupating Menu', args[0]);
             this.createMenu((path: string) => {
-                console.log(path)
+                //console.log(path)
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
                 const tr = path.split('.').reduce<any>((prev, curr) => {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-return

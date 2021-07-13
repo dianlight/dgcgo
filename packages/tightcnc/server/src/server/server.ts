@@ -1,8 +1,8 @@
 import express from 'express';
 import littleconf from 'littleconf';
 import TightCNCServer from './tightcnc-server';
+import { Operation } from '@dianlight/tightcnc-core'
 import { createJSONRPCErrorResponse, JSONRPC, JSONRPCID, JSONRPCMethod, JSONRPCRequest, JSONRPCResponse, JSONRPCResponsePromise, JSONRPCServer } from 'json-rpc-2.0';
-import Operation from './operation';
 import cors from 'cors'
 import { addExitCallback, CatchSignals } from 'catch-exit';
 //import { JSONSchema7 } from 'json-schema';

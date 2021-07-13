@@ -1,12 +1,11 @@
 import  cross from 'cross';
-import  Operation from '../server/operation';
+import { Operation, AbstractServer } from '@dianlight/tightcnc-core';
 import { errRegistry } from '@dianlight/tightcnc-core';
 import  objtools from'objtools';
 import { kdTree } from 'kd-tree-javascript';
 import fs from 'fs';
 import { GcodeLine, GcodeVM, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import { MoveSplitter } from './move-splitter';
-import TightCNCServer from '../server/tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
 
@@ -121,7 +120,7 @@ export class SurfaceLevelMap {
      * this returns the Z coordinate of the 2D point on the 3D plane specified by the 3 points.  This returns null in
      * cases that 2 of the plane points are colinear (and do not specify a plane), or the point given cannot fall on that plane.
      */
-    _planeZAtPoint(point:number[], planePoints: number[][], norm?:number[]) {
+    _planeZAtPoint(point:number[], planePoints: number[][], norm?:number[]):number|null {
         if (!norm) {
             let vA = [planePoints[1][0] - planePoints[0][0], planePoints[1][1] - planePoints[0][1], planePoints[1][2] - planePoints[0][2]];
             let vB = [planePoints[2][0] - planePoints[0][0], planePoints[2][1] - planePoints[0][1], planePoints[2][2] - planePoints[0][2]];
@@ -167,7 +166,7 @@ let surfaceProbeResults: {
    points: number[][]
 };
 
-function startProbeSurface(tightcnc: TightCNCServer, options: {
+function startProbeSurface(tightcnc: AbstractServer, options: {
     bounds: number[][],
     probeSpacing: number,
     surfaceMapFilename: string
@@ -313,14 +312,16 @@ function startProbeSurface(tightcnc: TightCNCServer, options: {
         surfaceProbeStatus.error = err.toObject ? err.toObject() : ('' + err);
     });
 }
+
 function getProbeStatus() {
     if (surfaceProbeStatus.state === 'none')
         return null;
     return surfaceProbeStatus;
 }
+
 class OpProbeSurface extends Operation {
 
-    constructor(tightcnc: TightCNCServer) {
+    constructor(tightcnc: AbstractServer) {
         super(tightcnc);
     }
 
@@ -863,7 +864,7 @@ class AutolevelConsoleUIJobOption extends JobOption {
 }
 */
 
-export function registerServerComponents(tightcnc:TightCNCServer) {
+export function registerServerComponents(tightcnc:AbstractServer) {
     tightcnc.registerGcodeProcessor(/*'autolevel',*/ AutolevelGcodeProcessor);
     tightcnc.registerOperation(/*'probeSurface',*/ OpProbeSurface);
     tightcnc.on('statusRequest', (status) => {

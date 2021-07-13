@@ -17,6 +17,13 @@ import * as node_stream from 'stream'
 */
 import path from 'path';
 import fs from 'fs';
+import { Operation } from './operation';
+import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+import { AbstractJobManager } from './AbstractJobManager';
+import { StatusObject } from './StatusObject';
+import { JobSourceOptions } from './JobSourceOptions';
+import { GcodeLineReadableStream } from './gcode-processor/GcodeLineReadableStream';
+import { BaseRegistryError } from 'new-error';
 /*
 import stable from 'stable';
 import Macros, { MacroOptions } from './macros';
@@ -187,9 +194,8 @@ export interface TightCNCConfig {
  * @class TightCNCServer
  */
 export abstract class AbstractServer extends EventEmitter {
-/*
+
     operations: Record<string,Operation> = {}
-    */
     baseDir: string;
     /*
     macros = new Macros(this);
@@ -198,22 +204,22 @@ export abstract class AbstractServer extends EventEmitter {
     } = {};
     */
     controller?: Controller;
-    /*
-    gcodeProcessors:Record<string,typeof GcodeProcessor> = {};
+    
+    gcodeProcessors: Record<string, typeof GcodeProcessor> = {};
     waitingForInput?:{
         prompt: any,
         schema: any,
         waiter: any,
         id: number
     };
+    /*
     waitingForInputCounter = 1;
     */
     loggerDisk?: LoggerDisk;
     loggerMem?: LoggerMem;
-    /*
     messageLog?: LoggerMem;
-    jobManager?: JobManager;
-    
+    jobManager?: AbstractJobManager;
+    /*
     ajv = new Ajv()
     
 
@@ -426,24 +432,14 @@ export abstract class AbstractServer extends EventEmitter {
         }
         return absPath;
     }
+*/
+    abstract registerController(name: string, cls: any):void;
 
-    registerController(name:string, cls:any) {
-        this.controllerClasses[name] = cls;
-    }
-    registerOperation(cls: typeof Operation) {
-        const opr: Operation = new (cls as any)(this);
-        const validate = this.ajv.compile(opr.getParamSchema() as Schema)
-        const name = opr.getParamSchema().$id?.slice(1) as string
-        if(this.operations[name])throw errRegistry.newError('INTERNAL_ERROR','UNSUPPORTED_OPERATION').formatMessage('Duble registration of operation: ' + name);
-        opr.config = (this.config!.operations as any)[name]
-        this.operations[name] = opr
-    }
+    abstract registerOperation(cls: typeof Operation):void;
 
-    registerGcodeProcessor(cls: typeof GcodeProcessor) {
-        const name = _.camelCase(cls.getOptionSchema().$id?.slice(1)|| cls.toString())
-        this.gcodeProcessors[name] = cls;
-    }
+    abstract registerGcodeProcessor(cls: typeof GcodeProcessor):void;
 
+ /*   
     async runOperation(opname:string, params:any) {
         if (!(opname in this.operations)) {
             throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('No such operation: ' + opname);
@@ -459,31 +455,15 @@ export abstract class AbstractServer extends EventEmitter {
             throw err;
         }
     }
+    */
     /**
      * Return the current status object.
      *
      * @method getStatus
      * @return {Promise{Object}}
-     * /
-    async getStatus():Promise<StatusObject> {
-        let statusObj: StatusObject = {};
-        // Fetch controller status
-        statusObj.controller = this.controller ? this.controller.getStatus() : undefined;
-        // Fetch job status
-        statusObj.job = this.jobManager ? this.jobManager.getStatus() : undefined;
-        // Emit 'statusRequest' event so other components can modify the status object directly
-        this.emit('statusRequest', statusObj);
-        // Add input request
-        if (this.waitingForInput) {
-            statusObj.requestInput = {
-                prompt: this.waitingForInput.prompt,
-                schema: this.waitingForInput.schema,
-                id: this.waitingForInput.id
-            };
-        }
-        // Return status
-        return statusObj;
-    }
+     */
+    abstract getStatus(): Promise<StatusObject>;
+    
     /**
      * Returns a stream of gcode data that can be piped to a controller.
      *
@@ -506,87 +486,10 @@ export abstract class AbstractServer extends EventEmitter {
      * @return {ReadableStream} - a readable object stream of GcodeLine instances.  The stream will have
      *   the additional property 'gcodeProcessorChain' containing an array of all GcodeProcessor's in the chain.  This property
      *   is only available once the 'processorChainReady' event is fired on the returned stream;
-     * /
-    getGcodeSourceStream(options: Readonly<JobSourceOptions> ): GcodeLineReadableStream {
-        // Handle case where returning raw strings
-        if (options.rawStrings) {
-            if (options.filename) {
-                let filename = options.filename;
-                filename = this.getFilename(filename, 'data', true);
-                return GcodeLineReadableStream.fromFile(filename)
-            }
-            else if (options.macro) {
-                return new GcodeLineReadableStream({
-                    gcodeLineTransform: (chunk:GcodeLine, callback) => {
-                        callback(null, chunk.toString())
-                    }
-                }).wrap(this.macros.generatorMacroStream(options.macro, options.macroParams || {}))
-               // this.macros.generatorMacroStream(options.macro, options.macroParams || {}).through((gline: GcodeLine) => gline.toString());
-            }
-            else {
-                return GcodeLineReadableStream.fromArray(options.data as string[]);
-            }
-        }
-        // 
-        let macroStreamFn:(() => node_stream.Readable)|undefined;
-        if (options.macro) {
-            macroStreamFn = () => {
-                return this.macros.generatorMacroStream(options.macro as string, options.macroParams || {});
-            };
-        }
-
-        // Sort gcode processors
-        let sortedGcodeProcessors = stable(options.gcodeProcessors || [], (a:any, b:any) => {
-            let aorder, border;
-            if ('order' in a)
-                aorder = a.order;
-            else if (a.name && this.gcodeProcessors[a.name] && 'DEFAULT_ORDER' in this.gcodeProcessors[a.name])
-                aorder = (this.gcodeProcessors[a.name] as any).DEFAULT_ORDER;
-            else
-                aorder = 0;
-            if ('order' in b)
-                border = b.order;
-            else if (b.name && this.gcodeProcessors[b.name] && 'DEFAULT_ORDER' in this.gcodeProcessors[b.name])
-                border = (this.gcodeProcessors[b.name] as any).DEFAULT_ORDER;
-            else
-                border = 0;
-            if (aorder > border)
-                return 1;
-            if (aorder < border)
-                return -1;
-            return 0;
-        });
-
-        // Construct gcode processor chain
-        let gcodeProcessorInstances: GcodeProcessor[] = [];
-        for (let gcpspec of sortedGcodeProcessors) {
-            if (gcpspec.inst) {
-                if (options.dryRun !== undefined)
-                    gcpspec.inst.dryRun = options.dryRun;
-                gcodeProcessorInstances.push(gcpspec.inst);
-            } else {
-                let cls = this.gcodeProcessors[gcpspec.name];
-                if (!cls)
-                    throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('Gcode processor not found: ' + gcpspec.name);
-                let opts = objtools.deepCopy(gcpspec.options || {});
-                opts.tightcnc = this;
-                if (options.job)
-                    opts.job = options.job;
-                let inst = new (cls as any)(opts,gcpspec.name);
-                if (options.dryRun)
-                    inst.dryRun = true;
-                gcpspec.inst = inst;
-                gcodeProcessorInstances.push(inst);
-            }
-        }
-        
-        if(options.filename)return buildProcessorChain(options.filename, gcodeProcessorInstances);
-        else if(options.data)return buildProcessorChain(options.data, gcodeProcessorInstances);
-        else if (macroStreamFn) return buildProcessorChain(macroStreamFn, gcodeProcessorInstances);
-        
-        throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Unable to create GCODE stream')
-    }
-
+     */
+    abstract getGcodeSourceStream(options: Readonly<JobSourceOptions>): GcodeLineReadableStream
+    
+    /*
     async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
         return await this.macros.runMacro(macro, params, options);
     }
@@ -617,22 +520,8 @@ export abstract class AbstractServer extends EventEmitter {
         let result = await this.waitingForInput.waiter.promise;
         return result;
     }
-
-    provideInput(value:any) {
-        if (!this.waitingForInput)
-            throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Not currently waiting for input');
-        let w = this.waitingForInput;
-        delete this.waitingForInput;
-        w.waiter.resolve(value);
-    }
-    cancelInput(err?:BaseRegistryError) {
-        if (!err)
-            err = errRegistry.newError('INTERNAL_ERROR','CANCELLED').formatMessage('Requested input cancelled');
-        if (!this.waitingForInput)
-            return;
-        let w = this.waitingForInput;
-        delete this.waitingForInput;
-        w.waiter.reject(err);
-    }
     */
+    abstract provideInput(value: any):void;
+    
+    abstract cancelInput(err?:BaseRegistryError):void
 }

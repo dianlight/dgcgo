@@ -1,6 +1,5 @@
-import  Operation from './operation';
 import objtools from 'objtools';
-import { errRegistry } from '@dianlight/tightcnc-core';
+import { errRegistry,Operation } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 import { StatusObject } from "@dianlight/tightcnc-core";
 import { JSONSchema7 } from 'json-schema';

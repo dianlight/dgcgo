@@ -1,4 +1,4 @@
-import Operation from './operation';
+import { Operation } from '@dianlight/tightcnc-core';
 import  fs from 'fs';
 import  path from 'path';
 import TightCNCServer from './tightcnc-server';

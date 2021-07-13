@@ -1,6 +1,6 @@
 import { GcPlugin, GcPluginDependencies } from '@dianlight/gcodego-core'
 import { RouteRecordRaw } from 'vue-router';
-import AutoLevelPage from 'pages/AutoLevel.vue'
+import AutoLevelPage from './pages/AutoLevelPage.vue'
 
 
 export class AutoLevel extends GcPlugin {

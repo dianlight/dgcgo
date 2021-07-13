@@ -1,9 +1,8 @@
 import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core'
 import  objtools from 'objtools';
-import TightCNCServer from '../server/tightcnc-server';
+import { AbstractServer } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema'
 import { UISchemaElement } from '@jsonforms/core'
-import { AbstractServer } from '@dianlight/tightcnc-core';
 
 interface MoveSplitterProcessorOptions extends GcodeProcessorOptions {
     maxMoveLength: number

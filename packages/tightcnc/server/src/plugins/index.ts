@@ -1,12 +1,13 @@
 import TightCNCServer from "../server/tightcnc-server";
 
-import * as autolevel from './autolevel'
+import { server_autolevel as autolevel } from '@dianlight/plugins-autolevel/lib/src/server'
 import * as moveSplitter from './move-splitter'
 //import * as jobRecovery from './job-recovery'
 import * as toolChange from './tool-change'
+import { AbstractServer } from "@dianlight/tightcnc-core";
 //import * as runtimeOverride from './runtime-override'
 
-const pluginList:((tightcnc: TightCNCServer) => void)[] = [
+const pluginList:((tightcnc: AbstractServer) => void)[] = [
 	autolevel.registerServerComponents,
 	moveSplitter.registerServerComponents,
 	//jobRecovery,
@@ -16,7 +17,7 @@ const pluginList:((tightcnc: TightCNCServer) => void)[] = [
 
 //const plugins = pluginList.map(async (reqName) => await import(`./${reqName}`));
 
-export function registerServerComponents(tightcnc: TightCNCServer) {
+export function registerServerComponents(tightcnc: AbstractServer) {
 	for (let plugin of pluginList) {
 		plugin(tightcnc)
 	}

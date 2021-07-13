@@ -1,6 +1,6 @@
 
-import { errRegistry } from '@dianlight/tightcnc-core';
-import TightCNCServer from './tightcnc-server';
+import { errRegistry } from './errRegistry';
+import { AbstractServer } from './AbstractServer';
 import { JSONSchema7 } from 'json-schema';
 
 /**
@@ -9,11 +9,11 @@ import { JSONSchema7 } from 'json-schema';
  *
  * @class Operation
  */
-export default abstract class Operation {
+export abstract class Operation {
 
     public config?:Record<string,any>
 
-    constructor(public tightcnc: TightCNCServer) { }
+    constructor(public tightcnc: AbstractServer) { }
         
     /**
      * Initialize the operation.  May return a Promise.

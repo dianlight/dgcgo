@@ -14,6 +14,8 @@ export * from './TightCNCControllers'
 export * from './JobSourceOptions'
 export * from './StatusObject'
 export * from './ControllerConfig'
+export * from './operation'
+export * from './AbstractJobManager'
 
 export { PortInfo } from 'serialport'
 

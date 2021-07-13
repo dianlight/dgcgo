@@ -4,3 +4,4 @@ lerna-debug.log
 yarn-error.log
 dist
 types
+lib

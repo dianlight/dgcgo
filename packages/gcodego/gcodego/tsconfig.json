@@ -1,6 +1,6 @@
 {
-  "extends": "@quasar/app/tsconfig-preset",
-//  "extends": "../../../tsconfig.json",
+// "extends": "@quasar/app/tsconfig-preset",
+  "extends": "../../../tsconfig.json",
   "include": [
     "src/**/*.ts",
     "src-electron/**/*.ts",
