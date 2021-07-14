@@ -1,4 +1,4 @@
-import { AutoLevel } from '@dianlight/plugins-autolevel/lib/src/ui';
+import { AutoLevel } from '@dianlight/plugins-autolevel/dist/src/ui';
 import { PluginAdapter } from './PluginAdapter';
 import { ToolChange } from './ToolChange';
 

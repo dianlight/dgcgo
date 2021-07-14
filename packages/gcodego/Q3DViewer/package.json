@@ -1,19 +1,22 @@
 {
-  "name": "@dianlight/plugins-autolevel",
+  "name": "@dianlight/q-3d-viewer",
   "version": "0.0.1",
-  "description": "An Autolevel Plugin for GCodeGo",
+  "description": "Quasar-3D-Viewer from GCodeGo",
   "keywords": [
-    "autolevel",
+    "quasar",
+    "3dviwer",
+    "threejs",
     "cnc",
-    "plugin",
+    "gcode",
     "gcodego"
   ],
   "author": "dianlight <lucio.tarantino@gmail.com>",
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
-  "main": "dist/src/server/index.js",
-  "browser": "dist/src/ui/index.js",
-  "_types": "types/src/ui/index.d.ts",
+  "main": "dist/src/index.js",
+  "browser":{
+    "./sfc":"src/components/Q3DViewer.vue"
+  },
   "directories": {
     "lib": "dist",
     "test": "__tests__"
@@ -28,8 +31,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "webpack --mode=production --config webpack.config.build.js",
-    "_build": "webpack --mode=production --config webpack.config.build.js && copyfiles -f ./src/*.vue lib",
-    "_dev": "webpack --mode=development --config webpack.config.build.js"
+    "dev": "webpack --mode=development --config webpack.config.build.js"
   },
   "bugs": {
     "url": "https://github.com/dianlight/dgcgo/issues"
@@ -62,11 +64,14 @@
     "vue-router": "^4.0.10"
   },
   "dependencies": {
-    "@dianlight/gcodego-core": "^0.2.0-alpha.1",
-    "@dianlight/tightcnc-core": "^0.3.2-alpha.1",
     "@quasar/extras": "^1.10.7",
-    "cross": "^1.0.0",
+    "camera-controls": "^1.29.0",
+    "colornames": "^1.1.1",
+    "gcode-toolpath": "^2.2.0",
     "quasar": "^2.0.0",
+    "split2": "^3.2.2",
+    "three": "^0.129.0",
+    "through2": "^4.0.2",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-i18n": "^9.1.6",
     "vue-property-decorator": "10.0.0-rc.3"

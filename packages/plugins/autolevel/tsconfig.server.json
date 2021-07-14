@@ -12,9 +12,9 @@
   ],
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "./lib/src/server",                              /* Redirect output structure to the directory. */
+    "outDir": "./dist/src/server",                              /* Redirect output structure to the directory. */
     "declaration": true,
-    "declarationDir": "./lib",
+    "declarationDir": "./dist",
     "declarationMap": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": true,

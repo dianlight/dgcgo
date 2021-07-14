@@ -5,7 +5,7 @@
     />
     <div v-if="totalframes > 0" class='col self-start' style="margin-left:-3em;">
       <q-slider :style="`height:${chight}px`"
-          v-model="currentframe"
+
           :min="0"
           :max="totalframes"
           :step="1"
@@ -50,7 +50,7 @@ import  * as THREE from 'three';
 import CameraControls from 'camera-controls';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
-import { dom } from 'quasar'
+import { dom,QSlider,QBtn, QBtnGroup, QTooltip } from 'quasar'
 import { Options, Vue } from 'vue-class-component';
 import split2 from 'split2'
 import through2 from 'through2'
@@ -107,40 +107,41 @@ class MotionColor {
 }
 
 @Options({
-  components: {},
+  components: { QSlider,QBtn,QBtnGroup, QTooltip },
+  name:'q-3d-viewer',
   watch: {
     gcode(newData: string, oldData: string) {
      if (newData != oldData) {
-        (this as Vue3GcodeViewer).reload = true;
+        (this as Q3DViewer).reload = true;
       }
     },
     darkMode(newData:boolean, oldData:boolean){
       if(newData != oldData){
-        (this as Vue3GcodeViewer).render3d()
+        (this as Q3DViewer).render3d()
       }
     },
     currentLine(newData:number, oldData:number){
       if(newData != oldData){   
-        (this as Vue3GcodeViewer).changeLine(newData)
+        (this as Q3DViewer).changeLine(newData)
       }
     },
     cursorPosition(newData?:number[],oldData?:number[]){
       if(_.difference(newData,oldData||[]).length > 0){
-        (this as Vue3GcodeViewer).pointer?.move(newData);
-//        (this as Vue3GcodeViewer).reload = true;
-        (this as Vue3GcodeViewer).render3d()
+        (this as Q3DViewer).pointer?.move(newData);
+//        (this as Q3DViewer).reload = true;
+        (this as Q3DViewer).render3d()
       }
     },
     machineSurface(newData?:number[],oldData?:number[]){
       if(newData && _.difference(newData,oldData||[]).length > 0){
-        (this as Vue3GcodeViewer).surface = new MachineSurface(newData);
-        (this as Vue3GcodeViewer).reload = true;
-//        (this as Vue3GcodeViewer).render3d()
+        (this as Q3DViewer).surface = new MachineSurface(newData);
+        (this as Q3DViewer).reload = true;
+//        (this as Q3DViewer).render3d()
       }
     },
     machineOffset(newData?:number[],oldData?:number[]){
       if(newData && _.difference(newData,oldData||[]).length > 0){
-        const self = this as Vue3GcodeViewer
+        const self = this as Q3DViewer
 
         const hdata = newData.slice()
         if(self.homeDirection && self.machineSurface){
@@ -150,7 +151,7 @@ class MotionColor {
         }
         self.surface?.move(hdata);
         self.reload = true;
-//        (this as Vue3GcodeViewer).render3d()
+//        (this as Q3DViewer).render3d()
       }
     }
     
@@ -159,7 +160,7 @@ class MotionColor {
     onprogress: null
   }
 })
-export default class Vue3GcodeViewer extends Vue.with(Props) {
+export default class Q3DViewer extends Vue.with(Props) {
 
   declare $refs: {
     container: HTMLDivElement

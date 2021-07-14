@@ -1,6 +1,6 @@
 import TightCNCServer from "../server/tightcnc-server";
 
-import { server_autolevel as autolevel } from '@dianlight/plugins-autolevel/lib/src/server'
+import { server_autolevel as autolevel } from '@dianlight/plugins-autolevel/dist/src/server'
 import * as moveSplitter from './move-splitter'
 //import * as jobRecovery from './job-recovery'
 import * as toolChange from './tool-change'

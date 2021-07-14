@@ -1,17 +1,16 @@
 {
-  "extends": "@quasar/app/tsconfig-preset",
-//  "extends": "../../../tsconfig.json",
+//  "extends": "@quasar/app/tsconfig-preset",
+  "extends": "../../../tsconfig.json",
 //  "include": [
 //    "src/**/*.ts",
 //    "src/**/*.vue",
 //  ],
   "exclude": [
-    "babel.config.js",
-    "src/server/**/*.ts"
+    "babel.config.js"
   ],
   "compilerOptions": {
     "noEmit": false,
-    "outDir": "./dist/src/ui",                              /* Redirect output structure to the directory. */
+    "outDir": "./dist/src",                              /* Redirect output structure to the directory. */
     "declaration": true,
     "declarationDir": "./dist",
     "declarationMap": true,
@@ -23,13 +22,13 @@
     "types": ["quasar", "webpack-env"],
     "lib": ["ESNext", "ScriptHost", "DOM", "DOM.Iterable"],
     "paths": {
-      "src/*": ["./src/ui/*"],
-      "components/*": ["./src/ui/components/*"],
-      "layouts/*": ["./src/ui/layouts/*"],
-      "pages/*": ["./src/ui/pages/*"],
-      "assets/*": ["./src/ui/assets/*"],
-      "boot/*": ["./src/ui/boot/*"],
-      "dialogs/*": ["./src/ui/dialogs/*"],
+      "src/*": ["./src/*"],
+      "components/*": ["./src/components/*"],
+      "layouts/*": ["./src/layouts/*"],
+      "pages/*": ["./src/pages/*"],
+      "assets/*": ["./src/assets/*"],
+      "boot/*": ["./src/boot/*"],
+      "dialogs/*": ["./src/dialogs/*"],
     },
   },
   /*

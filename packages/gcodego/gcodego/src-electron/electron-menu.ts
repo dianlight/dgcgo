@@ -195,7 +195,7 @@ export class ElectronMenu {
             if (menuPath[0] === 'menu' && menuPath.length > 2) {
                 //console.log('Is A Menu!', menuPath)
                 this.menu.forEach(cmenu => {
-                    console.log(menuPath[1],cmenu.role,cmenu.label)
+                    //console.log(menuPath[1],cmenu.role,cmenu.label)
                     if (cmenu.role === menuPath[1] || cmenu.label?.toLowerCase() === menuPath[1].toLowerCase()) {
                         (cmenu.submenu as Electron.MenuItemConstructorOptions[]).push(
                             {

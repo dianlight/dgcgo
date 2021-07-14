@@ -1,7 +1,7 @@
 <template>
   <q-page padding ref="page"> 
     <div class="row wrap justify-start items-start content-start" style="height:75vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
-      <vue-3-gcode-viewer
+      <Q3DViewer
         :gcode="gcode"
         :gcgrid="true"
         :dark-mode="$q.dark.isActive"
@@ -38,14 +38,14 @@
             Progress: {{ $store.state.tightcnc.lastStatus?.job?.progress}}
             Stats: {{ $store.state.tightcnc.lastStatus?.job?.stats}}   
           </span>
-      </vue-3-gcode-viewer>
+      </Q3DViewer>
     </div>
   </q-page>    
 </template>
 
 <script lang="ts">
 
-import Vue3GcodeViewer from 'components/Vue3GcodeViewer.vue'
+import Q3DViewer from '@dianlight/q-3d-viewer'
 import { Options, Vue } from 'vue-class-component';
 //import { Watch } from 'vue-property-decorator'
 import { uid } from 'quasar'
@@ -56,7 +56,7 @@ import { WorkBenchSessionData } from './WorkBenchSessionData'
 
 
 @Options({
-  components: { Vue3GcodeViewer },
+  components: { Q3DViewer },
   layout:{
     name: 'default',
     props: {
@@ -79,6 +79,10 @@ export default class WorkBench extends Vue {
   wdata:Partial<WorkBenchSessionData> = {}
 
   gcode = ''
+
+  override created(){
+    console.log(this.$options.components)
+  }
 
   override mounted(): void {
      console.log('File Opened:',this.$route.params.id)
