@@ -191,7 +191,7 @@ export default class MainLayout extends Vue {
   }
 
   override mounted(){
-     console.log('Current This is:',this)
+    // console.log('Current This is:',this)
       const starter = setInterval(()=>{
         if(this.$tightcnc){
           void this.$store.dispatch('tightcnc/clientStatus', this.$tightcnc)

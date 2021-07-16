@@ -30,6 +30,7 @@ export class MachineSurface extends THREE.Line {
         this.material = new THREE.LineBasicMaterial({ color: 0xA0A0A0 })
     }
 
+    
     move(position?: number[]) {
         if(position){
             this.position.x = -position[0]

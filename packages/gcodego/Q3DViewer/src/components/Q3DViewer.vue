@@ -110,7 +110,7 @@ export default class Q3DViewer extends Vue {
     @Prop() darkMode?:boolean;
     @Prop() gcode?:string;
     @Prop() currentLine?:number;
-    @Prop() cursorPosition?:number[];
+    @Prop() cursorPosition?:number[];  // Machine Coordinate curso Position
     @Prop() machineSurface?:number[];
     @Prop() machineOffset?:number[];
     @Prop() homeDirection?:('+'|'-')[];
@@ -158,6 +158,14 @@ export default class Q3DViewer extends Vue {
   override mounted() {
     this.init();
     this.chight = dom.height(this.$refs.container) 
+    let position: number[] =[]
+    if(this.homeDirection && this.surface && this.machineSurface){
+          for(let index = 0; index < this.homeDirection?.length; index++){
+            position[index]=this.homeDirection[index] === '+'?this.machineSurface[index]:0 
+          }
+          console.log('GridPosition:',position)
+          this.surface?.move(position)
+    }
     //console.log(dom.height(this.$refs.container))
     //this.animate();
   }
@@ -320,6 +328,12 @@ export default class Q3DViewer extends Vue {
                 //console.log(':',ev)
                 return ev.ln||0
               })),1))
+            
+            if(this.machineOffset){
+              this.workpiece.translateX(this.machineOffset[0])
+              this.workpiece.translateY(this.machineOffset[1])
+              this.workpiece.translateZ(this.machineOffset[2])
+            }
 
             this.workpiece.geometry.computeBoundingBox()
             if(this.workpiece.geometry.boundingBox){
@@ -365,58 +379,60 @@ export default class Q3DViewer extends Vue {
     @Watch('gcode')
     onChangeGcode(newData: string, oldData: string) {
       if (newData != oldData) {
-          (this as Q3DViewer).reload = true;
+          this.reload = true;
         }
       }
 
     @Watch('darkmode')
     onChangeDarkMode(newData:boolean, oldData:boolean){
       if(newData != oldData){
-        (this as Q3DViewer).render3d()
+        this.render3d()
       }
     }
 
     @Watch('currentline')
     onChangeCurrentLine(newData:number, oldData:number){
       if(newData != oldData){   
-        (this as Q3DViewer).changeLine(newData)
+        this.changeLine(newData)
       }
     }
 
     @Watch('cursorPosition')
     onChangeCursorPosition(newData?:number[],oldData?:number[]){
       if(_.difference(newData,oldData||[]).length > 0){
-        (this as Q3DViewer).pointer?.move(newData);
+        this.pointer?.move(newData);
 //        (this as Q3DViewer).reload = true;
-        (this as Q3DViewer).render3d()
+        this.render3d()
       }
     }
 
     @Watch('machineSurface')
     onChangeMachineSurface(newData?:number[],oldData?:number[]){
       if(newData && _.difference(newData,oldData||[]).length > 0){
-        (this as Q3DViewer).surface = new MachineSurface(newData);
-        (this as Q3DViewer).reload = true;
+        this.surface = new MachineSurface(newData);
+        this.reload = true;
 //        (this as Q3DViewer).render3d()
       }
     }
 
+
     @Watch('machineOffset')
     onChangeMachineOffset(newData?:number[],oldData?:number[]){
+//      console.log('1.New Machine Position',newData)
       if(newData && _.difference(newData,oldData||[]).length > 0){
-        const self = this as Q3DViewer
-
-        const hdata = newData.slice()
-        if(self.homeDirection && self.machineSurface){
-          for(let index = 0; index < hdata.length; index++){
-            hdata[index]+=self.homeDirection[index] === '+'?self.machineSurface[index]:0 
-          }
-        }
-        self.surface?.move(hdata);
-        self.reload = true;
+        console.log('New Machine Position',newData)
+//        const hdata = newData.slice()
+//        if(this.homeDirection && this.machineSurface){
+//          for(let index = 0; index < hdata.length; index++){
+//            hdata[index]+=this.homeDirection[index] === '+'?this.machineSurface[index]:0 
+//          }
+//        }
+        //self.surface?.move(hdata);
+        this.reload = true;
 //        (this as Q3DViewer).render3d()
       }
-    }  
+    } 
+
 
 
   /**

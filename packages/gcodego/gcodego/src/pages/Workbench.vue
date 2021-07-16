@@ -3,10 +3,10 @@
     <div class="row wrap justify-start items-start content-start" style="height:75vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
       <Q3DViewer
         :gcode="gcode"
-        :gcgrid="true"
+        :gcgrid="false"
         :dark-mode="$q.dark.isActive"
         :current-line="$store.state.tightcnc.lastStatus?.job?.stats.lineCount"
-        :cursor-position="$store.state.tightcnc.lastStatus?.controller?.pos"
+        :cursor-position="$store.state.tightcnc.lastStatus?.controller?.mpos"
         :machine-surface="$store.state.tightcnc.lastStatus?.controller?.axisMaxTravel"
         :machine-offset="$store.state.tightcnc.lastStatus?.controller?.mposOffset"
         :home-direction="$store.state.tightcnc.lastStatus?.controller?.homeDirection"

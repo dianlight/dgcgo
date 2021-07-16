@@ -1,10 +1,10 @@
 {
 //  "extends": "@quasar/app/tsconfig-preset",
   "extends": "../../../tsconfig.json",
-//  "include": [
-//    "src/**/*.ts",
-//    "src/**/*.vue",
-//  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+  ],
   "exclude": [
     "babel.config.js"
   ],
