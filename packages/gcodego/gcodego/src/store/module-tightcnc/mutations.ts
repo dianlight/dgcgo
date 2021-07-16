@@ -2,8 +2,9 @@ import { MutationTree } from 'vuex';
 import { TightCNCStateInterface } from './state';
 import {  StatusObject } from '@dianlight/tightcnc-core'
 import { ControllerStatus, JobStatus } from '@dianlight/tightcnc-core'
-import { LogLine } from '@dianlight/gcodego-core';
+import { GlobalEventBus, LogLine } from '@dianlight/gcodego-core';
 //import { Notify } from 'quasar'
+import { $globalEventBus } from '../../boot/globalEventBus'
 
 
 const mutation: MutationTree<TightCNCStateInterface> = {
@@ -92,8 +93,15 @@ const mutation: MutationTree<TightCNCStateInterface> = {
         return previousValue;
       }, [] as LogLine[])
       .filter((log) => {
-        /*
         if (log.direction === '<' && log.data.startsWith('[MSG:')) {
+          $globalEventBus.emit(GlobalEventBus.NOTIFY,{
+            type: 'info',
+            multiLine: true,
+            message: log.data.match(/\[MSG:(.*)]/ig) as unknown as string,
+            position: 'top-right',
+            timeout: 30000
+          })
+          /*
           Notify.create({
             type: 'info',
             multiLine: true,
@@ -101,8 +109,8 @@ const mutation: MutationTree<TightCNCStateInterface> = {
             position: 'top-right',
             timeout: 30000
           })
+          */
         }
-        */
 
         if (state.logs.options.filterStatus) {
           return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)

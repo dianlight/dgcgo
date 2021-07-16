@@ -129,7 +129,7 @@ module.exports = configure(function(ctx) {
                     position: 'bottom',
                     size: '15px'
                 },
-                notify: {}
+                notify: {/* look at QuasarConfOptions from the API card */}
             },
 
             // iconSet: 'material-icons', // Quasar icon set
@@ -139,7 +139,7 @@ module.exports = configure(function(ctx) {
             // (like functional components as one of the examples),
             // you can manually specify Quasar components/directives to be available everywhere:
             //
-            // components: [],
+            //components: [],
             // directives: [],
 
             // Quasar plugins

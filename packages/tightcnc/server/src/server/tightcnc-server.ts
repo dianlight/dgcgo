@@ -40,27 +40,11 @@ import { StatusObject } from '@dianlight/tightcnc-core';
  */
 export default class TightCNCServer extends AbstractServer {
 
-   // operations: Record<string,Operation> = {}
-   // baseDir:string;
     macros = new Macros(this);
     controllerClasses: {
         [key:string]:unknown
     } = {};
-    //controller?:Controller;
-    //gcodeProcessors:Record<string,typeof GcodeProcessor> = {};
-    /*
-    waitingForInput?:{
-        prompt: any,
-        schema: any,
-        waiter: any,
-        id: number
-    };
-    */
     waitingForInputCounter = 1;
-    //loggerDisk?: LoggerDisk;
-    //loggerMem?: LoggerMem;
-    //messageLog?: LoggerMem;
-    //jobManager?: JobManager;
     
     ajv = new Ajv()
     
@@ -92,10 +76,6 @@ export default class TightCNCServer extends AbstractServer {
         macrooperation(this);
         registerGcodeProcessors(this);
         
-        // {new(consoleui:ConsoleUI):JobOption}
-//        import('../../lib/gcode-processors/gcode-vm').then((namespace) => this.registerGcodeProcessor('gcodevm',namespace.default))
-        // Register bundled plugins
-       // import('../plugins').then( (namespace) => namespace.registerServerComponents(this));
         registerServerComponents(this)
         // Register external plugins
         /*

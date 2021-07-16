@@ -21,6 +21,9 @@ export default class App extends Vue {
   this.$globalEventBus.addListener(GlobalEventBus.DEL_ROUTE,(routeName: string)=>{
     this.$router.removeRoute(routeName)
   })
+  this.$globalEventBus.addListener(GlobalEventBus.NOTIFY, (opts)=>{
+    this.$q.notify(opts)
+  })
  }
 
 }
