@@ -55,9 +55,9 @@ import { PositionDialogModel } from './PositionDialogModel'
 export default class PositionDialog extends Vue {
 
 
-    @Prop(String) readonly title: string | undefined
+    @Prop(String) readonly title: string | undefined;
     @Model('modelValue', PositionDialogModel )
-    readonly value!: PositionDialogModel
+    readonly value!: PositionDialogModel;
 
     @Emit()
     moveTo():{pos:number[],type:'machine'|'work'}{

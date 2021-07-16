@@ -35,10 +35,10 @@
     "types": "types/src/index.d.ts",
     "dependencies": {
         "@dianlight/grbl-controller": "^1.0.0",
+        "@dianlight/plugins-autolevel": "*",
         "@dianlight/rawsocketbinding": "^1.0.0",
         "@dianlight/tightcnc-core": "^0.3.2-alpha.2",
         "@dianlight/tinyg-controller": "^1.0.0-alpha.1",
-        "@dianlight/plugins-autolevel": "*",
         "@jsonforms/core": "^2.5.2",
         "@serialport/stream": "^9.0.7",
         "ajv": "^8.6.0",

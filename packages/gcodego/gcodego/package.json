@@ -25,7 +25,7 @@
     "dependencies": {
         "@dianlight/gcodego-core": "^0.2.0-alpha.1",
         "@dianlight/plugins-autolevel": "*",
-        "@dianlight/q-3d-viewer":"0.0.1",
+        "@dianlight/q-3d-viewer": "0.0.1",
         "@dianlight/tightcnc-core": "^0.3.2-alpha.1",
         "@jsonforms/core": "^2.5.2",
         "@jsonforms/vue": "^2.5.2",

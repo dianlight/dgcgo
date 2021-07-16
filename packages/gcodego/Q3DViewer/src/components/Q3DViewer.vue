@@ -5,7 +5,7 @@
     />
     <div v-if="totalframes > 0" class='col self-start' style="margin-left:-3em;">
       <q-slider :style="`height:${chight}px`"
-
+          v-model="currentframe"
           :min="0"
           :max="totalframes"
           :step="1"
@@ -51,23 +51,12 @@ import CameraControls from 'camera-controls';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
 import { dom,QSlider,QBtn, QBtnGroup, QTooltip } from 'quasar'
-import { Options, Vue } from 'vue-class-component';
+import { Options, Vue, Prop, Model, Emit, Watch } from 'vue-property-decorator'
 import split2 from 'split2'
 import through2 from 'through2'
 import { MachineSurface } from '../threejs/MachineSurface'
 import { Pointer } from '../threejs/Pointer'
 import * as _ from 'lodash'
-
-class Props {
-    gcgrid?:boolean
-    darkMode?:boolean
-    gcode?:string
-    currentLine?:number
-    cursorPosition?:number[]
-    machineSurface?:number[]
-    machineOffset?:number[]
-    homeDirection?:('+'|'-')[]
-}
 
 class MotionColor {
 
@@ -110,57 +99,21 @@ class MotionColor {
   components: { QSlider,QBtn,QBtnGroup, QTooltip },
   name:'q-3d-viewer',
   watch: {
-    gcode(newData: string, oldData: string) {
-     if (newData != oldData) {
-        (this as Q3DViewer).reload = true;
-      }
-    },
-    darkMode(newData:boolean, oldData:boolean){
-      if(newData != oldData){
-        (this as Q3DViewer).render3d()
-      }
-    },
-    currentLine(newData:number, oldData:number){
-      if(newData != oldData){   
-        (this as Q3DViewer).changeLine(newData)
-      }
-    },
-    cursorPosition(newData?:number[],oldData?:number[]){
-      if(_.difference(newData,oldData||[]).length > 0){
-        (this as Q3DViewer).pointer?.move(newData);
-//        (this as Q3DViewer).reload = true;
-        (this as Q3DViewer).render3d()
-      }
-    },
-    machineSurface(newData?:number[],oldData?:number[]){
-      if(newData && _.difference(newData,oldData||[]).length > 0){
-        (this as Q3DViewer).surface = new MachineSurface(newData);
-        (this as Q3DViewer).reload = true;
-//        (this as Q3DViewer).render3d()
-      }
-    },
-    machineOffset(newData?:number[],oldData?:number[]){
-      if(newData && _.difference(newData,oldData||[]).length > 0){
-        const self = this as Q3DViewer
-
-        const hdata = newData.slice()
-        if(self.homeDirection && self.machineSurface){
-          for(let index = 0; index < hdata.length; index++){
-            hdata[index]+=self.homeDirection[index] === '+'?self.machineSurface[index]:0 
-          }
-        }
-        self.surface?.move(hdata);
-        self.reload = true;
-//        (this as Q3DViewer).render3d()
-      }
-    }
-    
   },
   emits: {
     onprogress: null
   }
 })
-export default class Q3DViewer extends Vue.with(Props) {
+export default class Q3DViewer extends Vue {
+
+    @Prop() gcgrid?:boolean;
+    @Prop() darkMode?:boolean;
+    @Prop() gcode?:string;
+    @Prop() currentLine?:number;
+    @Prop() cursorPosition?:number[];
+    @Prop() machineSurface?:number[];
+    @Prop() machineOffset?:number[];
+    @Prop() homeDirection?:('+'|'-')[];
 
   declare $refs: {
     container: HTMLDivElement
@@ -406,6 +359,69 @@ export default class Q3DViewer extends Vue.with(Props) {
       writer.destroy()
     }
   }
+  /** 
+   * Watchers
+   */
+    @Watch('gcode')
+    onChangeGcode(newData: string, oldData: string) {
+      if (newData != oldData) {
+          (this as Q3DViewer).reload = true;
+        }
+      }
+
+    @Watch('darkmode')
+    onChangeDarkMode(newData:boolean, oldData:boolean){
+      if(newData != oldData){
+        (this as Q3DViewer).render3d()
+      }
+    }
+
+    @Watch('currentline')
+    onChangeCurrentLine(newData:number, oldData:number){
+      if(newData != oldData){   
+        (this as Q3DViewer).changeLine(newData)
+      }
+    }
+
+    @Watch('cursorPosition')
+    onChangeCursorPosition(newData?:number[],oldData?:number[]){
+      if(_.difference(newData,oldData||[]).length > 0){
+        (this as Q3DViewer).pointer?.move(newData);
+//        (this as Q3DViewer).reload = true;
+        (this as Q3DViewer).render3d()
+      }
+    }
+
+    @Watch('machineSurface')
+    onChangeMachineSurface(newData?:number[],oldData?:number[]){
+      if(newData && _.difference(newData,oldData||[]).length > 0){
+        (this as Q3DViewer).surface = new MachineSurface(newData);
+        (this as Q3DViewer).reload = true;
+//        (this as Q3DViewer).render3d()
+      }
+    }
+
+    @Watch('machineOffset')
+    onChangeMachineOffset(newData?:number[],oldData?:number[]){
+      if(newData && _.difference(newData,oldData||[]).length > 0){
+        const self = this as Q3DViewer
+
+        const hdata = newData.slice()
+        if(self.homeDirection && self.machineSurface){
+          for(let index = 0; index < hdata.length; index++){
+            hdata[index]+=self.homeDirection[index] === '+'?self.machineSurface[index]:0 
+          }
+        }
+        self.surface?.move(hdata);
+        self.reload = true;
+//        (this as Q3DViewer).render3d()
+      }
+    }  
+
+
+  /**
+   * Buttons functions
+   */
 
     front(){
       const DEG90 = Math.PI * 0.5;

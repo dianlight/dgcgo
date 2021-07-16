@@ -14,8 +14,8 @@
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
   "main": "dist/src/index.js",
-  "browser":{
-    "./sfc":"src/components/Q3DViewer.vue"
+  "browser": {
+    "./sfc": "src/components/Q3DViewer.vue"
   },
   "directories": {
     "lib": "dist",

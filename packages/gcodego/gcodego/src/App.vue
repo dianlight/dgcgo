@@ -13,6 +13,7 @@ export default class App extends Vue {
 //    }
 
  override created(){
+  this.$tightcnc.notify = (arg)=>this.$q.notify(arg);  // TODO: This fix a undocumented BUG in Quasar Notify v 2.0.2. Try to remove in future versions
   this.$globalEventBus.addListener(GlobalEventBus.NEW_ROUTE,(route: RouteRecordRaw)=>{
     this.$router.addRoute('plugins',route)
     console.log('Adding Routes!',this.$router.getRoutes())

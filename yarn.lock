@@ -3115,15 +3115,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.3.0.tgz#1836664e4fad13b51b07eb6e882a53925e6543c4"
   integrity sha512-OydMCocGMGqw/1BnWbhtK+AtwyWTOigtrQlRe57OQmTNcI3HKlVI5FGlh+c4mSqInMPLynFrTlYjfajPu9O/eQ==
 
-"@types/node@^14":
+"@types/node@^14", "@types/node@^14.6.2":
   version "14.17.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.5.tgz#b59daf6a7ffa461b5648456ca59050ba8e40ed54"
   integrity sha512-bjqH2cX/O33jXT/UmReo2pM7DIJREPMnarixbQ57DOOzzFaI6D2+IcwaJQaJpv0M1E9TIhPCYVxrkcityLjlqA==
-
-"@types/node@^14.6.2":
-  version "14.17.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.4.tgz#218712242446fc868d0e007af29a4408c7765bc0"
-  integrity sha512-8kQ3+wKGRNN0ghtEn7EGps/B8CzuBz1nXZEIGGLP2GnwbqYn4dbTs7k+VKLTq1HvZLRCIDtN3Snx1Ege8B7L5A==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -3837,10 +3832,20 @@ ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.0, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, aj
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^8.0.1, ajv@^8.6.0:
+ajv@^8.0.1:
   version "8.6.1"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.6.1.tgz#ae65764bf1edde8cd861281cda5057852364a295"
   integrity sha512-42VLtQUOLefAvKFAQIxIZDaThq6om/PrfP0CYk3/vn+y4BMNkKnbli8ON2QCiHov4KkzOSJ/xSoBJdayiiYvVQ==
+  dependencies:
+    fast-deep-equal "^3.1.1"
+    json-schema-traverse "^1.0.0"
+    require-from-string "^2.0.2"
+    uri-js "^4.2.2"
+
+ajv@^8.6.0:
+  version "8.6.2"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.6.2.tgz#2fb45e0e5fcbc0813326c1c3da535d1881bb0571"
+  integrity sha512-9807RlWAgT564wT+DjeyU5OFMPjmzxVobvDFmNAhY+5zD6A2ly3jDp6sgnfyDtlIQ+7H97oc/DGCzzfu9rjw9w==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
@@ -6597,9 +6602,9 @@ electron-updater@^4.3.10:
     semver "^7.3.5"
 
 electron@^13.1.4:
-  version "13.1.6"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-13.1.6.tgz#6ecaf969255d62ce82cc0b5c948bf26e7dfb489b"
-  integrity sha512-XiB55/JTaQpDFQrD9pulYnOGwaWeMyRIub5ispvoE2bWBvM5zVMLptwMLb0m3KTMrfSkzhedZvOu7fwYvR7L7Q==
+  version "13.1.7"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-13.1.7.tgz#7e17f5c93a8d182a2a486884fed3dc34ab101be9"
+  integrity sha512-sVfpP/0s6a82FK32LMuEe9L+aWZw15u3uYn9xUJArPjy4OZHteE6yM5871YCNXNiDnoCLQ5eqQWipiVgHsf8nQ==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^14.6.2"
@@ -14234,9 +14239,9 @@ typescript@4.2.2:
   integrity sha512-tbb+NVrLfnsJy3M59lsDgrzWIflR4d4TIUjz+heUnHZwdF7YsrMTKoRERiIvI2lvBG95dfpLxB21WZhys1bgaQ==
 
 typescript@^4.4.0-dev.20210702:
-  version "4.4.0-dev.20210714"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210714.tgz#9e3a7ca6266b866f0a46b34ac8b11e38c20e2ec5"
-  integrity sha512-DLbv1uDsao7YphFJ6sm+gFd3iuNNj0SynJPuxD1MKM7hqPxKc8vSQHej/Va2k8fl27RTxB2KxxeZo0SoqszDpg==
+  version "4.4.0-dev.20210715"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.0-dev.20210715.tgz#62f9fb498ac5cad069bcf2ecf9d2e62db05135f2"
+  integrity sha512-qPq7CXLSmlFrteddmO/gRe49/TLlmhWK4HSR/pOqLlQC2Linp2SPaluk2ul7NwP3UI4rcdb4pvVKqN/nhBRsnA==
 
 uglify-js@^3.1.4, uglify-js@^3.5.1:
   version "3.13.10"
@@ -15211,9 +15216,9 @@ yargs@^17.0.1:
     yargs-parser "^20.2.2"
 
 yargs@^17.0.2-candidate:
-  version "17.0.2-candidate"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.0.2-candidate.tgz#97b90c7d9d46cc70c5538c120398ebee67f22b19"
-  integrity sha512-I8f9MSJr+dUZynHZ57fn5GFfFm2JVjiT/cdZHUgN35Hz6Pt99gQaHmx3IEryWCZefK722TrT40zD7rHIBLI5Zw==
+  version "17.0.2-candidate.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.0.2-candidate.1.tgz#1c88d9a5c4911fca5297738cb75060a955e480d5"
+  integrity sha512-zwahvTVFNLCsikyl8tL/q03VmSFmAUV43kGq95rQIDeEtNwoRDTuidlkyWuUOuuMkGSYn78VXLIdWjGKDvqs7w==
   dependencies:
     cliui "^7.0.2"
     escalade "^3.1.1"

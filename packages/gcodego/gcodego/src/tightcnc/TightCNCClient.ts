@@ -12,11 +12,9 @@ import { timeout } from 'utils-decorators';
 import { Notify } from 'quasar'
 import objtools from 'objtools'
 import { AbstractTightCNCClient, GcodeGoConfig, LogLineDirection, LogLine, ClientEvents } from '@dianlight/gcodego-core'
-
 export class TightCNCClient extends AbstractTightCNCClient {
     jsonrpc: JSONRPCClient;
     serverUrl: Promise<string> = new Promise(() => {/* Infinite Promise */ })
-
 
     hashes: Record<ClientEvents, string> = {
         'job-status-update': '0x0000',
@@ -24,6 +22,10 @@ export class TightCNCClient extends AbstractTightCNCClient {
         'client-connection-error': '0x0000',
         'op-error': '0x0000'
     };
+
+    
+    notify =  Notify['create']
+
 
     private config: Partial<GcodeGoConfig> = {
         enableServer: true,
@@ -93,10 +95,13 @@ export class TightCNCClient extends AbstractTightCNCClient {
         })
 
         this.on('op-error', (error: Error) => {
-            Notify.create({
-                message: error.message,
-                type: 'negative'
-            })
+            console.error(error);
+            try {
+                this.notify({
+                    message: error.message,
+                    type: 'negative'
+                })
+            } catch (error) { console.error(error) }
         })
 
     }
