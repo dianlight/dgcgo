@@ -51,7 +51,7 @@ import CameraControls from 'camera-controls';
 import Toolpath, { Modal, Position, LoadEventData } from 'gcode-toolpath';
 import colornames from 'colornames';
 import { dom,QSlider,QBtn, QBtnGroup, QTooltip } from 'quasar'
-import { Options, Vue, Prop, Model, Emit, Watch } from 'vue-property-decorator'
+import { Options, Vue, Prop, Watch } from 'vue-property-decorator'
 import split2 from 'split2'
 import through2 from 'through2'
 import { MachineSurface } from '../threejs/MachineSurface'

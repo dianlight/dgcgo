@@ -85,12 +85,15 @@
         "@quasar/cli": "^1.2.1",
         "@quasar/icongenie": "^2.4.0",
         "@types/colornames": "^1.1.1",
+        "@typescript-eslint/eslint-plugin": "^4.28.3",
+        "@typescript-eslint/parser": "^4.28.3",
         "electron": "^13.1.4",
         "electron-builder": "^22.11.7",
         "electron-devtools-installer": "^3.2.0",
         "electron-packager": "^15.2.0",
         "electron-rebuild": "^2.3.5",
-        "eslint-plugin-vue": "^7.11.1",
+        "eslint": "^7.30.0",
+        "eslint-plugin-vue": "^7.13.0",
         "rimraf": "^3.0.2"
     }
 }

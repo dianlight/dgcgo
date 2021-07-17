@@ -3,5 +3,14 @@
         "packages/gcodego/gcodego/src/i18n"
     ],
     "typescript.tsdk": "node_modules/typescript/lib",
-    "GitCommitPlugin.MaxSubjectWords": 40
+    "GitCommitPlugin.MaxSubjectWords": 40,
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/ci.yml"
+    ],
+    "eslint.alwaysShowStatus": true,
+    "eslint.debug": true,
+    "eslint.lintTask.enable": true,
+    "eslint.packageManager": "yarn",
+    "eslint-service.logLevel": "normal",
+    "eslint-service.packageManager": "yarn"
 }
