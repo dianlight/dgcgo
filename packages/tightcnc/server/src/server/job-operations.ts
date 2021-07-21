@@ -1,17 +1,17 @@
 //import Operation from './operation';
 import TightCNCServer from './tightcnc-server';
-import { JobSourceOptions, Operation } from "@dianlight/tightcnc-core";
+import { JobSourceOptions, Operation } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema';
 
 const jobOptionsSchema = {
     type: 'object',
     properties: {
         filename: {
-            type: "string",
+            type: 'string',
             description: 'Filename of gcode to run'
         },
         macro: {
-            type: "string",
+            type: 'string',
             description: 'Name of generator macro to use as gcode source',
             /*
             validate: (str: string) => {
@@ -29,7 +29,7 @@ const jobOptionsSchema = {
             description: 'Macro parameters, if macro is used'
         },
         rawFile: {
-            type: "boolean",
+            type: 'boolean',
             default: false,
             description: 'Do not process the gcode in the file at all.  Also disables stats.'
         },
@@ -39,7 +39,7 @@ const jobOptionsSchema = {
                 type: 'object',
                 properties:{
                     name: {
-                        type: "string",
+                        type: 'string',
                         description: 'Name of gcode processor',
                     },
                     options: {
@@ -76,15 +76,15 @@ class OpStartJob extends Operation {
         return jobOptionsSchema;
     }
     
-    async run(params: JobSourceOptions) {
-        let jobOptions: JobSourceOptions = {
-            filename: params.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
-            macro: params.macro,
-            macroParams: params.macroParams,
-            gcodeProcessors: params.gcodeProcessors,
-            rawFile: params.rawFile || false
+    async run(params?: JobSourceOptions) {
+        const jobOptions: JobSourceOptions = {
+            filename: params?.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
+            macro: params?.macro,
+            macroParams: params?.macroParams,
+            gcodeProcessors: params?.gcodeProcessors,
+            rawFile: params?.rawFile || false
         };
-        return await this.tightcnc!.jobManager?.startJob(jobOptions);
+        return await this.tightcnc.jobManager?.startJob(jobOptions);
     }
 }
 
@@ -94,24 +94,26 @@ interface JobOptionsDryRun extends JobSourceOptions {
 class OpJobDryRun extends Operation {
     
     override getParamSchema() {
-        jobOptionsSchema.$id='/jobDryRun'
-        jobOptionsSchema.properties!.outputFilename = {
-            type: "string",
-            description: 'Save processed gcode from dry run into this file'
-        } as JSONSchema7
+        jobOptionsSchema.$id = '/jobDryRun'
+        jobOptionsSchema.properties = {
+            outputFilename:{
+                type: 'string',
+                description: 'Save processed gcode from dry run into this file'
+            } as JSONSchema7
+        }
         return jobOptionsSchema
     }
     
 
-    async run(params: JobOptionsDryRun) {
-        let jobOptions:JobSourceOptions = {
+    async run(params: Partial<JobOptionsDryRun>) {
+        const jobOptions:JobSourceOptions = {
             filename: params.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
             macro: params.macro,
             macroParams: params.macroParams,
             gcodeProcessors: params.gcodeProcessors,
             rawFile: params.rawFile || false
         };
-        return await this.tightcnc!.jobManager?.dryRunJob(jobOptions, params.outputFilename ? this.tightcnc?.getFilename(params.outputFilename, 'data') : undefined);
+        return this.tightcnc.jobManager?.dryRunJob(jobOptions, params.outputFilename ? this.tightcnc?.getFilename(params.outputFilename, 'data') : undefined);
     }
 }
 export default function registerOperations(tightcnc: TightCNCServer) {

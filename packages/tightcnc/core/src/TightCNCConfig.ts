@@ -1,4 +1,4 @@
-import { TightCNCControllers } from "./TightCNCControllers";
+import { TightCNCControllers } from './TightCNCControllers';
 
 
 export interface TightCNCConfig {
@@ -17,6 +17,8 @@ export interface TightCNCConfig {
     };
     plugins: string[];
     operations: {
+        [key: string]: Record<string, unknown>;
+/*
         probeSurface: {
             defaultOptions: {
                 probeSpacing: number;
@@ -29,6 +31,7 @@ export interface TightCNCConfig {
                 extraProbeSampleClearance: number;
             };
         };
+*/
     };
     logger: {
         maxFileSize: number;

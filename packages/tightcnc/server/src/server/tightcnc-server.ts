@@ -8,10 +8,10 @@ import path from 'path';
 import fs from 'fs';
 import JobManager from './job-manager';
 import stable from 'stable';
-import Macros, { MacroOptions } from './macros';
+import { Macros, MacroOptions } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 import { createSchema } from 'common-schema';
-import littleconf from 'littleconf'
+//import littleconf from 'littleconf'
 import joboperations from './job-operations'
 import macrooperation from './macro-operations'
 import basicoperation from './basic-operations'
@@ -27,7 +27,7 @@ import { TinyGController } from '@dianlight/tinyg-controller'
 import { GRBLController } from '@dianlight/grbl-controller'
 import { registerServerComponents } from '../plugins'
 import Ajv, { Schema } from 'ajv'
-import * as _ from "lodash";
+import * as _ from 'lodash';
 import { TightCNCConfig } from '@dianlight/tightcnc-core';
 import { JobSourceOptions } from '@dianlight/tightcnc-core'
 import { StatusObject } from '@dianlight/tightcnc-core';
@@ -40,7 +40,8 @@ import { StatusObject } from '@dianlight/tightcnc-core';
  */
 export default class TightCNCServer extends AbstractServer {
 
-    macros = new Macros(this);
+    override macros: Macros;
+
     controllerClasses: {
         [key:string]:unknown
     } = {};
@@ -56,15 +57,14 @@ export default class TightCNCServer extends AbstractServer {
      * @constructor
      * @param {Object} config
      */
-    constructor(config?:TightCNCConfig) {
+    constructor(config:TightCNCConfig) {
         super(config);
-        if (!config) {
-            config = littleconf.getConfig();
-        }
-        if (config!.enableServer === false) {
+        this.macros = new Macros(this);
+    
+        if (config.enableServer === false) {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('enableServer config flag now found.  Ensure configuration is correct - check the documentation.');
         }
-        this.baseDir = this.config!.baseDir;
+        this.baseDir = this.config.baseDir;
         // Register builtin modules        
         this.registerController('TinyG',TinyGController)
         this.registerController('grbl',GRBLController)
@@ -95,37 +95,40 @@ export default class TightCNCServer extends AbstractServer {
      */
     async initServer() {
         // Whether to suppress duplicate error messages from being output sequentially
-        const suppressDuplicateErrors = this.config!.suppressDuplicateErrors === undefined ? true : this.config!.suppressDuplicateErrors;
+        const suppressDuplicateErrors = this.config.suppressDuplicateErrors === undefined ? true : this.config.suppressDuplicateErrors;
         // Create directories if missing
         this.getFilename(undefined, 'data', true, true, true);
         this.getFilename(undefined, 'macro', true, true, true);
         // Initialize the disk and in-memory communications loggers
-        this.loggerDisk = new LoggerDisk(this.config!.logger, this);
+        this.loggerDisk = new LoggerDisk(this.config.logger, this);
         await this.loggerDisk.init();
-        this.loggerMem = new LoggerMem(this.config!.loggerMem || {});
+        this.loggerMem = new LoggerMem(this.config.loggerMem || {});
         this.loggerMem.log('other', 'Server started.');
         this.loggerDisk.log('other', 'Server started.');
         // Initialize the message log
-        this.messageLog = new LoggerMem(this.config!.messageLog || {});
+        this.messageLog = new LoggerMem(this.config.messageLog || {});
         this.messageLog.log('Server started.');
         // Initialize macros
         await this.macros.initMacros();
         // Set up the controller
-        if (this.config!.controller) {
-            let controllerClass = this.controllerClasses[this.config!.controller];
-            let controllerConfig = this.config!.controllers[this.config!.controller];
+        if (this.config.controller) {
+            const controllerClass = this.controllerClasses[this.config.controller];
+            const controllerConfig = this.config.controllers[this.config.controller];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
             this.controller = new (<any>controllerClass)(controllerConfig);
             let lastError:string|undefined; // used to suppress duplicate error messages on repeated connection retries
-            this.controller?.on('error', (err) => {
-                let errrep = JSON.stringify(err.toObject ? err.toObject() : err.toString) + err;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            this.controller?.on('error', (err:any) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                const errrep = JSON.stringify(err.toObject ? err.toObject() : err.toString());
                 if (objtools.deepEquals(errrep, lastError) && suppressDuplicateErrors)
                     return;
                 lastError = errrep;
                 console.error('Controller error: ', err);
-                if (err.toObject)
-                    console.error(err.toObject());
-                if (err.stack)
-                    console.error(err.stack);
+                //if (err.toObject)
+                //    console.error(err.toObject());
+                //if (err.stack)
+                //    console.error(err.stack);
             });
             this.controller?.on('ready', () => {
                 lastError = undefined;
@@ -150,9 +153,9 @@ export default class TightCNCServer extends AbstractServer {
         }
         // Set up the job manager
         this.jobManager = new JobManager(this);
-        await this.jobManager.initialize();
+        this.jobManager.initialize();
         // Initialize operations
-        for (let opname in this.operations) {
+        for (const opname in this.operations) {
             await this.operations[opname].init();
         }
         // Setup Exit Hooks
@@ -175,15 +178,16 @@ export default class TightCNCServer extends AbstractServer {
     async shutdown(): Promise<void>{
         return new Promise((resolve) => {
             if (this.controller) {
-                this.controller.disconnect().then( ()=> process.exit(0))
+                void this.controller.disconnect().then( ()=> process.exit(0)).then( ()=> resolve());
             } else {
+                resolve();
                 process.exit(0)
             }
         })
     }
 
 
-    message(msg:string) {
+    override message(msg:string) {
         this.messageLog?.log(msg);
         this.loggerMem?.log('other', 'Message: ' + msg);
         this.loggerDisk?.log('other', 'Message: ' + msg);
@@ -231,12 +235,12 @@ export default class TightCNCServer extends AbstractServer {
     getDirectory(place?:string, createParentsIfMissing = false, createAsDirIfMissing = false) {
         let base = this.baseDir;
         if (place) {
-            let placePath = this.config!.paths[place];
+            const placePath = this.config.paths[place];
             if (!placePath)
                 throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('No such place ' + place);
             base = path.resolve(base, placePath);
         }
-        let absPath = base;
+        const absPath = base;
         if (createParentsIfMissing) {
             mkdirp.sync(path.dirname(absPath));
         }
@@ -256,7 +260,7 @@ export default class TightCNCServer extends AbstractServer {
         const validate = this.ajv.compile(opr.getParamSchema() as Schema)
         const name = opr.getParamSchema().$id?.slice(1) as string
         if(this.operations[name])throw errRegistry.newError('INTERNAL_ERROR','UNSUPPORTED_OPERATION').formatMessage('Duble registration of operation: ' + name);
-        opr.config = (this.config!.operations as any)[name]
+        opr.config = this.config.operations[name]
         this.operations[name] = opr
     }
 
@@ -265,12 +269,12 @@ export default class TightCNCServer extends AbstractServer {
         this.gcodeProcessors[name] = cls;
     }
 
-    async runOperation(opname:string, params:any) {
+    override async runOperation(opname:string, params:Record<string,unknown>):Promise<unknown> {
         if (!(opname in this.operations)) {
             throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('No such operation: ' + opname);
         }
         try {
-            return await this.operations[opname].run(params);
+            return this.operations[opname].run(params);
         }
         catch (err) {
             console.error('Error running operation ' + opname);
@@ -286,24 +290,25 @@ export default class TightCNCServer extends AbstractServer {
      * @method getStatus
      * @return {Promise{Object}}
      */
-    async getStatus():Promise<StatusObject> {
-        let statusObj: StatusObject = {};
-        // Fetch controller status
-        statusObj.controller = this.controller ? this.controller.getStatus() : undefined;
-        // Fetch job status
-        statusObj.job = this.jobManager ? this.jobManager.getStatus() : undefined;
-        // Emit 'statusRequest' event so other components can modify the status object directly
-        this.emit('statusRequest', statusObj);
-        // Add input request
-        if (this.waitingForInput) {
-            statusObj.requestInput = {
-                prompt: this.waitingForInput.prompt,
-                schema: this.waitingForInput.schema,
-                id: this.waitingForInput.id
-            };
-        }
-        // Return status
-        return statusObj;
+    async getStatus(): Promise<StatusObject> {
+        return new Promise((resolve) => {
+            const statusObj: StatusObject = {};
+            // Fetch controller status
+            statusObj.controller = this.controller ? this.controller.getStatus() : undefined;
+            // Fetch job status
+            statusObj.job = this.jobManager ? this.jobManager.getStatus() : undefined;
+            // Emit 'statusRequest' event so other components can modify the status object directly
+            this.emit('statusRequest', statusObj);
+            // Add input request
+            if (this.waitingForInput) {
+                statusObj.requestInput = {
+                    prompt: this.waitingForInput.prompt,
+                    schema: this.waitingForInput.schema,
+                    id: this.waitingForInput.id
+                };
+            }
+            resolve(statusObj);
+        })
     }
     /**
      * Returns a stream of gcode data that can be piped to a controller.
@@ -357,7 +362,7 @@ export default class TightCNCServer extends AbstractServer {
         }
 
         // Sort gcode processors
-        let sortedGcodeProcessors = stable(options.gcodeProcessors || [], (a:any, b:any) => {
+        const sortedGcodeProcessors = stable(options.gcodeProcessors || [], (a:any, b:any) => {
             let aorder, border;
             if ('order' in a)
                 aorder = a.order;
@@ -379,21 +384,21 @@ export default class TightCNCServer extends AbstractServer {
         });
 
         // Construct gcode processor chain
-        let gcodeProcessorInstances: GcodeProcessor[] = [];
-        for (let gcpspec of sortedGcodeProcessors) {
+        const gcodeProcessorInstances: GcodeProcessor[] = [];
+        for (const gcpspec of sortedGcodeProcessors) {
             if (gcpspec.inst) {
                 if (options.dryRun !== undefined)
                     gcpspec.inst.dryRun = options.dryRun;
                 gcodeProcessorInstances.push(gcpspec.inst);
             } else {
-                let cls = this.gcodeProcessors[gcpspec.name];
+                const cls = this.gcodeProcessors[gcpspec.name];
                 if (!cls)
                     throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('Gcode processor not found: ' + gcpspec.name);
-                let opts = objtools.deepCopy(gcpspec.options || {});
+                const opts = objtools.deepCopy(gcpspec.options || {});
                 opts.tightcnc = this;
                 if (options.job)
                     opts.job = options.job;
-                let inst = new (cls as any)(opts,gcpspec.name);
+                const inst = new (cls as any)(opts,gcpspec.name);
                 if (options.dryRun)
                     inst.dryRun = true;
                 gcpspec.inst = inst;
@@ -408,8 +413,8 @@ export default class TightCNCServer extends AbstractServer {
         throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Unable to create GCODE stream')
     }
 
-    async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
-        return await this.macros.runMacro(macro, params, options);
+    override async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
+        return this.macros.runMacro(macro, params, options);
     }
 
     async requestInput(prompt?:string|object, schema?:any):Promise<any>{
@@ -435,14 +440,14 @@ export default class TightCNCServer extends AbstractServer {
             waiter: pasync.waiter(),
             id: this.waitingForInputCounter++
         };
-        let result = await this.waitingForInput.waiter.promise;
+        const result = await this.waitingForInput.waiter.promise;
         return result;
     }
 
     provideInput(value:any) {
         if (!this.waitingForInput)
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Not currently waiting for input');
-        let w = this.waitingForInput;
+        const w = this.waitingForInput;
         delete this.waitingForInput;
         w.waiter.resolve(value);
     }
@@ -451,7 +456,7 @@ export default class TightCNCServer extends AbstractServer {
             err = errRegistry.newError('INTERNAL_ERROR','CANCELLED').formatMessage('Requested input cancelled');
         if (!this.waitingForInput)
             return;
-        let w = this.waitingForInput;
+        const w = this.waitingForInput;
         delete this.waitingForInput;
         w.waiter.reject(err);
     }

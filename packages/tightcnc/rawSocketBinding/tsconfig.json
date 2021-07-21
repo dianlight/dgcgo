@@ -9,7 +9,7 @@
         "baseUrl": ".",
         "declaration": true,
         "declarationDir": "./types",
-        "sourceMap": true,        
-        "sourceRoot": "./src"   
+        "declarationMap": true,
+        "sourceMap": true
     }
 }

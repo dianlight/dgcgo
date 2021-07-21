@@ -18,6 +18,7 @@ interface MoveSplitterProcessorOptions extends GcodeProcessorOptions {
  */
 export class MoveSplitter extends GcodeProcessor {
 
+
     maxMoveLength: number
     vm: GcodeVM
 
@@ -43,6 +44,17 @@ export class MoveSplitter extends GcodeProcessor {
             required: ['maxMoveLength']
         } as JSONSchema7
     }
+
+    override initProcessor(): Promise<void> {
+        return Promise.resolve();
+    }
+    override preprocessInputGcode(this: void): void | ReadableStream<any> {
+        // No action
+    }
+    override flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
+        // No action
+    }
+
 
     static override getOptionUISchema(): UISchemaElement {
         return {

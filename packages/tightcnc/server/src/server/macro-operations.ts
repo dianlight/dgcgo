@@ -6,25 +6,23 @@ class OpListMacros extends Operation {
 
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/listMacros",
-            type: "null",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/listMacros',
+            type: 'null',
         } as JSONSchema7
     }
 
 
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'params' implicitly has an 'any' type.
-    async run(params) {
-        let list = await (this as any).tightcnc.macros.listAllMacros();
-        // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'a' implicitly has an 'any' type.
-        list.sort((a, b) => {
+    async run() {
+        const list = this.tightcnc.macros?.listAllMacros();
+        list?.sort((a, b) => {
             if (a.name < b.name)
                 return -1;
             if (a.name > b.name)
                 return 1;
             return 0;
         });
-        return list;
+        return Promise.resolve(list);
     }
 }
 
@@ -33,9 +31,9 @@ class OpRunMacro extends Operation {
     
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/runMacro",
-            type: "object",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/runMacro',
+            type: 'object',
             properties: {
                 macro: {
                     type: 'string',
@@ -62,11 +60,19 @@ class OpRunMacro extends Operation {
         } as JSONSchema7;
     }
     
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'params' implicitly has an 'any' type.
-    async run(params) {
-        (this as any).checkReady();
-        await (this as any).tightcnc.runMacro(params.macro, params.params, { waitSync: params.waitSync });
-        return { success: true };
+    async run(params: {
+        macro: string;
+        params: { [key: string]: unknown };
+        waitSync: boolean;
+    }) {
+        this.checkReady();
+        return this.tightcnc.runMacro(params.macro, params.params, { waitSync: params.waitSync }).then(
+            () => {
+                return {
+                    status: 'ok'
+                };
+            }
+        )
     }
 }
 

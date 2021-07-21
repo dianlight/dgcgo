@@ -1,7 +1,8 @@
 {
       "extends": "./tsconfig.ui.json",
       "include": [
-        "./src/**/*.ts",
-        "./src/**/*.vue",
+        "src/ui/**/*.ts",
+        "src/ui/**/*.vue",
+        "src/server/**/*.ts",
       ]
 }

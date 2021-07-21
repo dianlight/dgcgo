@@ -10,7 +10,10 @@ _The ambition of the project is the creation of software like "Octoprint" for th
 
 ## Why?
 
-Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with grbl firmware. I immediately realized that unlike the world of 3D printers where semi-professional quality software is available for free in the world of CNC the situation is very different. Many software are dated and not optimized for new hardware and operating systems. Others lack features as necessary (like auto-level). There are specialized ones for Laser, Spindle but each one is missing something.
+Since I decided to make my PCBs for my projects I bought a Chinese CNC 1610 with grbl firmware.
+I immediately realized that unlike the world of 3D printers where semi-professional quality software is available for free in the world of CNC the situation is very different.
+Many software are dated and not optimized for new hardware and operating systems.
+Others lack features as necessary (like auto-level). There are specialized ones for Laser, Spindle but each one is missing something.
 
 ## Software I was inspired by
 

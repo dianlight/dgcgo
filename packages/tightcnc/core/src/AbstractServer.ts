@@ -1,20 +1,13 @@
-import { Controller, ControllerStatus } from './controller';
+import { Controller } from './controller';
 import EventEmitter from 'events';
 import { TightCNCConfig } from './TightCNCConfig';
 
-/*
-import { registerOperations } from './file-operations';
-*/
+
 import { errRegistry } from './errRegistry';
-/*
-import objtools from 'objtools';
-*/
 import { LoggerDisk } from './logger-disk';
 import { LoggerMem } from './logger-mem';
 import mkdirp from 'mkdirp';
-/*
-import * as node_stream from 'stream'
-*/
+
 import path from 'path';
 import fs from 'fs';
 import { Operation } from './operation';
@@ -24,168 +17,8 @@ import { StatusObject } from './StatusObject';
 import { JobSourceOptions } from './JobSourceOptions';
 import { GcodeLineReadableStream } from './gcode-processor/GcodeLineReadableStream';
 import { BaseRegistryError } from 'new-error';
-/*
-import stable from 'stable';
-import Macros, { MacroOptions } from './macros';
-import pasync from 'pasync';
-import { createSchema } from 'common-schema';
-import littleconf from 'littleconf'
-import joboperations from './job-operations'
-import macrooperation from './macro-operations'
-import basicoperation from './basic-operations'
-import systemoperation from './system-operations'
-import Controller, { ControllerStatus } from './controller';
-import JobState from './job-state';
-import GcodeLine from './new-gcode-processor/GcodeLine';
-import { BaseRegistryError } from 'new-error';
-import { addExitCallback, CatchSignals } from 'catch-exit';
-import { registerGcodeProcessors } from './new-gcode-processor'
-import { GcodeLineReadableStream } from './new-gcode-processor/GcodeLineReadableStream';
-import { buildProcessorChain, GcodeProcessor } from './new-gcode-processor/GcodeProcessor';
-
-import { TinyGController } from './tinyg-controller'
-import { GRBLController } from './grbl-controller'
-import { registerServerComponents } from '../plugins'
-import Operation from './operation';
-import Ajv, { Schema } from 'ajv'
-import * as _ from "lodash";
-*/
-/*
-
-export interface StatusObject {
-    controller?: ControllerStatus | undefined
-    job?: JobStatus | undefined
-    requestInput?: {
-        prompt: any
-        schema: any
-        id: number
-    }
-    units?: 'mm' | 'in'
-}
-
-export interface JobSourceOptions {
-    filename?: string | undefined,
-    macro?: string | undefined,
-    macroParams?: any,
-    rawFile?: boolean,
-    gcodeProcessors?: {
-        name: string,
-        options: {
-            id: string
-            updateOnHook?: string
-        },
-        order?: number
-        inst?: GcodeProcessor
-    }[] | undefined 
-    data?: string[],
-    rawStrings?: boolean,
-    dryRun?: boolean,
-    job?: AbtractJobState
-}
-
-export type TightCNCGrblConfig = {
-            // serial port settings
-            port: string, // '/dev/ttyACM1',
-            baudRate: number,
-            dataBits: number,
-            stopBits: 1|0,
-            parity: 'none',
-
-            usedAxes: [boolean, boolean, boolean],
-            homableAxes: [boolean, boolean, boolean]
-}
-
-export type TightCNCTinyGConfig = {
-            // serial port settings
-            port: string,
-            baudRate: number,
-            dataBits: number,
-            stopBits: 1|0,
-            parity: 'none',
-            rtscts: boolean,
-            xany: boolean,
-
-            usedAxes: [ boolean, boolean, boolean, boolean, boolean, boolean ], // which axes of xyzabc are actually used
-            homableAxes: [ boolean, boolean, boolean ], // which axes can be homed
-
-            // This parameter governs how "aggressive" we can be with queueing data to the device.  The tightcnc controller
-            // software already adjusts data queueing to make sure front-panel commands can be immediately handled, but
-            // sometimes the tinyg seems to get desynced, and on occasion, it seems to crash under these circumstances
-            // (with an error similar to "cannot get planner buffer").  If this is happening to you, try reducing this number.
-            // The possible negative side effect is that setting this number too low may cause stuttering with lots of fast
-            // moves.  Setting this to 4 is the equivalent of the tinyg "line mode" protocol.
-            maxUnackedRequests: number
-}
-
-export type TightCNCControllers = {
-        TinyG?: TightCNCTinyGConfig,
-        grbl?: TightCNCGrblConfig
-}
-
-export interface TightCNCConfig {
-    enableServer: boolean,
-    baseDir: string,
-    authKey: string, //'abc123',
-    serverPort: number, // 2363,
-    host: string, //'http://localhost',
-    controller: keyof TightCNCControllers,
-    controllers: TightCNCControllers,
-    paths: {
-        [key:string]:string,
-        data: string,
-        log: string,
-        macro: string
-    },
-    plugins: string[],
-    operations: {
-        probeSurface: {
-            defaultOptions: {
-                probeSpacing: number,
-                probeFeed: number,
-                clearanceHeight: number,
-                autoClearance: boolean,
-                autoClearanceMin: number,
-                probeMinZ: number,
-                numProbeSamples: number,
-                extraProbeSampleClearance: number
-            }
-        }
-    },
-    logger: {
-        maxFileSize: number,
-        keepFiles: number
-    },
-    loggerMem:{
-        size: number;
-        shiftBatchSize: number;
-    }
-    messageLog:{
-        size: number;
-        shiftBatchSize: number;
-    }
-    recovery: {
-        // rewind this number of seconds before the point where the job stopped
-        backUpTime: number,
-        // additionall back up for this number of lines before that (to account for uncertainty in which lines have been executed)
-        backUpLines: number,
-        // This is a list of gcode lines to execute to move the machine into a clearance position where it won't hit the workpiece
-        // The values {x}, {y}, etc. are replaced with the coordinates of the position (touching the workpiece) to resume the job.
-        moveToClearance: string[],
-        // List of gcode lines to execute to move from the clearance position to the position to restart the job.
-        moveToWorkpiece: string[]
-    },
-    toolChange: {
-        preToolChange: string[],
-        postToolChange: string[],
-        // Which axis number tool offsets apply to (in standard config, Z=2)
-        toolOffsetAxis: number,
-        negateToolOffset: boolean
-    },
-    enableDebug: boolean,
-    debugToStdout: boolean,
-    suppressDuplicateErrors?: boolean
-}
-*/
+import { JSONSchema7 } from 'json-schema';
+import { Macros, MacroOptions } from './macros';
 
 /**
  * This is the central class for the application server.  Operations, gcode processors, and controllers
@@ -219,6 +52,7 @@ export abstract class AbstractServer extends EventEmitter {
     loggerMem?: LoggerMem;
     messageLog?: LoggerMem;
     jobManager?: AbstractJobManager;
+    macros?: Macros;
     /*
     ajv = new Ajv()
     
@@ -230,7 +64,7 @@ export abstract class AbstractServer extends EventEmitter {
      * @constructor
      * @param {Object} config
      */
-    constructor(public config?:TightCNCConfig) {
+    constructor(public config:TightCNCConfig) {
         super();
         /*
         if (!config) {
@@ -240,7 +74,7 @@ export abstract class AbstractServer extends EventEmitter {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('enableServer config flag now found.  Ensure configuration is correct - check the documentation.');
         }
         */
-        this.baseDir = this.config!.baseDir;
+        this.baseDir = this.config.baseDir;
         /*
         // Register builtin modules
         //import('./tinyg-controller').then((namespace)=>this.registerController('TinyG',namespace.default))
@@ -365,18 +199,18 @@ export abstract class AbstractServer extends EventEmitter {
             }
         })
     }
-
+    */
 
     message(msg:string) {
         this.messageLog?.log(msg);
         this.loggerMem?.log('other', 'Message: ' + msg);
         this.loggerDisk?.log('other', 'Message: ' + msg);
     }
-    */
+    
     debug(str:string) {
-        if (!this.config!.enableDebug)
+        if (!this.config.enableDebug)
             return;
-        if (this.config!.debugToStdout) {
+        if (this.config.debugToStdout) {
             console.log('Debug: ' + str);
         }
         if (this.loggerDisk) {
@@ -392,7 +226,7 @@ export abstract class AbstractServer extends EventEmitter {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('May not ascend directories');
         let base = this.baseDir;
         if (place) {
-            let placePath = this.config!.paths[place];
+            const placePath = this.config.paths[place];
             if (!placePath)
                 throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('No such place ' + place);
             base = path.resolve(base, placePath);
@@ -400,7 +234,7 @@ export abstract class AbstractServer extends EventEmitter {
         if (name) {
             base = path.resolve(base, name);
         }
-        let absPath = base;
+        const absPath = base;
         if (createParentsIfMissing) {
             mkdirp.sync(path.dirname(absPath));
         }
@@ -437,8 +271,9 @@ export abstract class AbstractServer extends EventEmitter {
 
     abstract registerOperation(cls: typeof Operation):void;
 
-    abstract registerGcodeProcessor(cls: typeof GcodeProcessor):void;
-
+    abstract registerGcodeProcessor(cls: typeof GcodeProcessor): void;
+    
+    abstract runOperation(opname: string, params: Record<string,unknown>): Promise<unknown>;
  /*   
     async runOperation(opname:string, params:any) {
         if (!(opname in this.operations)) {
@@ -489,39 +324,16 @@ export abstract class AbstractServer extends EventEmitter {
      */
     abstract getGcodeSourceStream(options: Readonly<JobSourceOptions>): GcodeLineReadableStream
     
-    /*
-    async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
-        return await this.macros.runMacro(macro, params, options);
+    
+    async runMacro(macro: string | string[], params = {}, options: MacroOptions):Promise<void> {
+        return this.macros?.runMacro(macro, params, options);
     }
 
-    async requestInput(prompt?:string|object, schema?:any):Promise<any>{
-        if (prompt && typeof prompt === 'object' && !schema) {
-            schema = prompt;
-            prompt = undefined;
-        }
-        if (schema) {
-            if (typeof schema.getData !== 'function') {
-                schema = createSchema(schema);
-            }
-            schema = schema.getData();
-        }
-        if (!prompt)
-            prompt = 'Waiting ...';
-        if (this.waitingForInput) {
-            await this.waitingForInput.waiter.promise;
-            return await this.requestInput(prompt, schema);
-        }
-        this.waitingForInput = {
-            prompt: prompt,
-            schema: schema,
-            waiter: pasync.waiter(),
-            id: this.waitingForInputCounter++
-        };
-        let result = await this.waitingForInput.waiter.promise;
-        return result;
-    }
-    */
-    abstract provideInput(value: any):void;
+
+    
+    abstract requestInput(prompt?: string | Record<string, unknown>, schema?: JSONSchema7): Promise<unknown>;
+    
+    abstract provideInput(value: unknown):void;
     
     abstract cancelInput(err?:BaseRegistryError):void
 }

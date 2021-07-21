@@ -14,7 +14,7 @@ import { JobSourceOptions } from './JobSourceOptions';
 
 export abstract class AbstractJobManager {
 
-    currentJob?:any;
+    currentJob?:JobState;
 
     constructor(public tightcnc:AbstractServer) {
     }

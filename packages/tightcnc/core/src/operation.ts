@@ -11,7 +11,10 @@ import { JSONSchema7 } from 'json-schema';
  */
 export abstract class Operation {
 
-    public config?:Record<string,any>
+    public config?: {
+        [key: string]: unknown;
+        defaultOptions?: Record<string, unknown>;
+    }
 
     constructor(public tightcnc: AbstractServer) { }
         
@@ -29,7 +32,7 @@ export abstract class Operation {
      * @param {Object} params
      * @return {Mixed}
      */
-    abstract run(params:any):unknown
+    abstract run(params?:Record<string,unknown>):Promise<unknown>
     /**
      * Return a json-schema Schema object corresponding to the accepted parameters for the operation.
      *

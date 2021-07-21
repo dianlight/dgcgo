@@ -1,17 +1,26 @@
-import { GcodeLine,errRegistry,GcodeProcessor } from '@dianlight/tightcnc-core';
-import pasync from 'pasync';
+import { GcodeLine } from './gcode-processor/GcodeLine';
+import { errRegistry } from './errRegistry';
+import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+//import pasync from 'pasync';
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-empty-function
 const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
 import fs from 'fs';
 import path from 'path';
 import * as node_stream from 'stream'
-import objtools from 'objtools';
-import { createSchema } from 'common-schema';
-import { TightCNCServer } from '..'; // Avoid Circular dependency issue
+//import objtools from 'objtools';
+//import { createSchema } from 'common-schema';
+//import { TightCNCServer } from '..'; // Avoid Circular dependency issue
 import { BaseRegistryError } from 'new-error';
+import { AbstractServer } from './AbstractServer';
+import * as _ from 'lodash';
+//import { GcodeProcessorOptions } from './gcode-processor/GcodeProcessorOptions';
+import { ExternalizablePromise } from './ExternalizablePromise';
+import { JSONSchema7 } from 'json-schema';
 
 interface MacroMetaData {
-    params: unknown;
-    mergeParams: boolean[];
+    params: Record<string,unknown>;
+    mergeParams: string[];
+    isMacroMetadata: boolean;
 }
 interface MacroData {
         name: string;
@@ -28,12 +37,12 @@ export interface MacroOptions {
     waitSync?: boolean;
 }
 
-export default class Macros {
+export class Macros {
     macroCache:{
         [key: string]:MacroData
     } = {}
 
-    constructor(public tightcnc:TightCNCServer) {
+    constructor(public tightcnc:AbstractServer) {
         this.tightcnc = tightcnc;
     }
     async initMacros() {
@@ -46,26 +55,30 @@ export default class Macros {
             });
         }, 10000);
     }
-    async listAllMacros() {
-        let ret = [];
-        for (let key in this.macroCache) {
+    
+    listAllMacros() {
+        const ret: {
+            name: string,
+            params?: unknown,
+        }[] = [];
+        for (const key in this.macroCache) {
             ret.push({
                 name: key,
-                params: this.macroCache[key].metadata && this.macroCache[key]!.metadata!.params
+                params: this.macroCache[key].metadata && this.macroCache[key].metadata?.params
             });
         }
         return ret;
     }
 
-    getMacroParams(name: string):any {
+    getMacroParams(name: string):Record<string,unknown>|void {
         if (!this.macroCache[name])
             throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('Macro ' + name + ' not found');
-        let metadata = this.macroCache[name].metadata;
+        const metadata = this.macroCache[name].metadata;
         if (!metadata)
-            return null;
+            return;
         if (!metadata.params && !metadata.mergeParams)
-            return null;
-        let params = objtools.deepCopy(metadata.params || {});
+            return;
+        const params = _.cloneDeep(metadata.params); // objtools.deepCopy(metadata.params || {}) as unknown;
         if (metadata.mergeParams) {
             let otherMacros = metadata.mergeParams;
             if (!Array.isArray(otherMacros))
@@ -75,11 +88,11 @@ export default class Macros {
         return params;
     }
     async _loadMacroCache() {
-        let newMacroCache: {
+        const newMacroCache: {
             [key: string]: MacroData
         } = {};
-        let fileObjs = await this._listMacroFiles();
-        for (let fo of fileObjs) {
+        const fileObjs = await this._listMacroFiles();
+        for (const fo of fileObjs) {
             try {
                 fo.metadata = await this._loadMacroMetadata(await this._readFile(fo.absPath));
             }
@@ -91,24 +104,17 @@ export default class Macros {
         this.macroCache = newMacroCache;
     }
     async _updateMacroCache() {
-        let fileObjs = await this._listMacroFiles();
-        let fileObjMap: {
-            [key:string]: {
-                name: string;
-                absPath: string;
-                stat: any;
-                metadata?: any;
-            }
-        } = {};
-        for (let fo of fileObjs)
+        const fileObjs = await this._listMacroFiles();
+        const fileObjMap: Record<string, MacroData> = {};
+        for (const fo of fileObjs)
             fileObjMap[fo.name] = fo;
         // Delete anything from the cache that doesn't exist in the new listing
-        for (let key in this.macroCache) {
+        for (const key in this.macroCache) {
             if (!(key in fileObjMap))
                 delete this.macroCache[key];
         }
         // For each macro file, if it has been updated (or is new) since the cache load, reload it
-        for (let key in fileObjMap) {
+        for (const key in fileObjMap) {
             if (!(key in this.macroCache) || fileObjMap[key].stat.mtime.getTime() > this.macroCache[key].stat.mtime.getTime()) {
                 try {
                     fileObjMap[key].metadata = await this._loadMacroMetadata(await this._readFile(fileObjMap[key].absPath));
@@ -126,8 +132,8 @@ export default class Macros {
             await this._updateMacroCache();
             return;
         }
-        let fo = this.macroCache[macroName];
-        let stat = await new Promise<fs.Stats>((resolve, reject) => {
+        const fo = this.macroCache[macroName];
+        const stat = await new Promise<fs.Stats>((resolve, reject) => {
             fs.stat(fo.absPath, (err, stat) => {
                 if (err)
                     reject(err);
@@ -147,11 +153,11 @@ export default class Macros {
     }
     async _listMacroFiles():Promise<MacroData[]> {
         // later directories in this list take precedence in case of duplicate names
-        let dirs = [path.join(__dirname, 'macro'), this.tightcnc.getFilename(undefined, 'macro', false, true, true)];
-        let ret:MacroData[] = [];
-        for (let dir of dirs) {
+        const dirs = [path.join(__dirname, 'macro'), this.tightcnc.getFilename(undefined, 'macro', false, true, true)];
+        const ret:MacroData[] = [];
+        for (const dir of dirs) {
             try {
-                let files = await new Promise<string[]>((resolve, reject) => {
+                const files = await new Promise<string[]>((resolve, reject) => {
                     fs.readdir(dir, (err, files) => {
                         if (err)
                             reject(err);
@@ -159,12 +165,12 @@ export default class Macros {
                             resolve(files);
                     });
                 });
-                for (let file of files) {
+                for (const file of files) {
                     if (/\.(j|t)s$/.test(file)) {
-                        let absPath = path.resolve(dir, file);
+                        const absPath = path.resolve(dir, file);
                         try {
                             
-                            let stat = await new Promise<fs.Stats>((resolve, reject) => {
+                            const stat = await new Promise<fs.Stats>((resolve, reject) => {
                                 fs.stat(absPath, (err, stat) => {
                                     if (err)
                                         reject(err);
@@ -200,7 +206,7 @@ export default class Macros {
          */
         // Detect if there's a call to macroMeta
         let hasMacroMeta = false;
-        for (let line of code.split(/\r?\n/g)) {
+        for (const line of code.split(/\r?\n/g)) {
             if (/^\s*macroMeta\s*\(/.test(line)) {
                 hasMacroMeta = true;
                 break;
@@ -209,47 +215,48 @@ export default class Macros {
         if (!hasMacroMeta)
             return;
         // Construct the function to call and the macroMeta function
-        let fn = new AsyncFunction('tightcnc', 'macroMeta', code);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const fn = new AsyncFunction('tightcnc', 'macroMeta', code);
         const macroMeta = (metadata:MacroMetaData) => {
             throw { metadata, isMacroMetadata: true };
         };
         // Run the macro and trap the exception containing metadata
         let gotMacroMetadata:MacroMetaData;
         try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             await fn(this.tightcnc, macroMeta);
             throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Expected call to macroMeta() in macro');
         }
-        catch (err) {
-            if (err && (err as any).isMacroMetadata) {
+        catch (err:unknown) {
+            if (err && (err as MacroMetaData).isMacroMetadata) {
                 gotMacroMetadata = err as MacroMetaData;
                // TODO: what is? --> any.metadata;
             }
             else {
-                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error getting macro metadata').withMetadata(err as any);
+                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error getting macro metadata').withMetadata(err as Record<string, any>);
             }
         }
         if (!gotMacroMetadata)
             return;
         // Return the metadata
-        let metadata = gotMacroMetadata;
-        if (metadata.params) {
-            metadata.params = createSchema(metadata.params).getData();
-        }
+        const metadata = gotMacroMetadata;
+//        if (metadata.params) {
+       //     metadata.params = createSchema(metadata.params).getData();
+//        }
         return metadata;
     }
     _prepMacroParam(value: {
-        [key:string]:unknown
-    }, key: string, env: {
+        [key:string]:unknown;
+    }|unknown, key: string, env: {
         [key:string]:unknown
     }) {
-        let axisLabels = this.tightcnc.controller?.axisLabels;
+        const axisLabels = this.tightcnc.controller?.axisLabels || [];
         // allow things that look like coordinate arrays to be accessed by their axis letters
-        if (Array.isArray(value) && (value.length <= axisLabels!.length || value.length < 6)) {
-            let axisLabels = this.tightcnc.controller?.axisLabels;
-            for (let axisNum = 0; axisNum < value.length && axisNum < axisLabels!.length; axisNum++) {
-                let axis = axisLabels![axisNum].toLowerCase();
-                value[axis] = value[axisNum];
-                value[axis.toUpperCase()] = value[axisNum];
+        if (Array.isArray(value) && (value.length <= axisLabels.length || value.length < 6)) {
+            for (let axisNum = 0; axisNum < value.length && axisNum < axisLabels.length; axisNum++) {
+                const axis = axisLabels[axisNum].toLowerCase();
+                _.set(value,axis,value[axisNum]);
+                _.set(value,axis.toUpperCase(),value[axisNum]);
                 if (key === 'pos' && env && !(axis in env) && !(axis.toUpperCase() in env)) {
                     env[axis] = value[axisNum];
                     env[axis.toUpperCase()] = value[axisNum];
@@ -258,32 +265,31 @@ export default class Macros {
         }
         return value;
     }
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'ourParams' implicitly has an 'any' type... Remove this comment to see the full error message
-    _mergeParams(ourParams, ...otherMacroNames) {
-        for (let name of otherMacroNames) {
-            let otherParams = this.getMacroParams(name);
+
+    _mergeParams(ourParams:Record<string,unknown>, ...otherMacroNames:string[]):Record<string,unknown> {
+        for (const name of otherMacroNames) {
+            const otherParams = this.getMacroParams(name);
             if (otherParams) {
-                for (let key in otherParams) {
+                for (const key in otherParams) {
                     if (!(key in ourParams)) {
-                        ourParams[key] = objtools.deepCopy(otherParams[key]);
+                        ourParams[key] = _.cloneDeep(otherParams[key]);  // objtools.deepCopy(otherParams[key]);
                     }
                 }
             }
         }
         return ourParams;
     }
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'code' implicitly has an 'any' type.
-    async _makeMacroEnv(code, params, options) {
-        // @ts-expect-error ts-migrate(7034) FIXME: Variable 'env' implicitly has type 'any' in some l... Remove this comment to see the full error message
-        let env;
-        env = {
+        
+
+    async _makeMacroEnv(code:string, params:Record<string,unknown>, options:MacroOptions) {
+        const env = {
             // push gcode function available inside macro.  In gcode processor, pushes onto the gcode processor stream.
             // Otherwise, sends to controller.  Tracks if the most recent sent line is executed for syncing.
             push: (gline:GcodeLine|string|string[]) => {
                 if (typeof gline === 'string' || Array.isArray(gline))
                     gline = new GcodeLine(gline);
                 if (options.push) {
-                    options.push(gline);
+                    void options.push(gline);
                 }
                 else if (options.gcodeProcessor) {
                     options.gcodeProcessor.pushGcode(gline);
@@ -302,23 +308,18 @@ export default class Macros {
                 await this.tightcnc.controller?.waitSync();
             },
             // Runs a named operation
-            // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'name' implicitly has an 'any' type.
-            op: async (name, params) => {
-                return await this.tightcnc.runOperation(name, params);
+            op: async (name: string, params: Record<string, unknown>) => {
+                return this.tightcnc.runOperation(name, params);
             },
-            // @ts-expect-error ts-migrate(2705) FIXME: An async function or method in ES5/ES3 requires th... Remove this comment to see the full error message
-            runMacro: async (macro, params = {}) => {
+            runMacro: async (macro: string | string[], params = {}) => {
                 await this.runMacro(macro, params, options);
             },
-            // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'prompt' implicitly has an 'any' type.
-            input: async (prompt, schema) => {
-                // @ts-expect-error ts-migrate(7005) FIXME: Variable 'env' implicitly has an 'any' type.
+            input: async (prompt: string | Record<string, unknown> | undefined, schema: JSONSchema7 | undefined) => {
                 await env.sync();
-                return await this.tightcnc.requestInput(prompt, schema);
+                return this.tightcnc.requestInput(prompt, schema);
             },
-            // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'msg' implicitly has an 'any' type.
-            message: (msg) => {
-                this.tightcnc.message(msg);
+            message: (msg: string) => {
+                this.tightcnc?.message(msg);
             },
             tightcnc: this.tightcnc,
             gcodeProcessor: options.gcodeProcessor,
@@ -326,43 +327,46 @@ export default class Macros {
             axisLabels: this.tightcnc.controller?.axisLabels,
             XError: BaseRegistryError,
             GcodeLine: GcodeLine,
-            macroMeta: () => { } // this function is a no-op in normal operation
+            macroMeta: () => {
+               // this function is a no-op in normal operation  
+            },
+            allparams: {}
         };
-        let meta = await this._loadMacroMetadata(code);
-        let schema = meta?meta.params:undefined;
+        const meta = await this._loadMacroMetadata(code);
+        const schema = meta?meta.params:undefined;
         let pkeys;
-        if (schema && (schema as any).type === 'object' && (schema as any).properties) {
-            pkeys = Object.keys((schema as any).properties);
+        if (schema && schema.properties) {
+            pkeys = Object.keys(schema.properties as Record<string, any>);
         }
         else {
             pkeys = Object.keys(params);
         }
-        for (let key of pkeys) {
+        for (const key of pkeys) {
             if (!(key in env)) {
-                let value = this._prepMacroParam(params[key], key, env);
+                const value = this._prepMacroParam(params[key], key, env);
                 params[key] = value;
                 // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                 env[key] = value;
             }
         }
-        (env as any).allparams = params;
+        env.allparams = params;
         return env;
     }
-    async runJS(code: string, params = {}, options:{
-        waitSync?:boolean
-    }={}) {
+    async runJS(code: string, params:Record<string, unknown> = {}, options:MacroOptions={}) {
         if (options.waitSync)
             code += '\n;await sync();';
-        let env = await this._makeMacroEnv(code, params, options);
-        let envKeys = Object.keys(env);
-        let fnCtorArgs = envKeys.concat([code]);
-        let fn = new AsyncFunction(...fnCtorArgs);
-        let fnArgs = [];
-        for (let key of envKeys) {
+        const env = await this._makeMacroEnv(code, params, options);
+        const envKeys = Object.keys(env);
+        const fnCtorArgs = envKeys.concat([code]);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const fn = new AsyncFunction(...fnCtorArgs);
+        const fnArgs = [];
+        for (const key of envKeys) {
             // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             fnArgs.push(env[key]);
         }
-        return await fn(...fnArgs);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+        return fn(...fnArgs);
     }
     _readFile(filename:string):Promise<string> {
         return new Promise((resolve, reject) => {
@@ -418,10 +422,10 @@ export default class Macros {
      *     output stream instead of being directly executed on the controller.
      *   @param {Function} options.push - Provide a function for handling pushing gcode lines.
      */
-    async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
+    async runMacro(macro: string | string[], params:Record<string, unknown> = {}, options: MacroOptions) {
         if (typeof macro === 'string' && macro.indexOf(';') !== -1) {
             // A javascript string blob
-            return await this.runJS(macro, params, options);
+            return this.runJS(macro, params, options);
         }
         else if (typeof macro === 'string') {
             // A filename to a javascript file
@@ -432,24 +436,24 @@ export default class Macros {
             if (!this.macroCache[macro])
                 throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('Macro ' + macro + ' not found');
             // Normalize the params
-            let paramsSchema = this.getMacroParams(macro);
-            if (paramsSchema) {
-                createSchema(paramsSchema).normalize(params, { removeUnknownFields: true });
-            }
+            //const paramsSchema = this.getMacroParams(macro);
+            //if (paramsSchema) {
+            //    createSchema(paramsSchema).normalize(params, { removeUnknownFields: true });
+            //}
             // Load the macro code
-            let code = await this._readFile(this.macroCache[macro].absPath);
+            const code = await this._readFile(this.macroCache[macro].absPath);
             if (!code)
                 throw errRegistry.newError('INTERNAL_ERROR','NOT_FOUND').formatMessage('Macro ' + macro + ' not found');
             // Run the macro
-            return await this.runJS(code, params, options);
+            return this.runJS(code, params, options);
         }
         else if (Array.isArray(macro) && typeof macro[0] === 'string') {
             // An array of strings with substitutions
             let code = '';
-            for (let str of macro) {
+            for (const str of macro) {
                 code += 'push(`' + str + '`);\n';
             }
-            return await this.runJS(code, params, options);
+            return this.runJS(code, params, options);
         }
         else {
             throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Unknown macro type');
@@ -460,7 +464,7 @@ export default class Macros {
     }
 }
 class MacroGcodeSourceStream extends node_stream.Readable {
-    pushReadWaiter?:any;
+    pushReadWaiter?:ExternalizablePromise<void>;
 
     constructor(macros:Macros, macro:string, macroParams?:any) {
         super({ objectMode: true });
@@ -469,28 +473,28 @@ class MacroGcodeSourceStream extends node_stream.Readable {
             gotChainError = true;
             if (this.pushReadWaiter) {
                 this.pushReadWaiter.reject(err);
-                this.pushReadWaiter = null;
+                delete this.pushReadWaiter;
             }
         });
         macros.runMacro(macro, macroParams, {
             push: async (gline:GcodeLine) => {
-                let r = this.push(gline);
+                const r = this.push(gline);
                 if (!r) {
                     // wait until _read is called
                     if (!this.pushReadWaiter) {
-                        this.pushReadWaiter = pasync.waiter();
+                        this.pushReadWaiter = new ExternalizablePromise<void>();
                     }
-                    await this.pushReadWaiter.promise;
+                    await this.pushReadWaiter;
                 }
             },
-            sync: async () => {
+            sync: () => {
                 throw errRegistry.newError('INTERNAL_ERROR','UNSUPPORTED_OPERATION').formatMessage('sync() not supported in generator macros');
             }
         })
             .then(() => {
             this.push(null);
         })
-            .catch((err:any) => {
+            .catch((err:Record<string, any>) => {
             if (!gotChainError) {
                 this.emit('error', errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error running generator macro').withMetadata(err));
             }
@@ -499,7 +503,7 @@ class MacroGcodeSourceStream extends node_stream.Readable {
     override _read() {
         if (this.pushReadWaiter) {
             this.pushReadWaiter.resolve();
-            this.pushReadWaiter = null;
+            delete this.pushReadWaiter;
         }
     }
 }

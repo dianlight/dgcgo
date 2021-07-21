@@ -1,7 +1,7 @@
 import objtools from 'objtools';
 import CrispHooks from 'crisphooks';
 import { errRegistry } from '../errRegistry'
-import { VMState } from './GcodeVM';
+import { VMState } from './VMState';
 
 /**
  * This class is a parser, modification interface, and generator for gcode.
@@ -25,10 +25,10 @@ const modalGroupsG = [
 	[ 'G96', 'G97' ],
 	[ 'G7', 'G8' ]
 ];
-let modalGroupsGByCode: {
+const modalGroupsGByCode: {
 	[key:string]:string|number
 } = {};
-for (let gidx = 0; gidx < modalGroupsG.length; gidx++) for (let code of modalGroupsG[gidx]) modalGroupsGByCode[code] = gidx;
+for (let gidx = 0; gidx < modalGroupsG.length; gidx++) for (const code of modalGroupsG[gidx]) modalGroupsGByCode[code] = gidx;
 const modalGroupsM = [
 	[],
 	[],
@@ -41,11 +41,11 @@ const modalGroupsM = [
 	[ 'M7', 'M8', 'M9' ],
 	[ 'M48', 'M49' ]
 ];
-let modalGroupsMByCode: {
+const modalGroupsMByCode: {
 	[key:string]:number
 } = {};
-for (let gidx = 0; gidx < modalGroupsM.length; gidx++) for (let code of modalGroupsM[gidx]) modalGroupsMByCode[code] = gidx;
-const nonModals = [ 'G4', 'G10', 'G28', 'G30', 'G53', 'G92', 'G92.1', 'G92.2', 'G92.3' ];
+for (let gidx = 0; gidx < modalGroupsM.length; gidx++) for (const code of modalGroupsM[gidx]) modalGroupsMByCode[code] = gidx;
+//const nonModals = [ 'G4', 'G10', 'G28', 'G30', 'G53', 'G92', 'G92.1', 'G92.2', 'G92.3' ];
 
 const coordOrder = [ 'P', 'X', 'Y', 'Z', 'A', 'B', 'C', 'F' ];
 
@@ -94,7 +94,7 @@ export class GcodeLine extends CrispHooks {
 			this.origLine = this.toString();
 			this.origLineNumber = origLineNumber
 		} else if (arg && arg instanceof GcodeLine) {
-			this.words = objtools.deepCopy(arg.words);
+			this.words = objtools.deepCopy(arg.words) as (string | [string, number])[] | undefined;
 			this.comment = arg.comment;
 			this.commentStyle = arg .commentStyle;
 			this.origLine = arg.origLine;
@@ -124,7 +124,7 @@ export class GcodeLine extends CrispHooks {
 
 		// If mgroup is a full code, convert it to a group number
 		if (mgroup && typeof mgroup === 'string') {
-			let omgroup = mgroup;
+			const omgroup = mgroup;
 			if (letter === 'G') {
 				mgroup = modalGroupsGByCode[mgroup];
 			} else if (letter === 'M') {
@@ -145,10 +145,10 @@ export class GcodeLine extends CrispHooks {
 		}
 
 		let matches:T|T[]|undefined = multi ? [] as T[] : undefined;
-		if(this.words) for (let word of this.words) {
+		if(this.words) for (const word of this.words) {
 			if (word[0] === letter) {
 				if (mgroup) {
-					let fullCode = letter + word[1];
+					const fullCode =`letter${word[1]}`;
 					if (!mgroupMap || mgroup !== mgroupMap[fullCode]) continue;
 				}
 				if (multi) {
@@ -210,20 +210,20 @@ export class GcodeLine extends CrispHooks {
 
 		if (value === undefined) return;
 
-		if (!pos) {
+		if (!pos && this.words) {
 			// Guess position of word
-			let posMap: {
+			const posMap: {
 				[key:string]:number
 			} = {};
-			for (let i = 0; i < this.words!.length; i++) posMap[this.words![i][0] as string] = i;
+			for (let i = 0; i < this.words.length; i++) posMap[this.words[i][0]] = i;
 			if (letter === 'N') {
 				pos = 0; // line numbers go at the beginning
 			} else if (letter === 'G' || letter === 'M') {
 				// G or M go at the beginning, unless there's a line number
-				if ((posMap as any ).N === 0) pos = 1;
+				if (posMap.N === 0) pos = 1;
 				else pos = 0;
 			} else if (coordOrder.indexOf(letter) !== -1) {
-				let coordIdx = coordOrder.indexOf(letter);
+				const coordIdx = coordOrder.indexOf(letter);
 				for (let i = coordIdx - 1; i >= 0; i--) {
 					if (posMap[coordOrder[i]] !== undefined) {
 						pos = posMap[coordOrder[i]] + 1;
@@ -239,7 +239,7 @@ export class GcodeLine extends CrispHooks {
 					}
 				}
 				if (!pos) {
-					pos = this.words!.length;
+					pos = this.words.length;
 				}
 			} else {
 				// Default to putting it at the end
@@ -269,15 +269,15 @@ export class GcodeLine extends CrispHooks {
 	has(letter:string, mgroup?:number|string):boolean {
 		letter = letter.toUpperCase();
 		if (letter.length > 1) {
-			if(this.words) for (let word of this.words) {
-				if (letter === word[0] + word[1]) return true;
+			if(this.words) for (const word of this.words) {
+				if (letter === `${word[0]}${word[1]}`) return true;
 			}
 			return false;
 		} else if (mgroup) {
-			let vals = this.get(letter, mgroup, true);
+			const vals = this.get(letter, mgroup, true);
 			return (vals as []).length > 0;
 		} else {
-			if(this.words) for (let word of this.words) {
+			if(this.words) for (const word of this.words) {
 				if (letter === word[0]) return true;
 			}
 			return false;
@@ -305,7 +305,7 @@ export class GcodeLine extends CrispHooks {
 	 */
 	getCoords(axisLabels?:string[]):number[] {
 		if (!axisLabels) axisLabels = [ 'x', 'y', 'z', 'a', 'b', 'c' ];
-		let ret:number[] = [];
+		const ret:number[] = [];
 		for (let axisNum = 0; axisNum < axisLabels.length; axisNum++) {
 			ret.push(this.get(axisLabels[axisNum]) as number);
 		}
@@ -326,7 +326,7 @@ export class GcodeLine extends CrispHooks {
 			line = line.slice(0, matches.index) + line.slice(matches.index + matches[0].length);
 			matches = parenCommentRegex.exec(line);
 		}
-		let semicolonIdx = line.indexOf(';');
+		const semicolonIdx = line.indexOf(';');
 		if (semicolonIdx !== -1) {
 			this.commentStyle = ';';
 			if (this.comment) this.comment += '; ';
@@ -338,7 +338,7 @@ export class GcodeLine extends CrispHooks {
 		// Parse words
 		this.words = [];
 		line = line.trim();
-		let wordRegex = /([A-Za-z])\s*(-?[0-9]*\.[0-9]*|-?[0-9]+)\s*/y;
+		const wordRegex = /([A-Za-z])\s*(-?[0-9]*\.[0-9]*|-?[0-9]+)\s*/y;
 		let lastIndex = 0;
 		while (lastIndex < line.length) {
 			matches = wordRegex.exec(line);
@@ -365,10 +365,10 @@ export class GcodeLine extends CrispHooks {
 		// if not modified, output the original
 		if (!this.modified && this.origLine) return this.origLine;
 		let line = '';
-		if(this.words) for (let word of this.words) {
+		if(this.words) for (const word of this.words) {
 			if (line && !compact) line += ' ';
-			let valueStr = '' + (+(word[1] as number).toFixed(precision));
-			let letter = word[0];
+			let valueStr = `${(word[1] as number).toFixed(precision)}`;
+			const letter = word[0];
 			if (letter === 'G' || letter === 'M') {
 				while (valueStr.length < minCommandDigits) valueStr = '0' + valueStr;
 			}

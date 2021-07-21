@@ -6,8 +6,8 @@ export interface StatusObject {
     controller?: ControllerStatus | undefined;
     job?: JobStatus | undefined;
     requestInput?: {
-        prompt: any;
-        schema: any;
+        prompt: unknown;
+        schema: unknown;
         id: number;
     };
     units?: 'mm' | 'in';

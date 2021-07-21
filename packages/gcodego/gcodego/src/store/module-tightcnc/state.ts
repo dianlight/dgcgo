@@ -31,6 +31,6 @@ function state(): TightCNCStateInterface {
       lastVisualizedLine: -1
     }
   }
-};
+}
 
 export default state;

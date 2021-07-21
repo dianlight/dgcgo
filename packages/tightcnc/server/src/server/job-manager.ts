@@ -1,94 +1,77 @@
 import objtools from 'objtools';
-import { JobState, ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
+import { JobState, ERRORCODES, errRegistry, VMState } from '@dianlight/tightcnc-core';
 import * as node_stream from 'stream'
 import { callLineHooks, GcodeProcessor } from '@dianlight/tightcnc-core';
-import  TightCNCServer from './tightcnc-server';
-import { JobSourceOptions, AbstractJobManager } from "@dianlight/tightcnc-core";
+import { JobSourceOptions, AbstractJobManager } from '@dianlight/tightcnc-core';
 import { BaseRegistryError } from 'new-error';
 import { GcodeLine } from '@dianlight/tightcnc-core';
 import fs from 'fs'
 import { GcodeLineReadableStream, JobStatus } from '@dianlight/tightcnc-core';
+import * as _ from 'lodash';
 
-/*
-export interface JobStatus {
-    state: string,
-    jobOptions: Record<string,any>,
-    dryRunResults: any,
-    startTime: any,
-    error: string | null,
-    gcodeProcessors: Record<string,Record<string,any>>,
-    stats: Record<string,any>,
-    progress: {
-        gcodeLine: number;
-        timeRunning: any;
-        estTotalTime: any;
-        estTimeRemaining: number;
-        percentComplete: number;
-    },
-    waits: string[]
-};
-*/
+type MultipleGcodeStatus = Record<string, Partial<VMState>>;
+
 export default class JobManager extends AbstractJobManager {
 
-    //currentJob?:any;
 
     override initialize() {
+        // nop
     }
 
     override getStatus(job?:JobState):JobStatus|undefined {
-        if (!job)
-            job = this.currentJob;
-        if (!job)
-            return;
-        // Fetch the status from each gcode processor
-        let gcodeProcessorStatuses:Record<string,any> = {};
-        if (job.gcodeProcessors) {
-            for (let key in job.gcodeProcessors) {
-                let s = job.gcodeProcessors[key].getStatus();
-                if (s) {
-                    gcodeProcessorStatuses[key] = s;
+        if (!job && this.currentJob) job = this.currentJob;
+        else if (!job) return;
+        else {
+            // Fetch the status from each gcode processor
+            const gcodeProcessorStatuses: MultipleGcodeStatus = {};
+            if (job.gcodeProcessors) {
+                for (const key in job.gcodeProcessors) {
+                    const s = job.gcodeProcessors[key].getStatus();
+                    if (s) {
+                        gcodeProcessorStatuses[key] = s;
+                    }
                 }
             }
-        }
-        // Calculate main stats and progress
-        let progress = undefined;
-        let stats = this._mainJobStats(gcodeProcessorStatuses);
-        stats.predictedTime = stats.time;
-        let finalVMStatus = gcodeProcessorStatuses?gcodeProcessorStatuses['final-job-vm']:undefined;
-        if (finalVMStatus && finalVMStatus.updateTime && !job.dryRun) {
-            let curTime = new Date(finalVMStatus.updateTime);
-            stats.updateTime = curTime.toISOString();
-            stats.time = (curTime.getTime() - new Date(job.startTime).getTime()) / 1000;
-            // create job progress object
-            if (job.dryRunResults && job.dryRunResults.stats && job.dryRunResults.stats.time) {
-                let estTotalTime = job.dryRunResults.stats.time;
-                if (stats.lineCount >= 300) { // don't adjust based on current time unless enough lines have been processed to compensate for stream buffering
-                    estTotalTime *= (curTime.getTime() - new Date(job.startTime).getTime()) / 1000 / stats.predictedTime;
+            // Calculate main stats and progress
+            let progress = undefined;
+            const stats = this._mainJobStats(gcodeProcessorStatuses);
+            stats.predictedTime = stats.time;
+            const finalVMStatus = gcodeProcessorStatuses ? gcodeProcessorStatuses['final-job-vm'] : undefined;
+            if (finalVMStatus && finalVMStatus.updateTime && !job.dryRun) {
+                const curTime = new Date(finalVMStatus.updateTime);
+                stats.updateTime = curTime.toISOString();
+                stats.time = (curTime.getTime() - new Date(job.startTime).getTime()) / 1000;
+                // create job progress object
+                if (_.has(job,'dryRunResults.stats.time')) {
+                    let estTotalTime = _.get(job,'dryRunResults.stats.time') as number;
+                    if ((stats.lineCount as number) >= 300) { // don't adjust based on current time unless enough lines have been processed to compensate for stream buffering
+                        estTotalTime *= (curTime.getTime() - new Date(job.startTime).getTime()) / 1000 / (stats.predictedTime as number);
+                    }
+                    progress = {
+                        timeRunning: stats.time,
+                        gcodeLine: stats.gcodeLine,
+                        estTotalTime: estTotalTime,
+                        estTimeRemaining: Math.max(estTotalTime - (stats.time as number), 0),
+                        percentComplete: Math.min((stats.time as number) / (estTotalTime || 1) * 100, 100)
+                    };
                 }
-                progress = {
-                    timeRunning: stats.time,
-                    gcodeLine: stats.gcodeLine,
-                    estTotalTime: estTotalTime,
-                    estTimeRemaining: Math.max(estTotalTime - stats.time, 0),
-                    percentComplete: Math.min(stats.time / (estTotalTime || 1) * 100, 100)
-                };
             }
+            // Return status
+            return {
+                state: (job.waitList && job.waitList.length && job.state === 'running') ? 'waiting' : job.state,
+                jobOptions: job.jobOptions,
+                dryRunResults: job.dryRunResults,
+                startTime: job.startTime,
+                error: (job.state === 'error' && job.error ) ? job.error.toString() : undefined,
+                gcodeProcessorsStatus: gcodeProcessorStatuses,
+                stats: stats,
+                progress: progress,
+                waits: job.waitList
+            } as JobStatus;
         }
-        // Return status
-        return {
-            state: (job.waitList && job.waitList.length && job.state === 'running') ? 'waiting' : job.state,
-            jobOptions: job.jobOptions,
-            dryRunResults: job.dryRunResults,
-            startTime: job.startTime,
-            error: job.state === 'error' ? job.error.toString() : undefined,
-            gcodeProcessors: gcodeProcessorStatuses,
-            stats: stats,
-            progress: progress,
-            waits: job.waitList
-        } as JobStatus;
     }
 
-    _mainJobStats(gcodeProcessorStats: Record<string,Record<string,any>>):Record<string,any> {
+    _mainJobStats(gcodeProcessorStats: Record<string,Record<string,unknown>>):Record<string,unknown> {
         if (!gcodeProcessorStats || !gcodeProcessorStats['final-job-vm'])
             return { time: 0, line: 0, lineCount: 0 };
         return {
@@ -115,11 +98,10 @@ export default class JobManager extends AbstractJobManager {
      */
     async startJob(_jobOptions:Readonly<JobSourceOptions>):Promise<JobStatus> {
         this.tightcnc.debug('Begin startJob');
-        let job:JobState;
         // First do a dry run of the job to fetch overall stats
-        let dryRunResults = await this.dryRunJob(_jobOptions);
+        const dryRunResults = await this.dryRunJob(_jobOptions);
         // Set up the gcode processors for this job
-        let origJobOptions = _jobOptions;
+        const origJobOptions = _jobOptions;
 
         const jobOptions = objtools.deepCopy(_jobOptions) as JobSourceOptions;
         if (jobOptions.filename)
@@ -143,7 +125,7 @@ export default class JobManager extends AbstractJobManager {
         if (this.currentJob && this.currentJob.state !== 'complete' && this.currentJob.state !== 'cancelled' && this.currentJob.state !== 'error') {
             throw errRegistry.newError('INTERNAL_SERVER_ERROR','GENERIC').formatMessage('Cannot start job with another job running.');
         }
-        if (!this.tightcnc.controller!.ready) {
+        if (!this.tightcnc.controller?.ready) {
             throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Controller not ready.');
         }
         // Create the current job object
@@ -153,7 +135,7 @@ export default class JobManager extends AbstractJobManager {
             dryRunResults: dryRunResults,
             startTime: new Date().toISOString()
         });
-        job = this.currentJob;
+        const job = this.currentJob;
         // Clear the message log
         this.tightcnc.messageLog?.clear();
         this.tightcnc.messageLog?.log('Job started.');
@@ -165,7 +147,7 @@ export default class JobManager extends AbstractJobManager {
         // Controller#sendStream().
         // Build the processor chain
         this.tightcnc.debug('startJob getGcodeSourceStream');
-        let source = this.tightcnc.getGcodeSourceStream({
+        const source = this.tightcnc.getGcodeSourceStream({
             filename: jobOptions.filename,
             macro: jobOptions.macro,
             macroParams: jobOptions.macroParams,
@@ -189,8 +171,8 @@ export default class JobManager extends AbstractJobManager {
             }
             else {
                 job.state = 'error';
-                job.error = err;
-                console.error('Job error: ' + err);
+                job.error = JSON.stringify(err.toJSON());
+                console.error(`Job error: ${JSON.stringify(err)}`);
                 console.error(err.stack);
             }
             job.emitJobError(err);
@@ -207,12 +189,12 @@ export default class JobManager extends AbstractJobManager {
                 job.startTime = new Date().toISOString();
                 resolve();
             });
-            source.on('chainerror', (err) => {
+            source.on('chainerror', (err:unknown) => {
                 if (finished)
                     return;
                 finished = true;
                 job.state = 'error';
-                job.error = err;
+                job.error = JSON.stringify(err);
                 reject(err);
             });
         });
@@ -242,7 +224,7 @@ export default class JobManager extends AbstractJobManager {
                 order: 1000000
             });
         }
-        let job = new JobState({
+        const job = new JobState({
             state: 'initializing',
             jobOptions: origJobOptions,
             startTime: new Date().toISOString(),
@@ -259,7 +241,7 @@ export default class JobManager extends AbstractJobManager {
             dryRun: true,
             job: job
         });
-        let origSource = source;
+        const origSource = source;
         source = new GcodeLineReadableStream({
             gcodeLineTransform: (gline: GcodeLine, callback) => {
                 callLineHooks(gline)
@@ -270,7 +252,7 @@ export default class JobManager extends AbstractJobManager {
         job.sourceStream = source;
         job.state = 'running';
         return new Promise((resolve, reject) => {
-            origSource.on('processorChainReady', async (_chain:GcodeProcessor[]) => {
+            origSource.on('processorChainReady', (_chain:GcodeProcessor[]) => {
                 //console.log("Dry Run Chain Processors:",_chain)
                 job.gcodeProcessors = _chain.reduce((prev:Record<string,GcodeProcessor>, next) => { prev[next.id] = next; return prev; }, {} as Record<string,GcodeProcessor>);
                 this.tightcnc.debug('Dry run stream');
@@ -285,6 +267,7 @@ export default class JobManager extends AbstractJobManager {
                     .pipe(fs.createWriteStream(outputFile))
                 } 
                 (async function () {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     for await (const chunk of source) {
                         // console.log(chunk);
                     }
@@ -293,7 +276,7 @@ export default class JobManager extends AbstractJobManager {
                         job.state = 'complete';
                         // Get the job stats
                         this.tightcnc.debug('Dry run get stats');
-                        let ret = this.getStatus(job);
+                        const ret = this.getStatus(job);
                         this.tightcnc.debug('End dryRunJob');
                         if(!ret)reject(errRegistry.newError('INTERNAL_SERVER_ERROR','GENERIC').formatMessage('DryRun produce no status!'))
                         else resolve(ret);                                         

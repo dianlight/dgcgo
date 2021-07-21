@@ -1,18 +1,16 @@
 import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
 import  {Controller, GcodeVM ,VMState,GcodeLine } from '@dianlight/tightcnc-core';
-//import TightCNCServer from '../tightcnc-server';
 import { JSONSchema7 } from 'json-schema';
 
 interface GcodeVMProcessorOptions extends GcodeProcessorOptions{
+    noInit: boolean,
     controller: Controller, // - The machine controller class instance for the gcode to run on.  Used to fetch initial state.
-  //  tightcnc: TightCNCServer, // - Server instance.  Can also be provided to get some initial state.
     axisLabels: string[], // - Override default axis labels.  Defaults come from the controller, or are [ 'x', 'y', 'z' ].
     maxFeed: number, // - Maximum feed rate, used to calculate time for G0 moves.
     minMoveTime: number, // - Minimum time to count for a move.  Can be set to a low value to compensate for delays if lots  of small moves aren't filling the controller's buffer.
     updateOnHook: string, // - If a string hook name (for example, "executed"), the VM state is only updated once this hook is called on the gcode line.  This option cannot be used with stateSnapshots.
-    stateSnapshots: boolean //  - If true (and not using updateOnHook), gcode lines passing through are augmented with the properties before (vm state before line), after (vm state after line), and isMotion (whether the line represents motion).
-   
+    stateSnapshots: boolean //  - If true (and not using updateOnHook), gcode lines passing through are augmented with the properties before (vm state before line), after (vm state after line), and isMotion (whether the line represents motion).   
 }
 
 /**
@@ -55,6 +53,12 @@ interface GcodeVMProcessorOptions extends GcodeProcessorOptions{
  *     the properties before (vm state before line), after (vm state after line), and isMotion (whether the line represents motion).
  */
 export default class GcodeVMProcessor extends GcodeProcessor {
+    preprocessInputGcode(this: void): void | ReadableStream<any> {
+        // No action.
+    }
+    flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
+        // No action.
+    }
 
     vm: GcodeVM
     _statusVMState?: VMState
@@ -62,17 +66,18 @@ export default class GcodeVMProcessor extends GcodeProcessor {
 
     constructor(options:GcodeVMProcessorOptions) {
         super(options, 'gcodevm', false);
-        let vmOptions = objtools.deepCopy(options);
+        const vmOptions = objtools.deepCopy(options) as GcodeVMProcessorOptions;
         vmOptions.noInit = true;
         this.vm = new GcodeVM(vmOptions);
         this.vm.init();
         if (this.processorOptions.updateOnHook) {
-            this._statusVMState = objtools.deepCopy(this.vm.getState());
+            this._statusVMState = objtools.deepCopy(this.vm.getState()) as VMState;
         }
     }
 
     override async initProcessor() {
         this.vm.init();
+        return Promise.resolve();
     }
 
     /**
@@ -80,9 +85,9 @@ export default class GcodeVMProcessor extends GcodeProcessor {
      */
     static override getOptionSchema(): JSONSchema7 {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            type: "object",
-            $id: "/gcodevm",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            type: 'object',
+            $id: '/gcodevm',
         } as JSONSchema7
     }
 
@@ -92,7 +97,7 @@ export default class GcodeVMProcessor extends GcodeProcessor {
 
 
 
-    override getStatus():Record<string,any>|void {
+    override getStatus():Partial<VMState>|void {
         // return a reduced set of state information for the general status data; this is just used for
         // returning job data to clients - gline.before and gline.after still contain the full vmstate for internal use
         let vmState;
@@ -115,9 +120,9 @@ export default class GcodeVMProcessor extends GcodeProcessor {
     override processGcode(gline: GcodeLine) {
         this.lastLineProcessedTime = new Date();
         if (this.processorOptions.updateOnHook && !this.dryRun) {
-            let r = this.vm.runGcodeLine(gline);
+            const r = this.vm.runGcodeLine(gline);
             gline.isMotion = r.isMotion;
-            let vmStateAfter = objtools.deepCopy(this.vm.getState());
+            const vmStateAfter = objtools.deepCopy(this.vm.getState()) as VMState;
             //console.log(typeof gline,gline)
             gline.hookSync(this.processorOptions.updateOnHook, () => {
                 this.lastLineProcessedTime = new Date();
@@ -127,11 +132,11 @@ export default class GcodeVMProcessor extends GcodeProcessor {
             });
         } else if (this.processorOptions.stateSnapshots) {
             this.lastLineProcessedTime = new Date();
-            let beforeState = objtools.deepCopy(this.vm.getState());
-            let r = this.vm.runGcodeLine(gline);
+            const beforeState = objtools.deepCopy(this.vm.getState()) as VMState;
+            const r = this.vm.runGcodeLine(gline);
             // Augment line with state info, and return it
             gline.before = beforeState;
-            gline.after = objtools.deepCopy(this.vm.getState());
+            gline.after = objtools.deepCopy(this.vm.getState()) as VMState;
             gline.isMotion = r.isMotion;
         } else {
             this.lastLineProcessedTime = new Date();

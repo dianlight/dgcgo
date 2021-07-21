@@ -10,9 +10,9 @@ class OpListFiles extends Operation {
     
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/listFiles",
-            type: "object",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/listFiles',
+            type: 'object',
             properties: {
                 dir: {
                     type: 'string',
@@ -24,10 +24,9 @@ class OpListFiles extends Operation {
         } as JSONSchema7 ;
     }
     
-    // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'params' implicitly has an 'any' type.
-    async run(params) {
-        let dir = this.tightcnc.getFilename(undefined, params.dir, false, true, true);
-        let files = await new Promise<string[]>((resolve, reject) => {
+    async run(params:{dir:string}) {
+        const dir = this.tightcnc.getFilename(undefined, params.dir, false, true, true);
+        const files = await new Promise<string[]>((resolve, reject) => {
             fs.readdir(dir, (err: any, files: string[] | PromiseLike<string[]>) => {
                 if (err)
                     reject(err);
@@ -35,9 +34,9 @@ class OpListFiles extends Operation {
                     resolve(files);
             });
         });
-        let retfiles = [];
-        for (let file of files) {
-            let stat = await new Promise((resolve, reject) => {
+        const retfiles = [];
+        for (const file of files) {
+            const stat = await new Promise<fs.Stats>((resolve, reject) => {
                 fs.stat(path.join(dir, file), (err, stat) => {
                     if (err)
                         reject(err);
@@ -46,10 +45,10 @@ class OpListFiles extends Operation {
                 });
             });
             let type;
-            if ((stat as any).isDirectory()) {
+            if (stat.isDirectory()) {
                 type = 'dir';
             }
-            else if ((stat as any).isFile() && /(\.gcode|\.nc)$/i.test(file)) {
+            else if (stat.isFile() && /(\.gcode|\.nc)$/i.test(file)) {
                 type = 'gcode';
             }
             else {
@@ -58,7 +57,7 @@ class OpListFiles extends Operation {
             retfiles.push({
                 name: file,
                 type: type,
-                mtime: (stat as any).mtime.toISOString()
+                mtime: stat.mtime.toISOString()
             });
         }
         retfiles.sort((a, b) => {
@@ -79,12 +78,12 @@ class OpUploadFile extends Operation {
     
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/uploadFile",
-            type: "object",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/uploadFile',
+            type: 'object',
             properties: {
                 filename: {
-                    type: "string",
+                    type: 'string',
                     description: 'Remote filename to save file as',
                     /*
                     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'val' implicitly has an 'any' type.
@@ -97,7 +96,7 @@ class OpUploadFile extends Operation {
                     */
                 },
                 data: {
-                    type: "string",
+                    type: 'string',
                     description: 'File data'
                 }
             },
@@ -110,7 +109,7 @@ class OpUploadFile extends Operation {
         data: string
         makeTmp?:boolean
     }) {
-        let fullFilename = this.tightcnc.getFilename(params.filename, 'data', false, true);
+        const fullFilename = this.tightcnc.getFilename(params.filename, 'data', false, true);
         await new Promise<void>((resolve, reject) => {
             fs.writeFile(fullFilename, params.data, (err) => {
                 if (err)
@@ -118,7 +117,7 @@ class OpUploadFile extends Operation {
                 else {
                     if (params.makeTmp) {
                         addExitCallback(signal => {
-                            console.debug("Removing tmp file", fullFilename)
+                            console.debug('Removing tmp file', fullFilename, signal)
                             fs.unlinkSync(fullFilename)
                         } )
                     }

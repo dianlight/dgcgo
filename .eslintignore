@@ -3,7 +3,8 @@
 /src-capacitor
 /src-cordova
 /.quasar
-/node_modules
+node_modules
 .eslintrc.js
 babel.config.js
 /src-ssr
+types

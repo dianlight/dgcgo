@@ -1,14 +1,17 @@
 import express from 'express';
-import littleconf from 'littleconf';
+//import littleconf from 'littleconf';
 import TightCNCServer from './tightcnc-server';
-import { Operation } from '@dianlight/tightcnc-core'
+import { Operation, TightCNCConfig } from '@dianlight/tightcnc-core'
 import { createJSONRPCErrorResponse, JSONRPC, JSONRPCID, JSONRPCMethod, JSONRPCRequest, JSONRPCResponse, JSONRPCResponsePromise, JSONRPCServer } from 'json-rpc-2.0';
 import cors from 'cors'
 import { addExitCallback, CatchSignals } from 'catch-exit';
 //import { JSONSchema7 } from 'json-schema';
 import Ajv, { Schema } from 'ajv'
+import config from 'config';
+import { BaseError } from 'new-error';
 
-const config = littleconf.getConfig()
+//const config = littleconf.getConfig()
+//const config = config.get
 
 const ajv = new Ajv()
 
@@ -21,25 +24,26 @@ async function startServer() {
 	app.use(express.json({ limit:'1Gb'}))
 	app.use(cors())
 
-	let tightcnc = new TightCNCServer(config);
+	const tightcnc = new TightCNCServer(config as unknown as TightCNCConfig);
 	await tightcnc.initServer();
 
-	app.post("/v1/jsonrpc", (req, res) => {
+	app.post('/v1/jsonrpc', (req, res) => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const jsonRPCRequest = req.body;
-		let authHeader = req.header('Authorization');
+		const authHeader = req.header('Authorization');
 		if (!authHeader) {
 			res.sendStatus(403);
 		} else {
-			let parts = authHeader.split(' ');
+			const parts = authHeader.split(' ');
 			if (parts.length > 2) parts[1] = parts.slice(1).join(' ');
-			let authType = parts[0].toLowerCase();
-			let authString = parts[1];
+			const authType = parts[0].toLowerCase();
+			const authString = parts[1];
 
 			if (authType === 'key') {
-				if (config.authKey && authString === config.authKey) {
+				if (config.has('authKey') && authString === config.get('authKey')) {
 					// server.receive takes an optional second parameter.
 					// The parameter will be injected to the JSON-RPC method as the second parameter.
-					server.receive(jsonRPCRequest).then((jsonRPCResponse) => {
+					void server.receive(jsonRPCRequest).then((jsonRPCResponse) => {
 						if (jsonRPCResponse) {
 							res.json(jsonRPCResponse);
 						} else {
@@ -61,11 +65,11 @@ async function startServer() {
 	})
 	
 	
-	function registerOperationAPICall(operationName: string, operation: any) {
+	function registerOperationAPICall(operationName: string, operation: Operation) {
 
 		const mapResultToJSONRPCResponse = (
 			id: JSONRPCID | undefined,
-			result: any
+			result: unknown
 		  ): JSONRPCResponse | null => {
 			if (id !== undefined) {
 			  return {
@@ -80,13 +84,13 @@ async function startServer() {
 		
 		const mapErrorToJSONRPCResponse = (
 			id: JSONRPCID | undefined,
-			error: any
+			error?: BaseError
 		  ): JSONRPCResponse | null => {
 			if (id !== undefined) {
 			  return createJSONRPCErrorResponse(
 				id,
 				0 /*DefaultErrorCode*/,
-				(error && error.message) || "An unexpected error occurred"
+				(error && error.message) || 'An unexpected error occurred'
 			  );
 			} else {
 			  return null;
@@ -103,10 +107,10 @@ async function startServer() {
 				if (!valid) {
 					console.warn(request.params,object.getParamSchema().$id, validator.errors)
 				}
-				let response = object.run(request.params);
+				const response = object.run(request.params as Record<string, unknown>)
 				return Promise.resolve(response).then(
-					(result: any) => mapResultToJSONRPCResponse(request.id, result),
-					(error: any) => {
+					(result: unknown) => mapResultToJSONRPCResponse(request.id, result),
+					(error: BaseError) => {
 					console.warn(
 						`JSON-RPC method ${request.method} responded an error`,
 						error
@@ -120,13 +124,16 @@ async function startServer() {
 		
 	}
 
-	for (let operationName in tightcnc.operations) {
+	for (const operationName in tightcnc.operations) {
 		registerOperationAPICall(operationName, tightcnc.operations[operationName]);
 	}
 
-	let serverPort = config.serverPort || 2363;
+	let serverPort = 2363;
+	if (config.has('serverPort')) {
+		serverPort = config.get('serverPort');
+	}
 	app.listen(serverPort, () => {
-		console.log('Listening on port ' + serverPort);
+		console.log(`Listening on port ${serverPort}`);
 	});
 
 }
@@ -134,7 +141,7 @@ async function startServer() {
 // Exit hook 
 
 addExitCallback( (signal: CatchSignals, exitCode?: number, error?: Error) => {
-	console.log("TightCNC exit for signal ", signal, exitCode)
+	console.log('TightCNC exit for signal ', signal, exitCode)
 	if (error) {
 		console.error(error)
 	}
@@ -144,7 +151,7 @@ addExitCallback( (signal: CatchSignals, exitCode?: number, error?: Error) => {
 
 
 startServer()
-	.catch((err) => {
+	.catch((err: Error) => {
 		console.error(err);
 		console.error(err.stack);
 	});

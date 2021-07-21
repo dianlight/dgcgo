@@ -21,7 +21,7 @@ export class LoggerDisk {
         await mkdirp(this.logDir)
         
         // Get list of all log files currently in directory
-        let files = await new Promise<string[]>((resolve, reject) => {
+        const files = await new Promise<string[]>((resolve, reject) => {
             fs.readdir(this.logDir, (err, files) => {
                 if (err)
                     reject(err);
@@ -30,27 +30,24 @@ export class LoggerDisk {
             });
         });
         this.curFiles = [];
-        for (let f of files) {
-            let matches = /^cnc-([0-9]+)\.log$/.exec(f);
+        for (const f of files) {
+            const matches = /^cnc-([0-9]+)\.log$/.exec(f);
             if (matches) {
-                let num = parseInt(matches[1], 10);
-                let stats = await new Promise((resolve, reject) => {
+                const num = parseInt(matches[1], 10);
                     fs.stat(path.join(this.logDir, f), (err, stats) => {
                         if (err)
-                            reject(err);
+                            console.error(err);
                         else
-                            resolve(stats);
+                            this.curFiles.push({ filename: f, num: num, size: stats.size });
                     });
-                });
-                this.curFiles.push({ filename: f, num: num, size: (stats as any).size });
-            }
-        }
+                }
+        }       
         this.curFiles.sort((a, b) => a.num - b.num);
         // Create new file if none exist
         if (!this.curFiles.length)
             this.curFiles.push({ filename: 'cnc-0001.log', num: 1, size: 0 });
         // Open most recent file
-        let fullFn = path.join(this.logDir, this.curFiles[this.curFiles.length - 1].filename);
+        const fullFn = path.join(this.logDir, this.curFiles[this.curFiles.length - 1].filename);
         this.curStream = fs.createWriteStream(fullFn, { flags: 'a' });
     }
     /**
@@ -75,15 +72,15 @@ export class LoggerDisk {
         this.curFiles[this.curFiles.length - 1].size += msg.length;
         if (this.curFiles[this.curFiles.length - 1].size >= this.maxFileSize) {
             this.curStream?.end();
-            let newNum = this.curFiles[this.curFiles.length - 1].num + 1;
-            let newNumStr = '' + newNum;
+            const newNum = this.curFiles[this.curFiles.length - 1].num + 1;
+            let newNumStr = `${newNum}`;
             while (newNumStr.length < 4)
                 newNumStr = '0' + newNumStr;
-            let newFilename = 'cnc-' + newNumStr + '.log';
+            const newFilename = 'cnc-' + newNumStr + '.log';
             this.curFiles.push({ filename: newFilename, num: newNum, size: 0 });
             this.curStream = fs.createWriteStream(path.join(this.logDir, newFilename), { flags: 'w' });
             while (this.curFiles.length > this.keepFiles) {
-                let fileToDelete = this.curFiles.shift();
+                const fileToDelete = this.curFiles.shift();
                 if(fileToDelete) fs.unlink(path.join(this.logDir, fileToDelete.filename), (err) => {
                     if (err)
                         console.error('LoggerDisk error removing file', err);

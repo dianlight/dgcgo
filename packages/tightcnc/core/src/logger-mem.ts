@@ -66,7 +66,7 @@ export class LoggerMem {
         }
         if (start === this.nextNum || !this.lines.length)
             return [];
-        let linesStartNum = this.lines[0][0];
+        const linesStartNum = this.lines[0][0];
         if (start < linesStartNum)
             start = linesStartNum;
         if (end === undefined)
@@ -78,7 +78,7 @@ export class LoggerMem {
         if (end <= start)
             return [];
         let startIdx = start - linesStartNum;
-        let endIdx = end - linesStartNum;
+        const endIdx = end - linesStartNum;
         if (limit && endIdx - startIdx > limit)
             startIdx = endIdx - limit;
         return this.lines.slice(startIdx, endIdx);

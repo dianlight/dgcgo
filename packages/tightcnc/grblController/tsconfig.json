@@ -10,7 +10,7 @@
         "sourceMap": true,
         "declaration": true,
         "declarationDir": "./types",
-        "sourceRoot": "./src"   
+        "declarationMap": true
     },
     "references": [
         { "path":"../core"}

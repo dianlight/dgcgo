@@ -5,7 +5,7 @@ import { JobState } from './job-state';
 export interface JobSourceOptions {
     filename?: string | undefined;
     macro?: string | undefined;
-    macroParams?: any;
+    macroParams?: unknown | undefined;
     rawFile?: boolean;
     gcodeProcessors?: {
         name: string;

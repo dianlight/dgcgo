@@ -13,7 +13,10 @@ declare module 'crisphooks' {
         on<T>(someEvent: string,callback: (param: T) => void)
         emit<T>(someEvent: string, param: T)
         
-        static addHooks(target: any)
+        static addHooks(target: unknown)
+
+        /** Reseved for internal use */
+        _hooks: unknown
     }
 
     export class CrispPrePostHooks {

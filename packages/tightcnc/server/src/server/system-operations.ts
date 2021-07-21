@@ -1,6 +1,6 @@
 //import  Operation from './operation';
 import  TightCNCServer from './tightcnc-server';
-import { TightCNCConfig, Operation } from "@dianlight/tightcnc-core";
+import { TightCNCConfig, Operation } from '@dianlight/tightcnc-core';
 import  SerialPort, { PortInfo } from 'serialport';
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
@@ -12,13 +12,13 @@ class OpGetRunningConfig extends Operation {
 
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/getRunningConfig",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/getRunningConfig',
         } as JSONSchema7
     }
 
     async run(): Promise<TightCNCConfig> {
-        return new Promise<TightCNCConfig>((resolve, reject) => {
+        return new Promise<TightCNCConfig>((resolve) => {
             if (this.tightcnc.config) resolve(this.tightcnc.config)
             else throw errRegistry.newError('INTERNAL_SERVER_ERROR','GENERIC').formatMessage('Running config not found!')
         })
@@ -31,14 +31,14 @@ class OpGetAvailableSerials extends Operation {
 
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/getAvailableSerials",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/getAvailableSerials',
         } as JSONSchema7
     }
 
     async run(): Promise<PortInfo[]> {
-        return new Promise<PortInfo[]>((resolve, reject) => {
-            SerialPort.list().then(portInfos => {
+        return new Promise<PortInfo[]>((resolve) => {
+            void SerialPort.list().then(portInfos => {
                 // console.log('Serial PortInfo', portInfos)
                 resolve(portInfos)
             })
@@ -51,8 +51,8 @@ class OpGetAvailableOperations extends Operation {
 
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/getAvailableOperations",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/getAvailableOperations',
         } as JSONSchema7
     }
 
@@ -69,8 +69,8 @@ class OpGetAvailableGcodeProcessors extends Operation {
 
     override getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/getAvailableGcodeProcessors",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/getAvailableGcodeProcessors',
         } as JSONSchema7
     }
 

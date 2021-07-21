@@ -1,21 +1,26 @@
 import objtools from 'objtools';
-import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+//import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
 import EventEmitter from 'events';
+import { JobStatus } from './job-status';
+import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
+import { VMState } from './gcode-processor/VMState';
 /**
  * This class tracks the state of a running job or dry run.  It's mostly just a collection of properties
  * managed by JobManager.  It can also emit the events 'start', 'complete' and 'error' (also managed by JobManager).
  *
  * @class JobState
  */
-export class JobState extends EventEmitter {
-    [x: string]: any;
+export class JobState extends EventEmitter implements JobStatus {
+    [x: string]: unknown;
 
     state:'initializing'|'complete'|'cancelled'|'error'|'running' = 'initializing';
     startTime = new Date().toISOString();
     _hasFinished = false;
-    waitList = [];
-    sourceStream: any;
-    gcodeProcessors?:Record<string,GcodeProcessor>;
+    waitList:string[] = [];
+    //sourceStream: any;
+    gcodeProcessors?: Record<string, GcodeProcessor>;
+    dryRunResults?: Partial<JobStatus>
+    error?: string | undefined
 
     constructor(props:Partial<JobState>) {
         super();
@@ -23,18 +28,25 @@ export class JobState extends EventEmitter {
         // added and removed by the gcode processor.  the values themselves don't mean anything.  as long as there's at least one
         // entry in this wait list, the job status is returned as "waiting"
         
-        for (let key in props) {
+        for (const key in props) {
             this[key] = props[key];
         }
         // add a handler for 'error' so the default handler (exit program) doesn't happen
-        this.on('error', () => { });
+        //this.on('error', () => {});
     }
+
+    jobOptions?: Record<string, unknown>;
+    gcodeProcessorsStatus?: Record<string, Partial<VMState>>;
+    stats?: Record<string, unknown>;
+    progress?: { gcodeLine: number; timeRunning: unknown; estTotalTime: unknown; estTimeRemaining: number; percentComplete: number; };
+    waits?: string[];
+
     emitJobStart() {
         if (this._hasFinished)
             return;
         this.emit('start');
     }
-    emitJobError(err:any) {
+    emitJobError(err:unknown) {
         if (this._hasFinished)
             return;
         this._hasFinished = true;
@@ -46,11 +58,11 @@ export class JobState extends EventEmitter {
         this._hasFinished = true;
         this.emit('complete');
     }
-    addWait(val:never) {
+    addWait(val:string) {
         this.waitList.push(val);
     }
 
-    removeWait(val: never) {
+    removeWait(val: string) {
         this.waitList = this.waitList.filter((a) => !objtools.deepEquals(a, val));
     }
 }

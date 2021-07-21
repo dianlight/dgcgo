@@ -1,10 +1,10 @@
 {
   "extends": "@quasar/app/tsconfig-preset",
 //  "extends": "../../../tsconfig.json",
-//  "include": [
-//    "src/**/*.ts",
-//    "src/**/*.vue",
-//  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ],
   "exclude": [
     "babel.config.js",
     "src/server/**/*.ts"
@@ -13,7 +13,7 @@
     "noEmit": false,
     "outDir": "./dist/src/ui",                              /* Redirect output structure to the directory. */
     "declaration": true,
-    "declarationDir": "./dist",
+    "declarationDir": "./dist/src/ui",                      /* Output directory for generated declaration files.*/
     "declarationMap": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": true,

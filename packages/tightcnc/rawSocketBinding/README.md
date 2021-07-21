@@ -4,7 +4,7 @@
 
 ## Usage
 
-```
+```Typescript
 import SerialportRawSocketBinding from '@dianlight/serialportrawsocketbinding';
 
 new SerialPort("socket://<server>:<port>", {

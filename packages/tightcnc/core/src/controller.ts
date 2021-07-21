@@ -3,7 +3,7 @@ import * as node_stream from 'stream'
 import { GcodeLine } from './gcode-processor/GcodeLine';
 import { BaseRegistryError } from 'new-error';
 import fs from 'fs'
-import { VMState } from './gcode-processor/GcodeVM'
+import { VMState } from './gcode-processor/VMState';
 import { errRegistry } from './errRegistry';
 import { ControllerConfig } from './ControllerConfig';
 
@@ -75,7 +75,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
     ready = false;
     usedAxes = [true, true, true];
     homableAxes = [true, true, true];
-    axisMaxFeeds = [500, 500, 500];
+    axisMaxFeeds:number[] = [500, 500, 500];
     axisMaxTravel:number[] = []
     mpos = [0, 0, 0];
     activeCoordSys?:number|undefined = 0;
@@ -103,17 +103,17 @@ export abstract class Controller  extends EventEmitter implements VMState  {
     homeDirection?: ('+'|'-')[]
 
     coord?: (coords: number[], axis: string | number, value?: number | undefined) => number | undefined;
-    totalTime: number = 0;
+    totalTime = 0;
     bounds?: [(number | null)[], (number | null)[]];
     mbounds?: [(number | null)[], (number | null)[]];
-    lineCounter: number = 0;
+    lineCounter = 0;
     hasMovedToAxes: boolean[] = [false,false,false];
     seenWordSet: {
         [key:string]:boolean
     } = {};
     tool?: number;
-    countT: number = 0;
-    countM6: number = 0;
+    countT = 0;
+    countM6 = 0;
     motionMode?: 'G0' | 'G1' ;
     arcPlane?: number;
     pos: number[] = [0,0,0];
@@ -141,11 +141,15 @@ export abstract class Controller  extends EventEmitter implements VMState  {
         this.resetState();
     }
 
+    [key: string]: unknown;
+    
+    gcodeLine?: string | undefined;
+
     /**
      *  Perform the disconnection from the controlle 
      */
-    async disconnect(): Promise<void> {
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async disconnect(): Promise<void> {}
 
 
     /**
@@ -155,12 +159,12 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @return {Number[]}
      */
     getCoordOffsets():number[] {
-        let offsets = [];
+        const offsets = [];
         for (let i = 0; i < this.axisLabels.length; i++)
             offsets[i] = 0;
         if (typeof this.activeCoordSys === 'number' && this.activeCoordSys >= 0) {
             // Not machine coordinates; set offsets from this coord system
-            let csysOffsets = this.coordSysOffsets[this.activeCoordSys];
+            const csysOffsets = this.coordSysOffsets[this.activeCoordSys];
             if (csysOffsets) {
                 for (let i = 0; i < csysOffsets.length; i++) {
                     offsets[i] += csysOffsets[i];
@@ -181,10 +185,10 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @return {Number[]}
      */
     getPos() {
-        let off = this.getCoordOffsets();
-        let r = [];
+        const off = this.getCoordOffsets();
+        const r = [];
         for (let i = 0; i < this.mpos.length; i++) {
-            let o = off[i] || 0;
+            const o = off[i] || 0;
             r.push(this.mpos[i] - o);
         }
         return r;
@@ -256,7 +260,8 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @method initConnection
      * @param {Boolean} retry - Whether to continue retrying to connect on error
      */
-    initConnection(retry = true) { }
+    abstract initConnection(retry: boolean): Promise<void>;
+
     /**
      * Send a string line to the controller.
      *
@@ -264,7 +269,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {String} line - The string to send, without a \n at the end.
      * @param {Object} [options] - Controller-specific options
      */
-    abstract sendLine(line:string, options?:{}):void 
+    abstract sendLine(line:string, options?:unknown):void 
     /**
      * Send a GcodeLine object to the controller.  The GcodeLine object may optionally contain hooks as a
      * crisphooks instance (ie, using crisphooks.addHooks()).  If hooks are attached to the GcodeLine, the
@@ -286,11 +291,11 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {GcodeLine} gline
      * @param {Object} [options] - Controller-specific options
      */
-    abstract sendGcode(gline: GcodeLine, options?:{}):void;
+    abstract sendGcode(gline: GcodeLine, options?:unknown):void;
 
-    send(thing: string | GcodeLine, options?:{}):void {
+    send(thing: string | GcodeLine, options?:unknown):void {
         if (typeof thing === 'object' && thing.isGcodeLine) {
-            this.sendGcode(thing as GcodeLine, options);
+            this.sendGcode(thing, options);
         } else {
             this.sendLine(thing as string, options);
         }
@@ -309,7 +314,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
     sendFile(filename: string):Promise<void> {
    //     let stream = zstreams.fromFile(filename).pipe(new zstreams.SplitStream());
         /** FIXME: Very bad for big file */
-        let stream =node_stream.Readable.from(fs.readFileSync(filename as string).toString().split(/\r?\n/))
+        const stream =node_stream.Readable.from(fs.readFileSync(filename).toString().split(/\r?\n/))
         return this.sendStream(stream);
     }
     /**
@@ -322,37 +327,37 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @method waitSync
      * @return {Promise}
      */
-    waitSync() { }
+    abstract waitSync(): Promise<void>;
     /**
      * Pauses machine / feed hold.
      *
      * @method hold
      */
-    hold() { }
+    abstract hold(): void;
     /**
      * Resumes paused/held machine.
      *
      * @method resume
      */
-    resume() { }
+    abstract resume(): void;
     /**
      * Cancels any current operations and flushes queue.  If machine is in feed hold, unhold.
      *
      * @method cancel
      */
-    cancel() { }
+    abstract cancel(): void;
     /**
      * Resets machine.
      *
      * @method reset
      */
-    reset() { }
+    abstract reset(): void;
     /**
      * Clears a current error state, if possible.
      *
      * @method clearError
      */
-    clearError() { }
+    abstract clearError(): void;
     /**
      * Move by inc in direction of axis.  If this is called multiple times before a previous move is completed, extra invocations
      * should be ignored.  This is used for real-time control of the machine with an interface.
@@ -361,7 +366,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {Number} axis - Axis number.  0=x, 1=y, etc.
      * @param {Number} inc - Increment to move axis by.
      */
-    realTimeMove(axis:number, inc:number) { }
+    abstract realTimeMove(axis: number, inc: number): void;
     /**
      * Moves machine linearly to point, resolving promise when movement is complete and machine is stopped.
      * Should not be called simultaneously with any other functions.  Promise should error if a cancel() is
@@ -372,7 +377,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {Number} [feed] - Optional feed rate to move at.
      * @return {Promise} - Resolve when move is complete and machine is stopped.
      */
-    move(pos:(number|false)[], feed?:number) { }
+    abstract move(pos: (number | false)[], feed?: number): Promise<void>;
     /**
      * Home machine. (G28.2)
      *
@@ -391,6 +396,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {Number} [feed]
      * @return {Promise{pos}}
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     probe(pos: (number | boolean)[], feed?: number): Promise<number[]> {
         throw errRegistry.newError('INTERNAL_ERROR','UNSUPPORTED_OPERATION').formatMessage('Probe is not availble in this controller!')
      }
@@ -402,36 +408,35 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @return {Object}
      */
     getStatus():ControllerStatus {
-        let c = this;
         return {
-            ready: c.ready,
-            axisLabels: c.axisLabels,
-            usedAxes: c.usedAxes,
-            axisMaxFeeds: c.axisMaxFeeds,
-            axisMaxTravel: c.axisMaxTravel,
-            mpos: c.mpos,
-            pos: c.getPos(),
-            mposOffset: c.getCoordOffsets(),
-            activeCoordSys: c.activeCoordSys,
-            offset: c.offset,
-            offsetEnabled: c.offsetEnabled,
-            storedPositions: c.storedPositions,
-            homed: c.homed,
-            held: c.held,
-            units: c.units,
-            feed: c.feed,
-            incremental: c.incremental,
-            moving: c.moving,
-            coolant: c.coolant,
-            spindle: c.spindle,
-            spindleDirection: c.spindleDirection,
-            spindleSpeed: c.spindleSpeed || 0,
-            spindleSpeedMax: c.spindleSpeedMax,
-            spindleSpeedMin: c.spindleSpeedMin,            
-            line: c.line,
-            error: c.error,
-            errorData: c.errorData,
-            programRunning: c.programRunning,
+            ready: this.ready,
+            axisLabels: this.axisLabels,
+            usedAxes: this.usedAxes,
+            axisMaxFeeds: this.axisMaxFeeds,
+            axisMaxTravel: this.axisMaxTravel,
+            mpos: this.mpos,
+            pos: this.getPos(),
+            mposOffset: this.getCoordOffsets(),
+            activeCoordSys: this.activeCoordSys,
+            offset: this.offset,
+            offsetEnabled: this.offsetEnabled,
+            storedPositions: this.storedPositions,
+            homed: this.homed,
+            held: this.held,
+            units: this.units,
+            feed: this.feed,
+            incremental: this.incremental,
+            moving: this.moving,
+            coolant: this.coolant,
+            spindle: this.spindle,
+            spindleDirection: this.spindleDirection,
+            spindleSpeed: this.spindleSpeed || 0,
+            spindleSpeedMax: this.spindleSpeedMax,
+            spindleSpeedMin: this.spindleSpeedMin,            
+            line: this.line,
+            error: this.error,
+            errorData: this.errorData,
+            programRunning: this.programRunning,
             capabilities: {
                 variableSpindle:false, // 'V': 'variableSpindle',
                 mistCoolant: false, //'M': 'mistCoolant',
@@ -440,18 +445,18 @@ export abstract class Controller  extends EventEmitter implements VMState  {
                 homingSingleAxis:false, //'H': 'homingSingleAxis', $HX $HY $HZ
                 startUpHomeLock: false // 'L': 'powerUpLockWithoutHoming'
             },
-            lineCounter: c.lineCounter,
-            hasMovedToAxes: c.hasMovedToAxes,
-            countM6: c.countM6,
-            coordSysOffsets: c.coordSysOffsets,
-            countT: c.countT,
-            seenWordSet: c.seenWordSet,
-            totalTime: c.totalTime,
-            homeDirection: c.homeDirection
+            lineCounter: this.lineCounter,
+            hasMovedToAxes: this.hasMovedToAxes,
+            countM6: this.countM6,
+            coordSysOffsets: this.coordSysOffsets,
+            countT: this.countT,
+            seenWordSet: this.seenWordSet,
+            totalTime: this.totalTime,
+            homeDirection: this.homeDirection
         } as ControllerStatus;
     }
     listUsedAxisNumbers() {
-        let ret = [];
+        const ret = [];
         for (let axisNum = 0; axisNum < this.usedAxes.length; axisNum++) {
             if (this.usedAxes[axisNum])
                 ret.push(axisNum);
@@ -459,7 +464,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
         return ret;
     }
     listUsedAxisLabels() {
-        let ret = [];
+        const ret = [];
         for (let axisNum = 0; axisNum < this.usedAxes.length; axisNum++) {
             if (this.usedAxes[axisNum]) {
                 ret.push(this.axisLabels[axisNum]);

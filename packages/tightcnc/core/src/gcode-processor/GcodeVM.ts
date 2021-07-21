@@ -2,55 +2,9 @@ import { errRegistry } from '../errRegistry'
 import GcodeLine from './GcodeLine';
 import objtools from 'objtools' 
 import { Controller } from '../controller';
-import { AbstractServer } from '../AbstractServer';
+import { VMState } from './VMState';
+import { GcodeVMOptions } from './GcodeVMOptions';
 
-
-export interface GcodeVMOptions {
-    controller?: Controller,
-    tightcnc?: AbstractServer,
-    axisLabels?: string[],
-    maxFeed?: number | number[],
-    acceleration?: number | number[],
-    minMoveTime?: number
-    noInit?: boolean,
-    [key:string]:any
-}
-
-export interface VMState {
-    axisLabels: string[]
-    coord?:(coords:number[], axis:number|string, value?:number) => number|undefined // = this.coord.bind(this);
-    totalTime:number; // seconds
-    bounds?:[(number|null)[],(number|null)[]] // = [this.zerocoord(null), this.zerocoord(null)]; // min and max points
-    mbounds?:[(number|null)[],(number|null)[]]// = [this.zerocoord(null), this.zerocoord(null)]; // bounds for machine coordinates
-    lineCounter:number;
-    hasMovedToAxes:boolean[] // = this.zerocoord(false); // true for each axis that we've moved on, and have a definite position for
-    seenWordSet: {
-        [key:string]:boolean
-    }; // a mapping from word letters to boolean true if that word has been seen at least once
-    tool?:number | undefined;
-    countT:number;
-    countM6: number;
-    feed?: number | undefined
-    motionMode?: 'G0' | 'G1' | 'G2' | 'G3' | undefined
-    arcPlane?: number
-    incremental?: boolean
-    inverseFeed?: boolean
-    units?: 'in' | 'mm'
-    spindle?: boolean
-    spindleDirection?: -1 | 1
-    spindleSpeed?: number | undefined
-    coolant?: false | 1 | 2 | 3
-    activeCoordSys?: number | undefined
-    pos: number[],
-    mpos: number[]
-    coordSysOffsets: number[][]
-    offset?: (number|undefined)[]
-    offsetEnabled?: boolean
-    storedPositions: number[][]
-    line?: number
-    gcodeLine?: string
-    homeDirection?:('+'|'-')[]
-}
 
 /**
  * This is a virtual machine that tracks the state of a gcode job as it executes, and annotates all gcode lines
@@ -105,7 +59,6 @@ export class GcodeVM {
     _lastMoveAxisFeeds?:(number|undefined)[]
 
     constructor(public options:GcodeVMOptions) {
-        this.options = options;
         if (!options.maxFeed) options.maxFeed = 1000;
         if (!options.acceleration) options.acceleration = 100000;
         if (!options.noInit) this.init();
@@ -114,9 +67,9 @@ export class GcodeVM {
     // Gets or sets an axis value in a coordinate array.
     // If value is null, it returns the current value.  If value is numeric, it sets it.
     coord(coords:number[], axis:number|string, value?:number):number|undefined {
-        let axisNum = (typeof axis === 'number') ? axis : this.vmState?.axisLabels?.indexOf(axis.toLowerCase()) || 0;
-        if (axisNum === -1) throw  errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Invalid axis ' + axis);
-        if (axisNum < 0 || axisNum >= this.vmState!.axisLabels!.length) throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Axis out of bounds ' + axisNum);
+        const axisNum = (typeof axis === 'number') ? axis : this.vmState?.axisLabels?.indexOf(axis.toLowerCase()) || 0;
+        if (axisNum === -1) throw  errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage(`Invalid axis ${axis}`);
+        if (axisNum < 0 || axisNum >= this.vmState.axisLabels.length) throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage(`Axis out of bounds ${axisNum}`);
         //if (typeof value === 'number') {
         if (value !== undefined) {
             while (axisNum >= coords.length) coords.push(0);
@@ -127,7 +80,7 @@ export class GcodeVM {
     }
 
     public zerocoord<T>(val:T):T[] {
-        let coords:T[] = [];
+        const coords:T[] = [];
         for (let i = 0; i < this.vmState.axisLabels.length; i++) coords.push(val);
         return coords;
     }
@@ -143,7 +96,7 @@ export class GcodeVM {
 
     reset() {
         //let controller = this.options.controller || (this.options.tightcnc && this.options.tightcnc.controller) || {};
-        let vmState: VMState = {
+        const vmState: VMState = {
             pos: [],
             mpos: [],
             axisLabels: [],
@@ -197,18 +150,18 @@ export class GcodeVM {
             if (options.include && !options.exclude && options.include.indexOf(prop) !== -1) return true;
             return false;
         };
-        let vmState = options.vmState || this.vmState;
-        let ret = [];
+        const vmState = options.vmState || this.vmState;
+        const ret = [];
 
         // tool change
         if (typeof vmState?.tool === 'number' && shouldInclude('tool')) {
-            ret.push(new GcodeLine('T' + vmState.tool));
+            ret.push(new GcodeLine(`T${vmState.tool}`));
             if (vmState.countM6) ret.push(new GcodeLine('M6'));
         }
 
         // feed rate
         if (vmState?.feed && shouldInclude('feed')) {
-            ret.push(new GcodeLine('F' + vmState.feed));
+            ret.push(new GcodeLine(`F${vmState.feed}`));
         }
 
         // motion mode
@@ -257,8 +210,8 @@ export class GcodeVM {
         // spindle
         if (vmState?.spindle !== null && vmState?.spindle !== undefined && shouldInclude('spindle')) {
             if (vmState.spindle) {
-                let word = (vmState.spindleDirection === -1) ? 'M4' : 'M3';
-                let sword = vmState.spindleSpeed ? (' S' + vmState.spindleSpeed) : '';
+                const word = (vmState.spindleDirection === -1) ? 'M4' : 'M3';
+                const sword = vmState.spindleSpeed ? (` S${vmState.spindleSpeed}`) : '';
                 ret.push(new GcodeLine(word + sword));
             } else {
                 ret.push(new GcodeLine('M5'));
@@ -282,7 +235,7 @@ export class GcodeVM {
         if (vmState?.activeCoordSys !== null && vmState?.activeCoordSys !== undefined && shouldInclude('activeCoordSys')) {
             // TODO: Support for higher coordinate systems
             if (vmState.activeCoordSys < 6) {
-                ret.push(new GcodeLine('G' + (54 + vmState.activeCoordSys)));
+                ret.push(new GcodeLine(`G${54 + vmState.activeCoordSys}`));
             }
         }
 
@@ -303,17 +256,17 @@ export class GcodeVM {
             return false;
         };
 
-        let controller = options?.controller || this.options.controller || (this.options.tightcnc?this.options.tightcnc.controller:undefined);
-        let vmState = options?.vmState || this.vmState || {};
+        const controller = options?.controller || this.options.controller || (this.options.tightcnc?this.options.tightcnc.controller:undefined);
+        const vmState = options?.vmState || this.vmState || {};
 
-        if (shouldInclude('axisLabels')) vmState.axisLabels = objtools.deepCopy(this.options.axisLabels || controller?.axisLabels || ['x', 'y', 'z']);
-        if (shouldInclude('mpos')) vmState.mpos = objtools.deepCopy(controller?.mpos || this.zerocoord(null));
-        if (shouldInclude('pos')) vmState.pos = objtools.deepCopy((controller?.getPos && controller?.getPos()) || controller?.pos || this.zerocoord(null));
+        if (shouldInclude('axisLabels')) vmState.axisLabels = objtools.deepCopy(this.options.axisLabels || controller?.axisLabels || ['x', 'y', 'z']) as string[];
+        if (shouldInclude('mpos')) vmState.mpos = objtools.deepCopy(controller?.mpos || this.zerocoord(null)) as number[];
+        if (shouldInclude('pos')) vmState.pos = objtools.deepCopy((controller?.getPos && controller?.getPos()) || controller?.pos || this.zerocoord(null)) as number[];
         if (shouldInclude('activeCoordSys')) vmState.activeCoordSys = (typeof controller?.activeCoordSys === 'number') ? controller.activeCoordSys : undefined;
-        if (shouldInclude('coordSysOffsets')) vmState.coordSysOffsets = objtools.deepCopy(controller?.coordSysOffsets || [this.zerocoord(null)]);
+        if (shouldInclude('coordSysOffsets')) vmState.coordSysOffsets = objtools.deepCopy(controller?.coordSysOffsets || [this.zerocoord(null)]) as number[][];
         if (shouldInclude('offset')) vmState.offset = controller?.offset || this.zerocoord(0);
         if (shouldInclude('offsetEnabled')) vmState.offsetEnabled = controller?.offsetEnabled || false;
-        if (shouldInclude('storedPositions')) vmState.storedPositions = objtools.deepCopy(controller?.storedPositions || [this.zerocoord<number|undefined>(undefined), this.zerocoord<number|undefined>(undefined)]);
+        if (shouldInclude('storedPositions')) vmState.storedPositions = objtools.deepCopy(controller?.storedPositions || [this.zerocoord<number|undefined>(undefined), this.zerocoord<number|undefined>(undefined)]) as number[][];
         if (shouldInclude('units')) vmState.units = controller?.units || 'mm';
         if (shouldInclude('feed')) vmState.feed = controller?.feed || (Array.isArray(this.options.maxFeed) ? this.options.maxFeed[0] : this.options.maxFeed);
         if (shouldInclude('incremental')) vmState.incremental = controller?.incremental || false;
@@ -333,16 +286,16 @@ export class GcodeVM {
     }
 
     _convertCoordSys(pos:(number|undefined)[], fromCoordSys?:number, toCoordSys?:number, fromOffset?:(number|undefined)[], toOffset?:(number|undefined)[]):number[] {
-        let vmState = this.vmState;
-        let retPos:number[] = [];
+        const vmState = this.vmState;
+        const retPos:number[] = [];
         for (let axisNum = 0; axisNum < pos.length; axisNum++) {
             let fromTotalOffset = 0;
             let toTotalOffset = 0;
             if (typeof fromCoordSys === 'number') {
-                fromTotalOffset += (vmState?.coordSysOffsets![fromCoordSys] || [])[axisNum] || 0;
+                fromTotalOffset += (vmState?.coordSysOffsets[fromCoordSys] || [])[axisNum] || 0;
             }
             if (typeof toCoordSys === 'number') {
-                toTotalOffset += (vmState?.coordSysOffsets![toCoordSys] || [])[axisNum] || 0;
+                toTotalOffset += (vmState?.coordSysOffsets[toCoordSys] || [])[axisNum] || 0;
             }
             if (fromOffset) {
                 fromTotalOffset += fromOffset[axisNum] || 0;
@@ -365,7 +318,7 @@ export class GcodeVM {
 
     _updateBounds(bounds:number[][], pos:number[], axisFlags?:boolean[]) {
         for (let axisNum = 0; axisNum < pos.length; axisNum++) {
-            let v = pos[axisNum];
+            const v = pos[axisNum];
             if (typeof v !== 'number' || (axisFlags && !axisFlags[axisNum])) continue;
             if (bounds[0][axisNum] === null || v < bounds[0][axisNum]) {
                 bounds[0][axisNum] = v;
@@ -376,10 +329,10 @@ export class GcodeVM {
         }
     }
 
-    _processMove(to:number[], axisFlags?:boolean[], feed?:number, travel?:number, incremental?:boolean) {
+    _processMove(to:(number|undefined)[], axisFlags?:boolean[], feed?:number, travel?:number, incremental?:boolean) {
         if (incremental) {
             // Update pos if incremental coordinates
-            to = objtools.deepCopy(to);
+            to = objtools.deepCopy(to) as number[];
             for (let axisNum = 0; axisNum < this.vmState.pos.length; axisNum++) {
                 to[axisNum] = (to[axisNum] || 0) + this.vmState.pos[axisNum];
             }
@@ -393,16 +346,16 @@ export class GcodeVM {
             }
             travel = Math.sqrt(travelSq);
         }
-        let from = this.vmState.pos;
+        const from = this.vmState.pos;
         let moveTime;
         if (this.vmState.inverseFeed && feed) {
             // Handle time calc if inverse feed
             // Calculate the minimum amount of time this move would take so we can compare it to the requested time
             let minTime = 0;
             for (let axisNum = 0; axisNum < to.length && axisNum < from.length; axisNum++) {
-                let axisTravel = Math.abs(from[axisNum] - to[axisNum]);
-                let axisFeed = Array.isArray(this.options.maxFeed) ? this.options.maxFeed[axisNum] : this.options.maxFeed;
-                let travelTime = axisTravel / (axisFeed || 1000) * 60;
+                const axisTravel = Math.abs(from[axisNum] - (to[axisNum] || 0));
+                const axisFeed = Array.isArray(this.options.maxFeed) ? this.options.maxFeed[axisNum] : this.options.maxFeed;
+                const travelTime = axisTravel / (axisFeed || 1000) * 60;
                 if (travelTime > minTime) minTime = travelTime;
             }
             // Calculate move time
@@ -420,18 +373,18 @@ export class GcodeVM {
             // calculate linear distance travelled (this, and other parts of this method, will need to be adjusted for nonlinear moves)
             let linearDist = 0;
             for (let axisNum = 0; axisNum < to.length; axisNum++) {
-                let d = to[axisNum] - this.vmState.pos[axisNum];
+                const d = (to[axisNum]|| 0) - this.vmState.pos[axisNum];
                 linearDist += d * d;
             }
             linearDist = Math.sqrt(linearDist);
             // Determine the axis that will require the most amount of time to change velocity
             let maxAccelTime = 0; // minutes
-            let axisAccelTimes = [];
+            const axisAccelTimes = [];
             let accelMin:number|undefined;
             for (let axisNum = 0; axisNum < to.length; axisNum++) {
-                let accel = (Array.isArray(this.options.acceleration) ? this.options.acceleration[axisNum] : this.options.acceleration) || 0;
+                const accel = (Array.isArray(this.options.acceleration) ? this.options.acceleration[axisNum] : this.options.acceleration) || 0;
                 if (!accelMin || accel < accelMin) accelMin = accel;
-                let diff = to[axisNum] - this.vmState.pos[axisNum];
+                const diff = (to[axisNum]||0) - this.vmState.pos[axisNum];
                 // calculate feed component for this axis (may be negative to indicate negative direction)
                 let axisFeed;
                 if (!feed) { // G0
@@ -440,27 +393,27 @@ export class GcodeVM {
                     axisFeed = diff / linearDist * feed; // in units/min
                 }
                 // Get and update the last move's axis feed rate
-                let lastMoveAxisFeed = this._lastMoveAxisFeeds[axisNum];
+                const lastMoveAxisFeed = this._lastMoveAxisFeeds[axisNum];
                 this._lastMoveAxisFeeds[axisNum] = axisFeed;
                 // calculate amount of time it would take to accelerate between the feeds
-                let accelTime = Math.abs(axisFeed! - lastMoveAxisFeed!) / accel; // min
+                const accelTime = Math.abs(axisFeed || 0 - (lastMoveAxisFeed || 0)) / accel; // min
                 if (accelTime > maxAccelTime) maxAccelTime = accelTime;
                 axisAccelTimes[axisNum] = accelTime;
             }
             // Determine the distance travelled for that acceleration time
-            let accelDist = Math.abs((1 / 2) * accelMin! * (maxAccelTime * maxAccelTime));
+            let accelDist = Math.abs((1 / 2) * (accelMin || 0) * (maxAccelTime * maxAccelTime));
             if (accelDist > travel) accelDist = travel;
             // Calcualate the base move time (time when travelling over move at max feed, minus the distances for acceleration)
             if (!feed) { // G0
                 moveTime = 0;
                 for (let axisNum = 0; axisNum < to.length && axisNum < from.length; axisNum++) {
-                    let accel = Array.isArray(this.options.acceleration) ? this.options.acceleration[axisNum] : this.options.acceleration;
-                    let axisAccelTime = axisAccelTimes[axisNum];
-                    let axisAccelDist = Math.abs((1 / 2) * accel! * (axisAccelTime * axisAccelTime));
-                    let axisTravel = Math.abs(to[axisNum] - this.vmState.pos[axisNum]);
+                    const accel = Array.isArray(this.options.acceleration) ? this.options.acceleration[axisNum] : this.options.acceleration;
+                    const axisAccelTime = axisAccelTimes[axisNum];
+                    let axisAccelDist = Math.abs((1 / 2) * (accel || 0) * (axisAccelTime * axisAccelTime));
+                    let axisTravel = Math.abs((to[axisNum] || 0) - this.vmState.pos[axisNum]);
                     if (axisAccelDist > axisTravel) axisAccelDist = axisTravel;
                     axisTravel -= axisAccelDist;
-                    let axisFeed = Array.isArray(this.options.maxFeed) ? this.options.maxFeed[axisNum] : this.options.maxFeed;
+                    const axisFeed = Array.isArray(this.options.maxFeed) ? this.options.maxFeed[axisNum] : this.options.maxFeed;
                     let travelTime = axisTravel / (axisFeed || 1000); // minutes
                     travelTime += axisAccelTime;
                     if (travelTime > moveTime) moveTime = travelTime;
@@ -477,10 +430,10 @@ export class GcodeVM {
             moveTime = this.options.minMoveTime;
         }
 
-        this.vmState.totalTime! += moveTime || 0;
+        this.vmState.totalTime += moveTime || 0;
         // Update local coordinates
         for (let axisNum = 0; axisNum < to.length; axisNum++) {
-            this.vmState.pos[axisNum] = to[axisNum];
+            this.vmState.pos[axisNum] = to[axisNum] || 0;
         }
         // Update machine position
         this._updateMPosFromPos();
@@ -520,23 +473,22 @@ export class GcodeVM {
         gline = new GcodeLine(gline);
         // This is NOT a gcode validator.  Input gcode is expected to be valid and well-formed.
         //
-        let vmState = this.vmState;
+        const vmState = this.vmState;
         vmState.gcodeLine = gline.toString()
-        let origCoordSys = vmState.activeCoordSys;
-        let origTotalTime = vmState.totalTime;
+        const origCoordSys = vmState.activeCoordSys;
+        const origTotalTime = vmState.totalTime;
         let changedCoordOffsets = false;
 
         // Determine if this line represents motion
-        let motionCode = null; // The G code on this line in the motion modal group (indicating some kind of machine motion)
-        let hasCoords = []; // A list of axis word letters present (eg. [ 'X', 'Z' ]) 
-        let coordPos = vmState.incremental ? this.zerocoord<number|undefined>(undefined) : objtools.deepCopy(vmState.pos); // Position indicated by coordinates present, filling in missing ones with current pos; unless incremental, then all zeroes
-        let coordPosSparse = this.zerocoord<number|undefined>(undefined); // Position indicated by coordinates present, with missing axes filled in with nulls
-        let coordFlags = this.zerocoord(false); // True in positions where coordinates are present
+        const hasCoords = []; // A list of axis word letters present (eg. [ 'X', 'Z' ]) 
+        const coordPos = vmState.incremental ? this.zerocoord<number|undefined>(undefined) : objtools.deepCopy(vmState.pos) as number[]; // Position indicated by coordinates present, filling in missing ones with current pos; unless incremental, then all zeroes
+        const coordPosSparse = this.zerocoord<number|undefined>(undefined); // Position indicated by coordinates present, with missing axes filled in with nulls
+        const coordFlags = this.zerocoord(false); // True in positions where coordinates are present
 
         // Determine which axis words are present and convert to coordinate arrays
-        for (let axisNum = 0; axisNum < vmState.axisLabels!.length; axisNum++) {
-            let axis = vmState.axisLabels![axisNum].toUpperCase();
-            let val = gline.get(axis);
+        for (let axisNum = 0; axisNum < vmState.axisLabels.length; axisNum++) {
+            const axis = vmState.axisLabels[axisNum].toUpperCase();
+            const val = gline.get(axis);
             if (typeof val === 'number') {
                 hasCoords.push(axis);
                 coordPos[axisNum] = val;
@@ -547,27 +499,28 @@ export class GcodeVM {
         }
 
         // Check if a motion gcode is indicated (either by presence of a motion gcode word, or presence of coordinates without any other gcode)
+        let motionCode:string|number|undefined; // The G code on this line in the motion modal group (indicating some kind of machine motion)
         if (!gline.has('G') && hasCoords.length) {
             motionCode = vmState.motionMode;
         } else {
-            motionCode = gline.get<string>('G', 'G0') as 'G0'|'G1'|'G2'|'G3';
+            motionCode = gline.get<string|number>('G', 'G0');
             if (typeof motionCode === 'number') {
-                motionCode = 'G' + motionCode;
+                motionCode = `G${motionCode}`;
                 vmState.motionMode = motionCode as 'G0'|'G1'|'G2'|'G3';
             }
         }
 
         // Check if this is simple motion that can skip extra checks (for efficiency in the most common case)
-        let isSimpleMotion = motionCode && (motionCode === 'G0' || motionCode === 'G1') && (gline.has(motionCode) ? 1 : 0) + (gline.has('F') ? 1 : 0) + (gline.has('N') ? 1 : 0) + hasCoords.length === gline.words?.length;
+        const isSimpleMotion = motionCode && (motionCode === 'G0' || motionCode === 'G1') && (gline.has(motionCode) ? 1 : 0) + (gline.has('F') ? 1 : 0) + (gline.has('N') ? 1 : 0) + hasCoords.length === gline.words?.length;
 
         // Update seenWordSet
-        if(gline.words)for (let word of gline.words) {
+        if(gline.words)for (const word of gline.words) {
             vmState.seenWordSet[word[0].toUpperCase()] = true;
         }
 
         // Check for other codes that set modals
         let tempCoordSys = false;
-        let wordF = gline.get('F');
+        const wordF = gline.get('F');
         if (typeof wordF === 'number') vmState.feed = wordF;
         if (!isSimpleMotion) {
             if (gline.has('G17')) vmState.arcPlane = 0;
@@ -576,7 +529,7 @@ export class GcodeVM {
             if (gline.has('G20')) vmState.units = 'in';
             if (gline.has('G21')) vmState.units = 'mm';
             for (let i = 0; i < 6; i++) {
-                if (gline.has('G' + (54 + i))) {
+                if (gline.has(`G${54 + i}`)) {
                     this._setCoordSys(i);
                     changedCoordOffsets = true;
                 }
@@ -599,7 +552,7 @@ export class GcodeVM {
                 vmState.units = 'mm';
                 changedCoordOffsets = true;
             }
-            let wordS = gline.get('S');
+            const wordS = gline.get('S');
             if (typeof wordS === 'number') vmState.spindleSpeed = wordS;
             if (gline.has('M3')) {
                 vmState.spindleDirection = 1;
@@ -670,8 +623,8 @@ export class GcodeVM {
             // Handle G10 L2
             if (gline.has('G10') && gline.has('L2') && gline.has('P') && hasCoords.length) {
                 this._updateMPosFromPos();
-                let newOffset = coordPosSparse.map((v) => (v || 0));
-                let coordSys = gline.get('P') as number - 1;
+                const newOffset = coordPosSparse.map((v) => (v || 0));
+                const coordSys = gline.get('P') as number - 1;
                 vmState.coordSysOffsets[coordSys] = newOffset;
                 this._updatePosFromMPos();
                 changedCoordOffsets = true;
@@ -679,8 +632,8 @@ export class GcodeVM {
             // Handle G10 L20
             if (gline.has('G10') && gline.has('L20') && gline.has('P') && hasCoords.length) {
                 this._updateMPosFromPos();
-                let newOffset = coordPosSparse.map((v) => (v || 0)).map((v, i) => (vmState.mpos[i] || 0) - v);
-                let coordSys = gline.get('P') as number - 1;
+                const newOffset = coordPosSparse.map((v) => (v || 0)).map((v, i) => (vmState.mpos[i] || 0) - v);
+                const coordSys = gline.get('P') as number - 1;
                 vmState.coordSysOffsets[coordSys] = newOffset;
                 this._updatePosFromMPos();
                 changedCoordOffsets = true;
@@ -688,10 +641,10 @@ export class GcodeVM {
 
             // Handle G28.1
             if (gline.has('G28.1')) {
-                vmState.storedPositions[0] = objtools.deepCopy(vmState.mpos);
+                vmState.storedPositions[0] = objtools.deepCopy(vmState.mpos) as number[];
             }
             if (gline.has('G30.1')) {
-                vmState.storedPositions[1] = objtools.deepCopy(vmState.mpos);
+                vmState.storedPositions[1] = objtools.deepCopy(vmState.mpos) as number[];
             }
 
             // Handle homing (can't really be handled exactly correctly without knowing actual machine position)
@@ -745,7 +698,7 @@ export class GcodeVM {
         }
 
         // Handle line number
-        let lineNum = gline.get('N') as number;
+        const lineNum = gline.get('N') as number;
         if (lineNum !== null) vmState.line = lineNum;
 
         // Add to line counter
@@ -761,7 +714,7 @@ export class GcodeVM {
             isMotion: isMotion, // whether the line represents motion
             motionCode: motionCode as 'G0'|'G1'|'G2'|'G3', // If motion, the G code associated with the motion
             changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
-            time: (vmState!.totalTime || 0) - (origTotalTime || 0) // estimated duration of instruction execution, in seconds
+            time: (vmState.totalTime || 0) - (origTotalTime || 0) // estimated duration of instruction execution, in seconds
         };
     }
 

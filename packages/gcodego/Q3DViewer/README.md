@@ -4,6 +4,6 @@
 
 ## Usage
 
-```
+```Typescript
 // TODO: DEMONSTRATE API
 ```

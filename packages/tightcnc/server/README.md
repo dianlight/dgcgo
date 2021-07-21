@@ -1,47 +1,3 @@
-## Repotisory / Fork Scope
-NO MORE A FORK. Not tightCNC is integrated in DGCGO and is incompatible ad protocol level to the original TightCNC
-
-This fork scope is to upgrade TightCNC to better use in my GCODEGO project. 
-Planned task upgrade:
-- [x] Typescript Migration (ts-migrate)
- - [x] Generate dist with types
- - [ ] Correct macro loading -- radulucut/script-store o @krlwlfrt/dml
- - [ ] Dynamic Plugin and Processor loader - @krlwlfrt/dml
- - [x] Remove XError
- - [ ] Code cleanup
-  - [x] Remove yaar and use a Typescript system.
-  - [ ] Plugin indipendent UI interfaces
-    - [ ] Remove clientui codebase
-  - [ ] Correct all ts-migrate FIXME:
-  - [ ] Use import not required
- - [ ] Remove not Typescript friendly dependencies 
- - [x] ~~Typescript Migration for lib ( ts-migrate )~~ rewrited lib content
-  - [x] Remove ts-migrate dependecy
- - [x] Clientlib migration
-  - [x] Expose clientlib d.ts
-- [x] Upgrade to serialport 9.x 
-  - [x] Support for raw socket communication - serialport-binding
-    - [x] Manage connection errors
-  - [ ] Support for websocket comunication - serilaport-binding
-  - [x] Support grbl-sim in process comunication - serilaport-binding  - *For MacOs use my branch [dianlight/grblsim](https://github.com/dianlight/grbl-sim)*
-  - [ ] User Port as url to manage transparent binging. ( serial: socket: grblsim: )
-- [x] ~~Support start without config~~ (Removed controllers from default conf!)
-- [ ] Support for new API
-  - [ ] Reload Config without restart ( need for web version and to allow tmp file consistency )
-  - [x] ~~Is Alive~~ **Not needed!**
-  - [x] Get available serials ports
-    - [ ] Based on controller to use custom bundings.
-  - [x] Controller Capability
-    - [x] Home single axes 
-    - [ ] Laser / Spindle mode
-- [ ] Sender as Worker
-  - [x] ~~support Virtual comunication API Adapter ( comunication as plugin )~~ Serialport binding
-    - [ ] Web-Serial/Web-USB API - serialport-binding-webserialapi
-- [ ] Firmware
-  - [ ] Support grblHal (Simulator)[https://github.com/grblHAL/Simulator] 
-  - [ ] Test TinyG * Need HW or Emulator* 
-  - [ ] Support g2core * Need HW of Emulator*
-  - [ ] Support Marlin * Need HW or Emulator*  
 # TightCNC
 
 TightCNC is a CNC controller interface application with a focus on backend robustness and stability.  The architecture
@@ -74,40 +30,40 @@ are handled server-side, so things like UI crashes are not an issue for ongoing 
 
 ![TightCNC Screenshot](/images/consoleui/control-mode.png)
 
-- [TightCNC](#tightcnc)
+* [TightCNC](#tightcnc)
   * [Supported Devices](#supported-devices)
   * [Setup](#setup)
-    + [Install Node.JS](#install-nodejs)
-    + [Install TightCNC](#install-tightcnc)
-    + [Configure TightCNC](#configure-tightcnc)
-    + [Permissions](#permissions)
+    * [Install Node.JS](#install-nodejs)
+    * [Install TightCNC](#install-tightcnc)
+    * [Configure TightCNC](#configure-tightcnc)
+    * [Permissions](#permissions)
   * [Running](#running)
-    + [Server](#server)
-    + [Console UI](#console-ui)
-    + [Command Line Interface](#command-line-interface)
+    * [Server](#server)
+    * [Console UI](#console-ui)
+    * [Command Line Interface](#command-line-interface)
   * [ConsoleUI Usage](#consoleui-usage)
-    + [Screen Layout](#screen-layout)
-    + [Home Screen](#home-screen)
-    + [Control Mode](#control-mode)
-    + [Log Mode](#log-mode)
-    + [New Job Mode](#new-job-mode)
-    + [Job Info Mode](#job-info-mode)
-    + [Automatic Job Recovery](#automatic-job-recovery)
-    + [Autolevel](#autolevel)
-    + [Tool Change](#tool-change)
-    + [Live Feed Rate Multiplier](#live-feed-rate-multiplier)
+    * [Screen Layout](#screen-layout)
+    * [Home Screen](#home-screen)
+    * [Control Mode](#control-mode)
+    * [Log Mode](#log-mode)
+    * [New Job Mode](#new-job-mode)
+    * [Job Info Mode](#job-info-mode)
+    * [Automatic Job Recovery](#automatic-job-recovery)
+    * [Autolevel](#autolevel)
+    * [Tool Change](#tool-change)
+    * [Live Feed Rate Multiplier](#live-feed-rate-multiplier)
   * [Command Line Interface Usage](#command-line-interface-usage)
   * [Server Communications Log](#server-communications-log)
   * [Macros](#macros)
-    + [Shorthand Macros](#shorthand-macros)
-    + [Macro Environment](#macro-environment)
-    + [Macro Parameters](#macro-parameters)
-    + [Generator Macros](#generator-macros)
-    + [Included Macros](#included-macros)
+    * [Shorthand Macros](#shorthand-macros)
+    * [Macro Environment](#macro-environment)
+    * [Macro Parameters](#macro-parameters)
+    * [Generator Macros](#generator-macros)
+    * [Included Macros](#included-macros)
   * [Operations](#operations)
   * [API](#api)
   * [Gcode Processors](#gcode-processors)
-    + [Building Gcode Processors](#building-gcode-processors)
+    * [Building Gcode Processors](#building-gcode-processors)
   * [Plugins](#plugins)
   * [TinyG/G2Core](#tinygg2core)
 
@@ -153,7 +109,6 @@ consoleui-specific options as well.
 The server process will need to be able to access the serial port.  On Linux, this can be accomplished either by running the server as root (not recommended),
 or by giving the user access to the serial port.  On many Linux systems, the command `sudo usermod -a -G serial <username>` will work.
 
-
 ## Running
 
 ### Server
@@ -172,7 +127,6 @@ consoleui will exit immediately.
 ### Command Line Interface
 
 The command-line interface can be accessed with the command `tightcnc --help`, or (from git) `./bin/cli.js --help`.
-
 
 ## ConsoleUI Usage
 
@@ -353,8 +307,6 @@ Hit `f` in job info mode to specify a feed rate multiplier.  The runtime modific
 buffer is necessary for speedy operation.  Depending on the size of the buffer and the duration of the gcode lines being executed, the feed override may take
 time to take effect.
 
-
-
 ## Command Line Interface Usage
 
 If installed globally, the CLI should be available through the `tightcnc` command.  If checked out from git, it can be found in `./bin/cli.js`.  Either way, the options to it are the same.
@@ -371,7 +323,7 @@ These commands can be listed with `tightcnc --help`.  Usage information for each
 
 Examples:
 
-```
+```bash
 tightcnc status --format jsonpretty
 
 tightcnc send G0X50Y30
@@ -381,7 +333,7 @@ tightcnc op probe -p pos='[ null, null, -2 ]' -p feed=45
 tightcnc job -f myfile.nc -p recoverytracker:recoverySaveInterval=10
 ```
 
-```
+```bash
 $ ./bin/cli.js --help
 cli.js <command>
 
@@ -402,12 +354,10 @@ Options:
   --help     Show help                                                 [boolean]
 ```
 
-
 ## Server Communications Log
 
 TightCNC will automatically store a log of all communications with the device and some additional log information.  This can be very useful for debugging issues with
 the device.  The log is stored across several files which are automatically rotated to minimize disk usage.  Settings for this rotation are in the config file.
-
 
 ## Macros
 
@@ -418,9 +368,9 @@ should be placed in the tightcnc macro directory (inside the configured base dir
 
 Example basic macro (moves in a circle):
 
-```
+```js
 for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 100) {
-	push('G0 X' + Math.cos(angle) + ' Y' + Math.sin(angle));
+ push('G0 X' + Math.cos(angle) + ' Y' + Math.sin(angle));
 }
 ```
 
@@ -434,8 +384,13 @@ interpolation.  For example, a shorthand macro substituting for parameters might
 
 The macro javascript code is executed in a context with the following available:
 
-* Any parameters supplied.  Parameters can be accessed by name as "raw" variables.  Parameters that look like position arrays (short arrays of numbers) are additionally augmented by adding the properties 'x', 'y', and 'z' (or whatever the axis letters are) for easy access to these values.  The special parameter `pos` is also automatically deconstructed and the variables `x`, `y`, and `z` become available, corresponding to the components of `pos`.
-* `push(gcode)`: Outputs the gcode line.  If the macro is running independently, the line is immediately executed.  If run as part of a job, it is pushed into the gcode processor chain for the job.  The parameter to `push` can be a string, an instance of `GcodeLine`, or an array of words in a format accepted by the GcodeLine constructor.  If a macro is intended to be used as a generator and can generate large amounts of gcode, you should call this as `await push(gcode);`.  This will allow backpressure to be exerted on the macro.
+* Any parameters supplied.  Parameters can be accessed by name as "raw" variables.  Parameters that look like position arrays (short arrays of numbers)
+are additionally augmented by adding the properties 'x', 'y', and 'z' (or whatever the axis letters are) for easy access to these values.  The special parameter `pos` is also automatically
+deconstructed and the variables `x`, `y`, and `z` become available, corresponding to the components of `pos`.
+* `push(gcode)`: Outputs the gcode line.  If the macro is running independently, the line is immediately executed.
+If run as part of a job, it is pushed into the gcode processor chain for the job.  The parameter to `push` can be a string, an instance of `GcodeLine`,
+or an array of words in a format accepted by the GcodeLine constructor.  If a macro is intended to be used as a generator and can generate large amounts of gcode,
+you should call this as `await push(gcode);`.  This will allow backpressure to be exerted on the macro.
 * `await sync()`: This waits until the machine has stopped and all buffers have emptied.
 * `await op(opname, params)`: This runs an operation and returns the result.
 * `await runMacro(macroName, params)`: Runs another macro.
@@ -453,20 +408,20 @@ Macros can be configurable and can accept parameters.  Parameters are specified 
 
 Example:
 
-```
+```js
 macroMeta({
-	params: {
-		speed: {
-			type: 'number',
-			default: 5000,
-			description: 'The speed'
-		},
-		startPosition: {
-			type: [ 'number' ],
-			isCoordinates: true,
-			description: 'Starting coords'
-		}
-	}
+ params: {
+  speed: {
+   type: 'number',
+   default: 5000,
+   description: 'The speed'
+  },
+  startPosition: {
+   type: [ 'number' ],
+   isCoordinates: true,
+   description: 'Starting coords'
+  }
+ }
 });
 
 message('The speed was set to ' + speed);
@@ -476,13 +431,14 @@ push('G0 X' + startPosition.x + ' Y' + startPosition.y);
 
 ~~Parameters are specified in [common schema format](https://www.npmjs.com/package/common-schema).~~
 
-Additionally, there may be cases that you want to merge in another macro's parameters with your macro's (typically when calling that macro and allowing the user to define the params).
+Additionally, there may be cases that you want to merge in another macro's parameters with your macro's (typically when calling
+that macro and allowing the user to define the params).
 To do this, add a `mergeParams` option to `macroMeta()` containing an array of macro names to pull additional parameters from.
 
 ### Generator Macros
 
-Generator macros are just ordinary macros that are intended to be used to generate gcode for a job.  They must start with `generator-` to mark them as generators.  In general,
-calls to `push()` in a generator should be called with `await` to prevent filling up memory with large amounts of generated gcode.
+Generator macros are just ordinary macros that are intended to be used to generate gcode for a job.  They must start with `generator-` to mark them as generators.
+In general, calls to `push()` in a generator should be called with `await` to prevent filling up memory with large amounts of generated gcode.
 
 ### Included Macros
 
@@ -495,21 +451,26 @@ The current included macros are:
 * `end-generator`: Like `begin-generator`, is executed at the end of built-in generators.
 * `generator-flatten-surface`: This generates gcode to flatten a surface.
 * `mill-hole`: This moves the machine in a motion to mill a round hole with a selected size.
-* `probe-pins-center`: An example probing macro.  When used with a contact probe and 2 vertical pins parallel to the Y axis, it will find the center of both pins using the probe and then find a reference point at the midpoint of the pins.  To use, the probe must be positioned in between the two pins, and must be within 1 pin diameter of the lower pin.
-
+* `probe-pins-center`: An example probing macro.  When used with a contact probe and 2 vertical pins parallel to the Y axis, it will find the center of both pins using the
+probe and then find a reference point at the midpoint of the pins.  To use, the probe must be positioned in between the two pins, and must be within 1 pin diameter of the lower pin.
 
 ## Operations
 
 A core internal concent in TightCNC is the operation.  It is analogous to an API call, but is additionally used internally for other functions such as macros.
 Operations provide abstractions for common actions.  The current operations are:
 
-* `getStatus`: Returns current server and machine status.  Parameters: `fields` (an array of fields to return; if absent, all fields are returned), `sync` (if true, runs a `waitSync` operation before returning status)
-* `send`: Sends a line of gcode to the controller.  Parameters: `line` (the string gcode line to send), `wait` (if true, wait for confirmation the line was transmitted to the controller before returning)
+* `getStatus`: Returns current server and machine status.
+Parameters: `fields` (an array of fields to return; if absent, all fields are returned), `sync` (if true, runs a `waitSync`
+operation before returning status)
+* `send`: Sends a line of gcode to the controller.
+Parameters: `line` (the string gcode line to send), `wait` (if true, wait for confirmation the line was transmitted to the controller before returning)
 * `hold`: Start a feed hold.
 * `resume`: Resume movement from a feed hold.
 * `cancel`: Cancel any running gcode, jobs, and macros, and flush the gcode queues.
 * `reset`: Attempt to reset the controller.
-* `realTimeMove`: Jogs the machine.  Keep calling repeatedly to keep jogging.  The controller implementation limits the number of buffered jogging gcodes to ensure the machine can stop quickly.  Parameters: `axis` (axis number, x=0, y=1, etc), `inc` (amount to move, negative to move in reverse)
+* `realTimeMove`: Jogs the machine.  Keep calling repeatedly to keep jogging.
+The controller implementation limits the number of buffered jogging gcodes to ensure the machine can stop quickly.
+Parameters: `axis` (axis number, x=0, y=1, etc), `inc` (amount to move, negative to move in reverse)
 * `move`: Send a basic movement gcode (G0/G1).  Parameters: `pos` (the position to move to, in array-of-numbers form), `feed` (feed rate)
 * `home`: Runs the machine homing sequence.  Parameters: `axes` (array of booleans; true in positions for the axes to home; if not present, all axes will be homed)
 * `setAbsolutePos`: Set absolute machine coordinate origin.  Parameters: `pos` (position to set absolute coordinates to, in number-array form; if not provided, origin is set to current position)
@@ -521,13 +482,13 @@ Operations provide abstractions for common actions.  The current operations are:
 * `cancelInput`: Cancel a user input request.  Parameters: `inputId`
 * `listFiles`: Returns a list of data files.
 * `uploadFile`: Upload a blob to the server as a data file.  Parameters: `filename` (remote name for the file), `data` (contents of file)
-* `startJob`: Start running a job.  Parameters: `filename` (source data filename), `macro` (generator macro name, used instead of a filename), `macroParams` (generator parameters), `rawFile` (if true, skip most gcode processing and just send to the controller), `gcodeProcessors` (an array of objects like `{ name: "gcode processor name", options: "gcode processor options" }`)
+* `startJob`: Start running a job.  Parameters: `filename` (source data filename), `macro` (generator macro name, used instead of a filename), `macroParams` (generator parameters), `rawFile`
+(if true, skip most gcode processing and just send to the controller), `gcodeProcessors` (an array of objects like `{ name: "gcode processor name", options: "gcode processor options" }`)
 * `jobDryRun`: Performs a job dry run.  Returns the results, including stats such as line count and predicted time.  Parameters: Same as `startJob`, with the addition of `outputFilename` (if provided, output processed gcode to this file)
 * `listMacros`: Returns a list of available macros and parameter schemas for each.
 * `runMacro`: Runs a macro.  Parameters: `macro` (macro name), `params` (macro parameters)
 
 Additional operations can be provided by plugins.
-
 
 ## API
 
@@ -537,25 +498,25 @@ imperative action-driven APIs with a variety of actions (REST is better for reso
 All API calls have the same HTTP wrapper:
 
 * Method: POST
-* URL: http://<host>:2363/v1/jsonrpc
+* URL: `http://<host>:2363/v1/jsonrpc`
 * Header Content-type: application/json
-* Header Authorization: Key <authKey>  (the auth key comes from the config file)
+* Header Authorization: Key `<authKey>`  (the auth key comes from the config file)
 
 The body is in JSON and has this format:
 
-```
+```json
 {
-	"method": <operation name>,
-	"params": { <operation parameters> }
+ "method": <operation name>,
+ "params": { <operation parameters> }
 }
 ```
 
 Responses are always HTTP 200's and are JSON objects.  The object contains either a `result` key or an `error` key, and looks like this:
 
-```
+```json
 {
-	"result": <operation result>,
-	"error": null
+ "result": <operation result>,
+ "error": null
 }
 ```
 
@@ -581,24 +542,22 @@ Here's an example gcode processor as a plugin.  It simply doubles all X and Y co
 const { GcodeProcessor } = require('tightcnc');
 
 class SizeDouber extends GcodeProcessor {
-	processGcode(gline) {
-		if (gline.has('X')) gline.set('X', gline.get('X') * 2);
-		if (gline.has('Y')) gline.set('Y', gline.get('Y') * 2);
-		return gline;
-	}
+ processGcode(gline) {
+  if (gline.has('X')) gline.set('X', gline.get('X') * 2);
+  if (gline.has('Y')) gline.set('Y', gline.get('Y') * 2);
+  return gline;
+ }
 }
 
 module.exports.registerServerComponents = function (tightcnc) {
-	tightcnc.registerGcodeProcessor('sizedoubler', SizeDoubler);
+ tightcnc.registerGcodeProcessor('sizedoubler', SizeDoubler);
 };
 ```
-
 
 ## Plugins
 
 TightCNC can be augmented by installing external plugins.  Plugins can add gcode processors, register new operations, add new console ui components, and
-generally augment the internals of the server and consoleui client.  Currently, the only plugins that exist are the [built-in ones](), but new plugins
-can easily be added externally.
+generally augment the internals of the server and consoleui client.
 
 Plugins can be installed using `npm`.  Plugins that are published can be installed with `npm install`, and local ones can be installed with `npm link`.  TightCNC
 just has to be able to `require()` the plugin.
@@ -608,7 +567,6 @@ After installing the plugin, it must be added to the `plugins` array in the Tigh
 A plugin exports two functions: `registerServerComponents(tightcnc)` and `registerConsoleUIComponents(consoleui)`.  Both functions are optional.
 These functions are called on server/client startup to register whatever is needed.  An example of a plugin registering a gcode processor
 is above.  Take a look at the [built-in plugins](https://github.com/crispy1989/tightcnc/tree/master/src/plugins) for more examples of how to plug in to TightCNC and interact with the user.
-
 
 ## TinyG/G2Core
 
@@ -635,7 +593,6 @@ can sometimes overfill the controller's receive buffer.  This isn't an issue wit
 to datastream corruption.  If you cannot use hardware flow control, you should probably disable the aggressive sending algorithm by setting
 `controllers.TinyG.maxUnackedRequests` to `8` (in the config).
 
-
 ## GRBL
 
 The GRBL controller implementation works with both the grbl 0.9 protocol and grbl 1.1 protocol.  Block execution timing is supported
@@ -643,5 +600,3 @@ even without line number support compiled into grbl.  Feed and acceleration valu
 how long each move will take.  This is augmented with other protocol information to predict when each block starts and finishes executing.
 
 The grbl protocol version is autodetected.  Just make sure the baud rate setting in the config file is correct for your version.
-
-

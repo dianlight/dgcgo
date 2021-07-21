@@ -132,7 +132,7 @@ export  class TinyGController extends Controller {
         if (!err)
             err = errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Communications reset');
         // Call the error hook on anything in sendQueue
-        for (let entry of this.sendQueue) {
+        for (const entry of this.sendQueue) {
             if (entry.hooks) {
                 this.debug('_commsReset triggering error hook on sendQueue entry');
                 entry.hooks.triggerSync('error', err);
@@ -155,13 +155,13 @@ export  class TinyGController extends Controller {
     // Calls executing hooks corresponding to front entry in planner mirror
     _commsCallExecutingHooks(minLineId = -1) {
         //this.debug('_commsCallExecutingHooks() ' + minLineId);
-        let lineidRange = this.plannerMirror[0];
+        const lineidRange = this.plannerMirror[0];
         if (lineidRange) {
-            let topLineId = lineidRange[1]; // max line id inclusive
+            const topLineId = lineidRange[1]; // max line id inclusive
             // Call hook on each line in the send queue until we've exceeded the top line id
             let sqIdx = 0;
             while (sqIdx < this.sendQueue.length && this.sendQueue[sqIdx].lineid <= topLineId) {
-                let sqEntry = this.sendQueue[sqIdx];
+                const sqEntry = this.sendQueue[sqIdx];
                 sqIdx++;
                 // run hooks if present
                 if (sqEntry.hooks && sqEntry.lineid >= minLineId) {
@@ -195,14 +195,14 @@ export  class TinyGController extends Controller {
     _commsShiftPlannerMirror() {
         //this.debug('_commsShiftPlannerMirror() plannerMirror.length ' + this.plannerMirror.length);
         // Shift off the front entry of the planner queue, and handle each line id range
-        let lineidRange = this.plannerMirror.shift();
+        const lineidRange = this.plannerMirror.shift();
         if (lineidRange) {
-            let topLineId = lineidRange[1]; // max line id to "resolve", inclusive
+            const topLineId = lineidRange[1]; // max line id to "resolve", inclusive
             //this.debug('Shifted top line id ' + topLineId);
             // Resolve each line in the send queue until we've exceeded the top line id
             while (this.sendQueue.length > 0 && this.sendQueue[0].lineid <= topLineId) {
                 //this.debug('shifting sendQueue');
-                let sqEntry = this.sendQueue.shift();
+                const sqEntry = this.sendQueue.shift();
                 // adjust pointers after shifting
                 this.sendQueueIdxToSend--;
                 this.sendQueueIdxToReceive--;
@@ -229,24 +229,24 @@ export  class TinyGController extends Controller {
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'queueReport' implicitly has an 'any' ty... Remove this comment to see the full error message
     _commsHandleQueueReportReceived(queueReport) {
         //this.debug('_commsHandleQueueReportReceived()');
-        let { qr, qi, qo } = queueReport;
+        const { qr, qi, qo } = queueReport;
         // --- HANDLE qi ---
         // For each entry pushed onto the planner since the last report, push onto the mirror planner.
         // Each of these entries should correspond to 0 or more gcode line IDs.
         // The range of gcode lines in the queue that correspond to this range of qi is sendQueueIdxToRecvAtLastQr (inclusive) to sendQueueIdxToReceive (exclusive)
         //this.debug('qi pushes');
         let sendQueueIdxRangeStart = this.sendQueueIdxToRecvAtLastQr;
-        let sendQueueIdxRangeEnd = this.sendQueueIdxToReceive;
+        const sendQueueIdxRangeEnd = this.sendQueueIdxToReceive;
         for (let qiCtr = 0; qiCtr < qi; qiCtr++) {
-            let qisLeft = qi - qiCtr;
-            let sendQueuesLeft = sendQueueIdxRangeEnd - sendQueueIdxRangeStart;
-            let numGcodesThisQi = Math.floor(sendQueuesLeft / qisLeft);
+            const qisLeft = qi - qiCtr;
+            const sendQueuesLeft = sendQueueIdxRangeEnd - sendQueueIdxRangeStart;
+            const numGcodesThisQi = Math.floor(sendQueuesLeft / qisLeft);
             if (numGcodesThisQi === 0) {
                 this.plannerMirror.push(null);
                 continue;
             }
-            let lineIdStart = this.sendQueue[sendQueueIdxRangeStart].lineid;
-            let lineIdEnd = this.sendQueue[sendQueueIdxRangeStart + numGcodesThisQi - 1].lineid;
+            const lineIdStart = this.sendQueue[sendQueueIdxRangeStart].lineid;
+            const lineIdEnd = this.sendQueue[sendQueueIdxRangeStart + numGcodesThisQi - 1].lineid;
             this.plannerMirror.push([lineIdStart, lineIdEnd]);
             if (this.plannerMirror.length === 1) {
                 this._commsCallExecutingHooks();
@@ -259,12 +259,12 @@ export  class TinyGController extends Controller {
         let shiftPlannerMirrorExtra = 0;
         if (qi < 1 && sendQueueIdxRangeEnd > sendQueueIdxRangeStart) {
             //this.debug('handle extra responses');
-            let lineIdStart = this.sendQueue[sendQueueIdxRangeStart].lineid;
-            let lineIdEnd = this.sendQueue[sendQueueIdxRangeEnd - 1].lineid;
+            const lineIdStart = this.sendQueue[sendQueueIdxRangeStart].lineid;
+            const lineIdEnd = this.sendQueue[sendQueueIdxRangeEnd - 1].lineid;
             if (this.plannerMirror.length > 1) {
                 // Combine it with the range of the most recent entry pushed onto plannerMirror
                 if (this.plannerMirror[this.plannerMirror.length - 1]) {
-                    let pmentry = this.plannerMirror[this.plannerMirror.length - 1];
+                    const pmentry = this.plannerMirror[this.plannerMirror.length - 1];
                     if (pmentry[1] < lineIdEnd) {
                         pmentry[1] = lineIdEnd;
                     }
@@ -327,9 +327,9 @@ export  class TinyGController extends Controller {
         // ignore the response.
         if (this.sendQueueIdxToSend <= this.sendQueueIdxToReceive)
             return;
-        let responseStatusCode = r.f ? r.f[1] : 0;
+        const responseStatusCode = r.f ? r.f[1] : 0;
         // Fire off the ack hook
-        let entry = this.sendQueue[this.sendQueueIdxToReceive];
+        const entry = this.sendQueue[this.sendQueueIdxToReceive];
         if (entry.hooks)
             entry.hooks.triggerSync('ack', entry, r);
         if (responseStatusCode === 0) {
@@ -373,13 +373,13 @@ export  class TinyGController extends Controller {
         }
         // Don't send more if we haven't received responses for more than a threshold number
         const maxUnackedRequests = (this.config as TinyGControllerConfig).maxUnackedRequests || 32;
-        let numUnackedRequests = this.sendQueueIdxToSend - this.sendQueueIdxToReceive;
+        const numUnackedRequests = this.sendQueueIdxToSend - this.sendQueueIdxToReceive;
         if (numUnackedRequests >= maxUnackedRequests)
             return false;
         // We can send more if either 1) The serial receive buffer is filled less than 4 lines (recommended as per tinyg docs), or 2) The planner
         // queue is expected to have fewer than 24 entries in it
         // The number of slots in the receive buffer expected to be filled is equal to the number of responses we have not yet received for requests.
-        let receiveBufferFilled = this.sendQueueIdxToSend - this.sendQueueIdxToReceive;
+        const receiveBufferFilled = this.sendQueueIdxToSend - this.sendQueueIdxToReceive;
         const receiveBufferMaxFill = 4;
         if (receiveBufferFilled < receiveBufferMaxFill)
             return true;
@@ -392,14 +392,14 @@ export  class TinyGController extends Controller {
             effectiveFreePlannerBuffers -= this.sendQueue[i].goesToPlanner;
         }
         // send another line if that line is expected to fit in planner queue
-        let nextLinePlannerBuffers = (this.sendQueueIdxToSend < this.sendQueue.length) ? this.sendQueue[this.sendQueueIdxToSend].goesToPlanner : 4;
+        const nextLinePlannerBuffers = (this.sendQueueIdxToSend < this.sendQueue.length) ? this.sendQueue[this.sendQueueIdxToSend].goesToPlanner : 4;
         return effectiveFreePlannerBuffers >= nextLinePlannerBuffers;
     }
     _checkSendLoop() {
         //this.debug('_checkSendLoop()');
         while ((this.sendImmediateCounter > 0 || this._checkSendToDevice()) && this.sendQueueIdxToSend < this.sendQueue.length) {
             //this.debug('_checkSendLoop() iteration');
-            let entry = this.sendQueue[this.sendQueueIdxToSend];
+            const entry = this.sendQueue[this.sendQueueIdxToSend];
             this._writeToSerial(entry.str + '\n');
             this.sendQueueIdxToSend++;
             if (this.sendImmediateCounter > 0)
@@ -446,7 +446,7 @@ export  class TinyGController extends Controller {
         // Need to insert the block immediately after the most recently sent block
         // Determine the line id based on its position
         let newLineId;
-        let sendQueueIdxLastSent = this.sendQueueIdxToSend - 1;
+        const sendQueueIdxLastSent = this.sendQueueIdxToSend - 1;
         if (sendQueueIdxLastSent < 0) {
             // The most recently sent block has already been shifted off the sendQueue
             if (this.sendQueue.length) {
@@ -460,10 +460,10 @@ export  class TinyGController extends Controller {
         }
         else {
             // We know the lineid of the last sent block
-            let lineidLastSent = this.sendQueue[sendQueueIdxLastSent].lineid;
+            const lineidLastSent = this.sendQueue[sendQueueIdxLastSent].lineid;
             if (this.sendQueue.length > this.sendQueueIdxToSend) {
                 // There are more entries queued to be sent
-                let lineidNextSent = this.sendQueue[this.sendQueueIdxToSend].lineid;
+                const lineidNextSent = this.sendQueue[this.sendQueueIdxToSend].lineid;
                 newLineId = (lineidNextSent + lineidLastSent) / 2;
             }
             else {
@@ -486,7 +486,7 @@ export  class TinyGController extends Controller {
     _updateStateFromGcode(gline) {
         // Shortcut case for simple common moves which don't need to be tracked here
         let isSimpleMove = true;
-        for (let word of gline.words) {
+        for (const word of gline.words) {
             if (word[0] === 'G' && word[1] !== 0 && word[1] !== 1) {
                 isSimpleMove = false;
                 break;
@@ -511,15 +511,15 @@ export  class TinyGController extends Controller {
          * M3/M4/M5 - Changes spindle state
          * M7/M8/M9 - Changes coolant state
         */
-        let zeropoint = [];
+        const zeropoint = [];
         for (let i = 0; i < this.axisLabels.length; i++)
             zeropoint.push(0);
         if (gline.has('G10') && gline.has('L2') && gline.has('P')) {
-            let csys = gline.get('P') - 1;
+            const csys = gline.get('P') - 1;
             if (!this.coordSysOffsets[csys])
                 this.coordSysOffsets[csys] = zeropoint;
             for (let axisNum = 0; axisNum < this.axisLabels.length; axisNum++) {
-                let axis = this.axisLabels[axisNum].toUpperCase();
+                const axis = this.axisLabels[axisNum].toUpperCase();
                 if (gline.has(axis))
                     this.coordSysOffsets[csys][axisNum] = gline.get(axis);
             }
@@ -530,19 +530,19 @@ export  class TinyGController extends Controller {
             this.emit('statusUpdate');
         }
         if (gline.has('G28.1') || gline.has('G30.1')) {
-            let posnum = gline.has('G28.1') ? 0 : 1;
+            const posnum = gline.has('G28.1') ? 0 : 1;
             this.storedPositions[posnum] = this.mpos.slice();
             this.emit('statusUpdate');
         }
         if (gline.has('G28.2') || gline.has('G28.3')) {
             for (let axisNum = 0; axisNum < this.axisLabels.length; axisNum++) {
-                let axis = this.axisLabels[axisNum].toUpperCase();
+                const axis = this.axisLabels[axisNum].toUpperCase();
                 if (gline.has(axis))
                     this.homed[axisNum] = true;
             }
             this.emit('statusUpdate');
         }
-        let csysCode = gline.get('G', 'G54');
+        const csysCode = gline.get('G', 'G54');
         if (csysCode && csysCode >= 54 && csysCode <= 59 && Math.floor(csysCode) === csysCode) {
             this.activeCoordSys = csysCode - 54;
             this.emit('statusUpdate');
@@ -555,7 +555,7 @@ export  class TinyGController extends Controller {
             if (!this.offset)
                 this.offset = zeropoint;
             for (let axisNum = 0; axisNum < this.axisLabels.length; axisNum++) {
-                let axis = this.axisLabels[axisNum].toUpperCase();
+                const axis = this.axisLabels[axisNum].toUpperCase();
                 if (gline.has(axis))
                     this.offset[axisNum] = gline.get(axis);
             }
@@ -608,7 +608,7 @@ export  class TinyGController extends Controller {
     }
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'gline' implicitly has an 'any' type.
     sendGcode(gline, options = {}) {
-        let hooks = (options as any).hooks || (gline.triggerSync ? gline : new CrispHooks());
+        const hooks = (options as any).hooks || (gline.triggerSync ? gline : new CrispHooks());
         hooks.hookSync('executing', () => this._updateStateFromGcode(gline));
         this._sendBlock({
             str: gline.toString(),
@@ -654,7 +654,7 @@ export  class TinyGController extends Controller {
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'gline' implicitly has an 'any' type.
     _gcodeLineRequiresPlanner(gline) {
         let containsCoordinates = false;
-        for (let label of this.axisLabels) {
+        for (const label of this.axisLabels) {
             if (gline.has(label)) {
                 containsCoordinates = true;
                 break;
@@ -703,7 +703,7 @@ export  class TinyGController extends Controller {
     // Temporarily disable sending anything to the machine for a period of time to wait for it to catch up or something
     _tempDisableSending(time = 3500) {
         this.debug('_tempDisableSending');
-        let origDisableSending = this._disableSending;
+        const origDisableSending = this._disableSending;
         this._disableSending = true;
         setTimeout(() => {
             if (this._disableSending === true)
@@ -739,7 +739,7 @@ export  class TinyGController extends Controller {
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'line' implicitly has an 'any' type.
     request(line) {
         return new Promise((resolve, reject) => {
-            let hooks = new CrispHooks();
+            const hooks = new CrispHooks();
             let resolved = false;
             // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'entry' implicitly has an 'any' type.
             hooks.hookSync('ack', (entry, response) => {
@@ -757,11 +757,12 @@ export  class TinyGController extends Controller {
             this.send(line, { hooks: hooks });
         });
     }
-    override initConnection(retry = true) {
+
+    override initConnection(retry = true):Promise<void> {
         this.debug('initConnection()');
         if (this._initializing) {
             this.debug('skipping, already initializing');
-            return;
+            return Promise.resolve();
         }
         this._retryConnectFlag = retry;
         this.ready = false;
@@ -774,7 +775,7 @@ export  class TinyGController extends Controller {
         // Define an async function and call it so we can use async/await
         const doInit = async () => {
             // Set up options for serial connection.  (Set defaults, then apply configs on top.)
-            let serialOptions:SerialPort.OpenOptions = {
+            const serialOptions:SerialPort.OpenOptions = {
                 autoOpen: true,
                 baudRate: 115200,
                 dataBits: 8,
@@ -783,13 +784,13 @@ export  class TinyGController extends Controller {
                 rtscts: true,
                 xany: false
             };
-            for (let key in this.config) {
+            for (const key in this.config) {
                 if (key in serialOptions) {
                     // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                     serialOptions[key] = this.config[key];
                 }
             }
-            let port = this.config.port || '/dev/ttyUSB0';
+            const port = this.config.port || '/dev/ttyUSB0';
             // Try to open the serial port
             this.debug('Opening serial port');
             await new Promise<void>((resolve, reject) => {
@@ -831,7 +832,7 @@ export  class TinyGController extends Controller {
             const onSerialClose = () => {
                 this.debug('Serial close');
                 // Note that this isn't called during intended closures via this.close(), since this.close() first removes all handlers
-                let err = errRegistry.newError('IO_ERROR','COMM_ERROR').formatMessage('Serial port closed unexpectedly');
+                const err = errRegistry.newError('IO_ERROR','COMM_ERROR').formatMessage('Serial port closed unexpectedly');
                 if (!this._initializing)
                     this.emit('error', err);
                 this.close(err);
@@ -840,17 +841,17 @@ export  class TinyGController extends Controller {
             // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'buf' implicitly has an 'any' type.
             const onSerialData = (buf) => {
                 // Remove any stray XONs, XOFFs, and NULs from the stream
-                let newBuf = Buffer.alloc(buf.length);
+                const newBuf = Buffer.alloc(buf.length);
                 let newBufIdx = 0;
-                for (let b of buf) {
+                for (const b of buf) {
                     if (b != 0 && b != 17 && b != 19) {
                         newBuf[newBufIdx] = b;
                         newBufIdx++;
                     }
                 }
                 buf = newBuf.slice(0, newBufIdx);
-                let str = this.serialReceiveBuf + buf.toString('utf8');
-                let strlines = str.split(/[\r\n]+/);
+                const str = this.serialReceiveBuf + buf.toString('utf8');
+                const strlines = str.split(/[\r\n]+/);
                 if (!strlines[strlines.length - 1].trim()) {
                     // Received data ended in a newline, so don't need to buffer anything
                     strlines.pop();
@@ -884,7 +885,7 @@ export  class TinyGController extends Controller {
                 close: onSerialClose,
                 data: onSerialData
             };
-            for (let eventName in this._serialListeners)
+            for (const eventName in this._serialListeners)
                 this.serial?.on(eventName, this._serialListeners[eventName]);
             // This handles the case that the app might have been killed with a partially sent serial buffer.  Send a newline
             // to "flush" it, then wait a short period of time for any possible response to be received (and ignored).
@@ -928,6 +929,7 @@ export  class TinyGController extends Controller {
             this._initializing = false;
             this._retryConnect();
         });
+        return Promise.resolve();
     }
  
     close(err:BaseRegistryError) {
@@ -941,7 +943,7 @@ export  class TinyGController extends Controller {
         this._cancelRunningOps(err || errRegistry.newError('IO_ERROR','CANCELLED').formatMessage('Operations cancelled due to close'));
         if (this.serial) {
             this.debug('close() removing listeners from serial');
-            for (let key in this._serialListeners) {
+            for (const key in this._serialListeners) {
                 this.serial.removeListener(key, this._serialListeners[key]);
             }
             this._serialListeners = {};
@@ -985,16 +987,16 @@ export  class TinyGController extends Controller {
         // 2. There are no sent lines for which responses have not been received.
         // 3. There is nothing queued to be sent (or sending is paused)
         // 4. We're sure our last received status report is up to date (either we've received a sr since the last response, or it has been more than X amount of time since last response)
-        let wasSynced = this.synced;
+        const wasSynced = this.synced;
         const respTimeThreshold = 500;
-        let exceededRespTimeThreshold = this.lastResponseReceivedTime && this.lastResponseReceivedTime?.getTime() + respTimeThreshold <= new Date().getTime();
-        let hasReliableSR = this.lastStatusReportCounter !== null && (this.lastResponseReceivedCounter === null || (this.lastStatusReportCounter && this.lastResponseReceivedCounter && this.lastStatusReportCounter >= this.lastResponseReceivedCounter) || this.lastResponseReceivedTime === null || exceededRespTimeThreshold);
-        let machineSynced = (this.currentStatusReport.stat === 3 || this.currentStatusReport.stat === 4 || this.currentStatusReport.stat === 1) &&
+        const exceededRespTimeThreshold = this.lastResponseReceivedTime && this.lastResponseReceivedTime?.getTime() + respTimeThreshold <= new Date().getTime();
+        const hasReliableSR = this.lastStatusReportCounter !== null && (this.lastResponseReceivedCounter === null || (this.lastStatusReportCounter && this.lastResponseReceivedCounter && this.lastStatusReportCounter >= this.lastResponseReceivedCounter) || this.lastResponseReceivedTime === null || exceededRespTimeThreshold);
+        const machineSynced = (this.currentStatusReport.stat === 3 || this.currentStatusReport.stat === 4 || this.currentStatusReport.stat === 1) &&
             this.sendQueueIdxToReceive >= this.sendQueueIdxToSend &&
             hasReliableSR;
         // only consider things truly synced if the machine has synchronized to our instructions, and we have no more instructions to give it
         // but we still need to track machineSynced for proper planner mirror syncing behavior
-        let nowSynced = machineSynced &&
+        const nowSynced = machineSynced &&
             (this.sendQueueIdxToSend >= this.sendQueue.length || this._disableSending);
         // Call hooks on all gcode lines once machine has stopped (fixes some desyncs with queue reports)
         if (machineSynced)
@@ -1078,7 +1080,7 @@ export  class TinyGController extends Controller {
         this.receivedLineCounter++;
         if (line[0] != '{')
             throw errRegistry.newError('PARSE_ERROR','GENERIC').formatMessage('Error parsing received serial line').withMetadata({ data: line });
-        let data = AbbrJSON.parse(line);
+        const data = AbbrJSON.parse(line);
         // Check if the line contains a message that should be reported to the message log
         let message = null;
         if ('msg' in data)
@@ -1092,7 +1094,7 @@ export  class TinyGController extends Controller {
         // Check if this is a SYSTEM READY response indicating a reset
         if ('r' in data && data.r.msg === 'SYSTEM READY') {
             this.debug('Got SYSTEM READY message');
-            let err = errRegistry.newError('MACHINE_ERROR','CANCELLED').formatMessage('Machine reset');
+            const err = errRegistry.newError('MACHINE_ERROR','CANCELLED').formatMessage('Machine reset');
             this.close(err);
             if (!this._initializing) {
                 this.debug('calling _retryConnect() after receive SYSTEM READY');
@@ -1107,17 +1109,17 @@ export  class TinyGController extends Controller {
                 this.error = true;
                 this.errorData = errRegistry.newError('MACHINE_ERROR','GENERIC').formatMessage(data.er.msg || JSON.stringify(data.er)).withMetadata(data.er);
                 this.ready = false;
-                let err = errRegistry.newError('MACHINE_ERROR','GENERIC').formatMessage(data.er.msg || ('Code ' + data.er.st) || 'Machine error report').withMetadata(data.er);
+                const err = errRegistry.newError('MACHINE_ERROR','GENERIC').formatMessage(data.er.msg || ('Code ' + data.er.st) || 'Machine error report').withMetadata(data.er);
                 this._cancelRunningOps(err);
                 if (!this._initializing)
                     this.emit('error', err);
             }
             return;
         }
-        let statusVars = {}; // updated status vars
+        const statusVars = {}; // updated status vars
         if ('sr' in data) {
             // Update the current status variables
-            for (let key in data.sr)
+            for (const key in data.sr)
                 // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                 statusVars[key] = data.sr[key];
             this.lastStatusReportCounter = this.receivedLineCounter;
@@ -1130,7 +1132,7 @@ export  class TinyGController extends Controller {
         if ('qr' in data && 'qi' in data && 'qo' in data) {
             queueReport = data;
         }
-        for (let key in this.currentStatusReport) {
+        for (const key in this.currentStatusReport) {
             if (key in data)
                 // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                 statusVars[key] = data[key];
@@ -1144,7 +1146,7 @@ export  class TinyGController extends Controller {
             this.lastResponseReceivedTime = new Date();
             if ('sr' in data.r) {
                 // Update the current status variables
-                for (let key in data.r.sr)
+                for (const key in data.r.sr)
                     // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                     statusVars[key] = data.r.sr[key];
                 this.lastStatusReportCounter = this.receivedLineCounter;
@@ -1182,7 +1184,7 @@ export  class TinyGController extends Controller {
     _updateStatusReport(sr, emitEvent = true) {
         // Update this.currentStatusReport
         let statusUpdated = false;
-        for (let key in sr) {
+        for (const key in sr) {
             if (this.currentStatusReport[key] !== sr[key]) {
                 this.currentStatusReport[key] = sr[key];
                 statusUpdated = true;
@@ -1191,7 +1193,7 @@ export  class TinyGController extends Controller {
         // Keys we care about: mpo{x}, coor, g5{4}{x}, g92{x}, g{28,30}{x}, hom{x}, stat, unit, feed, dist, n
         // Check for axis-specific keys
         for (let axisNum = 0; axisNum < this.axisLabels.length; axisNum++) {
-            let axis = this.axisLabels[axisNum];
+            const axis = this.axisLabels[axisNum];
             if (('mpo' + axis) in sr)
                 this.mpos[axisNum] = sr['mpo' + axis];
             if (('g92' + axis) in sr)
@@ -1203,7 +1205,7 @@ export  class TinyGController extends Controller {
             if (('hom' + axis) in sr)
                 this.homed[axisNum] = !!sr['hom' + axis];
             for (let csys = 0; csys < 6; csys++) {
-                let csysName = 'g5' + (4 + csys);
+                const csysName = 'g5' + (4 + csys);
                 if (!this.coordSysOffsets[csys])
                     this.coordSysOffsets[csys] = [];
                 if ((csysName + axis) in sr)
@@ -1308,7 +1310,7 @@ export  class TinyGController extends Controller {
             // @ts-expect-error ts-migrate(2322) FIXME: Type 'string[]' is not assignable to type 'null'.
             vars = ['coor', 'stat', 'unit', 'feed', 'dist', 'n', 'qr'];
             for (let axisNum = 0; axisNum < this.axisLabels.length; axisNum++) {
-                let axis = this.axisLabels[axisNum];
+                const axis = this.axisLabels[axisNum];
                 // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
                 vars.push('mpo' + axis, 'g92' + axis, 'g28' + axis, 'g30' + axis, 'hom' + axis);
                 for (let csys = 0; csys < 6; csys++) {
@@ -1318,12 +1320,12 @@ export  class TinyGController extends Controller {
             }
         }
         // Fetch each, constructing a status report
-        let sr = {};
+        const sr = {};
         // @ts-expect-error ts-migrate(7034) FIXME: Variable 'promises' implicitly has type 'any[]' in... Remove this comment to see the full error message
-        let promises = [];
+        const promises = [];
         // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'name' implicitly has an 'any' type.
         const fetchVar = (name) => {
-            let p = this.request({ [name]: null })
+            const p = this.request({ [name]: null })
                 .then((data) => {
                 // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
                 sr[name] = data.r[name];
@@ -1331,7 +1333,7 @@ export  class TinyGController extends Controller {
             promises.push(p);
         };
         // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
-        for (let name of vars) {
+        for (const name of vars) {
             fetchVar(name);
         }
         // @ts-expect-error ts-migrate(2585) FIXME: 'Promise' only refers to a type, but is being used... Remove this comment to see the full error message
@@ -1357,12 +1359,12 @@ export  class TinyGController extends Controller {
         await this.request({ si: (this.config as TinyGControllerConfig).statusReportInterval || 250 });
         // Configure status report fields
         //await this.request({ sr: false }); // to work with future firmware versions where status report variables are configured incrementally
-        let srVars = ['n', 'feed', 'stat'];
-        for (let axis of this.axisLabels) {
+        const srVars = ['n', 'feed', 'stat'];
+        for (const axis of this.axisLabels) {
             srVars.push('mpo' + axis);
         }
-        let srConfig = {};
-        for (let name of srVars) {
+        const srConfig = {};
+        for (const name of srVars) {
             // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             srConfig[name] = true;
         }
@@ -1374,7 +1376,7 @@ export  class TinyGController extends Controller {
         // Fetch axis maximum velocities
         for (let axisNum = 0; axisNum < this.usedAxes.length; axisNum++) {
             if (this.usedAxes[axisNum]) {
-                let axis = this.axisLabels[axisNum];
+                const axis = this.axisLabels[axisNum];
                 let response = await this.request({ [axis + 'vm']: null });
                 if ((response as any).r)
                     response = (response as any).r;
@@ -1389,11 +1391,11 @@ export  class TinyGController extends Controller {
     }
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'stream' implicitly has an 'any' type.
     sendStream(stream) {
-        let waiter = pasync.waiter();
+        const waiter = pasync.waiter();
         // Bounds within which to stop and start reading from the stream.  These correspond to the number of queued lines
         // not yet sent to the controller.
-        let sendQueueHighWater = this.config.streamSendQueueHighWaterMark || 20;
-        let sendQueueLowWater = this.config.streamSendQueueLowWaterMark || Math.min(10, Math.floor(sendQueueHighWater / 5));
+        const sendQueueHighWater = this.config.streamSendQueueHighWaterMark || 20;
+        const sendQueueLowWater = this.config.streamSendQueueLowWaterMark || Math.min(10, Math.floor(sendQueueHighWater / 5));
         let streamPaused = false;
         let canceled = false;
         const numUnsentLines = () => {
@@ -1513,26 +1515,26 @@ export  class TinyGController extends Controller {
         if (this._numInFlightRequests() > (this.config.realTimeMovesMaxQueued || 8))
             return false;
         // Rate-limit real time move requests according to feed rate
-        let rtmTargetFeed = (this.axisMaxFeeds[axisNum] || 500) * 0.98; // target about 98% of max feed rate
-        let counterDecrement = (new Date().getTime() - this.realTimeMovesTimeStart[axisNum]) / 1000 * rtmTargetFeed / 60;
+        const rtmTargetFeed = (this.axisMaxFeeds[axisNum] || 500) * 0.98; // target about 98% of max feed rate
+        const counterDecrement = (new Date().getTime() - this.realTimeMovesTimeStart[axisNum]) / 1000 * rtmTargetFeed / 60;
         this.realTimeMovesCounter[axisNum] -= counterDecrement;
         if (this.realTimeMovesCounter[axisNum] < 0) {
             this.realTimeMovesCounter[axisNum] = 0;
         }
         this.realTimeMovesTimeStart[axisNum] = new Date().getTime();
-        let maxOvershoot = (this.config.realTimeMovesMaxOvershootFactor || 2) * Math.abs(inc);
+        const maxOvershoot = (this.config.realTimeMovesMaxOvershootFactor || 2) * Math.abs(inc);
         if (this.realTimeMovesCounter[axisNum] > maxOvershoot)
             return false;
         this.realTimeMovesCounter[axisNum] += Math.abs(inc);
         // Send the move
         this.send('G91');
-        let gcode = 'G0 ' + this.axisLabels[axisNum].toUpperCase() + inc;
+        const gcode = 'G0 ' + this.axisLabels[axisNum].toUpperCase() + inc;
         this.send(gcode);
         this.send('G90');
     }
     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'line' implicitly has an 'any' type.
     _sendImmediate(line, waiter = null) {
-        let hooks = new CrispHooks();
+        const hooks = new CrispHooks();
         this.send(line, { immediate: true, hooks: hooks });
         let resolved = false;
         if (waiter) {
@@ -1617,8 +1619,8 @@ export  class TinyGController extends Controller {
             await this.waitSync();
             // Ensure a single axis will move.
             let selectedAxisNum = null;
-            let curOffsets = this.getCoordOffsets();
-            let curPos = this.getPos().slice();
+            const curOffsets = this.getCoordOffsets();
+            const curPos = this.getPos().slice();
             for (let axisNum = 0; axisNum < pos.length; axisNum++) {
                 if (typeof pos[axisNum] === 'number' && pos[axisNum] !== curPos[axisNum]) {
                     if (selectedAxisNum !== null) {
@@ -1640,11 +1642,11 @@ export  class TinyGController extends Controller {
                 let probeTestToSameMachineCoords = curOffsets[selectedAxisNum] > 0;
                 if (pos[selectedAxisNum] - curPos[selectedAxisNum] < 0)
                     probeTestToSameMachineCoords = !probeTestToSameMachineCoords;
-                let probeTestCoord = probeTestToSameMachineCoords ? this.mpos[selectedAxisNum] : curPos[selectedAxisNum];
-                let startingMCoord = this.mpos[selectedAxisNum];
+                const probeTestCoord = probeTestToSameMachineCoords ? this.mpos[selectedAxisNum] : curPos[selectedAxisNum];
+                const startingMCoord = this.mpos[selectedAxisNum];
                 // run probe to selected point; use _sendImmediate since normal sends are disabled
                 const probeTestFeed = 1;
-                let testProbeGcode = 'G38.2 ' + this.axisLabels[selectedAxisNum].toUpperCase() + probeTestCoord + ' F' + probeTestFeed;
+                const testProbeGcode = 'G38.2 ' + this.axisLabels[selectedAxisNum].toUpperCase() + probeTestCoord + ' F' + probeTestFeed;
                 waiter = pasync.waiter();
                 this._sendImmediate(testProbeGcode, waiter);
                 // Probing to the same point is not currently a response error on my system, but in case it becomes one, wrap this in a try/catch
@@ -1667,12 +1669,12 @@ export  class TinyGController extends Controller {
                 // Request an updated machine position for the axis we're testing
                 waiter = pasync.waiter();
                 this._sendImmediate({ ['mpo' + this.axisLabels[selectedAxisNum].toLowerCase()]: null }, waiter);
-                let mpoResult = await waiter.promise;
+                const mpoResult = await waiter.promise;
                 // Depending on whether or not the probe moved during that time, we now know if this tinyg version expects machine or offset coordinates
-                let nowMCoord = mpoResult.r['mpo' + this.axisLabels[selectedAxisNum].toLowerCase()];
+                const nowMCoord = mpoResult.r['mpo' + this.axisLabels[selectedAxisNum].toLowerCase()];
                 if (typeof nowMCoord !== 'number')
                     throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Unexpected response from TinyG');
-                let probeMoved = nowMCoord !== startingMCoord;
+                const probeMoved = nowMCoord !== startingMCoord;
                 if (probeMoved) {
                     (this.config as TinyGControllerConfig).probeUsesMachineCoords = !probeTestToSameMachineCoords;
                     // Move back to the starting position before the test
@@ -1684,11 +1686,11 @@ export  class TinyGController extends Controller {
                     (this.config as TinyGControllerConfig).probeUsesMachineCoords = probeTestToSameMachineCoords;
                 }
             }
-            let useMachineCoords = curOffsets[selectedAxisNum] === 0 || (this.config as TinyGControllerConfig).probeUsesMachineCoords;
+            const useMachineCoords = curOffsets[selectedAxisNum] === 0 || (this.config as TinyGControllerConfig).probeUsesMachineCoords;
             // Run the probe in the coordinate system chosen
-            let probeTo = useMachineCoords ? (pos[selectedAxisNum] + curOffsets[selectedAxisNum]) : pos[selectedAxisNum];
-            let probeDirection = (pos[selectedAxisNum] > curPos[selectedAxisNum]) ? 1 : -1;
-            let probeGcode = 'G38.2 ' + this.axisLabels[selectedAxisNum].toUpperCase() + probeTo + ' F' + feed;
+            const probeTo = useMachineCoords ? (pos[selectedAxisNum] + curOffsets[selectedAxisNum]) : pos[selectedAxisNum];
+            const probeDirection = (pos[selectedAxisNum] > curPos[selectedAxisNum]) ? 1 : -1;
+            const probeGcode = 'G38.2 ' + this.axisLabels[selectedAxisNum].toUpperCase() + probeTo + ' F' + feed;
             waiter = pasync.waiter();
             this._sendImmediate(probeGcode, waiter);
             await waiter.promise; // wait for first response to probe to be received
@@ -1698,8 +1700,8 @@ export  class TinyGController extends Controller {
             // Fetch probe report
             waiter = pasync.waiter();
             this._sendImmediate({ prb: null }, waiter);
-            let probeResult = await waiter.promise;
-            let probeReport = probeResult.r.prb;
+            const probeResult = await waiter.promise;
+            const probeReport = probeResult.r.prb;
             let probeTripped = !!probeReport.e;
             let probePos = probeReport[this.axisLabels[selectedAxisNum]];
             // Workaround for e value sometimes being incorrect
@@ -1731,7 +1733,7 @@ export  class TinyGController extends Controller {
         }
     }
     override getStatus() {
-        let o = super.getStatus();
+        const o = super.getStatus();
         (o as any).comms = {
             sendQueueLength: this.sendQueue.length,
             plannerMirrorLength: this.plannerMirror.length,

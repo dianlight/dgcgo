@@ -396,42 +396,42 @@ class OpProbeSurface extends Operation {
                 },
                 probeSpacing: {
                     type: 'number',
-                    default: this.config?.defaultOptions.probeSpacing,
+                    default: this.config?.defaultOptions?.probeSpacing,
                     description: 'Maximum grid separation between probe points'
                 },
                 probeFeed: {
                     type: 'number',
-                    default: this.config?.defaultOptions.probeFeed,
+                    default: this.config?.defaultOptions?.probeFeed,
                     description: 'Feed rate for probing'
                 },
                 clearanceHeight: {
                     type: 'number',
-                    default: this.config?.defaultOptions.clearanceHeight,
+                    default: this.config?.defaultOptions?.clearanceHeight,
                     description: 'Clearance Z for moving across surface'
                 },
                 autoClearance: {
                     type: 'boolean',
-                    default: this.config?.defaultOptions.autoClearance,
+                    default: this.config?.defaultOptions?.autoClearance,
                     description: 'Whether to automatically adjust clearance height based on known probe points to optimize speed'
                 },
                 autoClearanceMin: {
                     type: 'number',
-                    default: this.config?.defaultOptions.autoClearanceMin,
+                    default: this.config?.defaultOptions?.autoClearanceMin,
                     description: 'Minimum amount of clearance when using autoClearance'
                 },
                 probeMinZ: {
                     type: 'number',
-                    default: this.config?.defaultOptions.probeMinZ,
+                    default: this.config?.defaultOptions?.probeMinZ,
                     description: 'Minimum Z value to probe toward.  Error if this Z is reached without the probe tripping.'
                 },
                 numProbeSamples: {
                     type: 'number',
-                    default: this.config?.defaultOptions.numProbeSamples,
+                    default: this.config?.defaultOptions?.numProbeSamples,
                     description: 'Number of times to probe for each point'
                 },
                 extraProbeSampleClearance: {
                     type: 'number',
-                    default: this.config?.defaultOptions.extraProbeSampleClearance,
+                    default: this.config?.defaultOptions?.extraProbeSampleClearance,
                     description: 'When probing multiple times per point, the clearance to use for all but the first probe'
                 }
             }
@@ -442,7 +442,8 @@ class OpProbeSurface extends Operation {
 interface AutolevelGcodeProcessorOptions extends GcodeProcessorOptions {
     surfaceMapFilename: string
 }
-class AutolevelGcodeProcessor extends GcodeProcessor {
+export class AutolevelGcodeProcessor extends GcodeProcessor {
+
     surfaceMapFilename: string;
     vm: GcodeVM;
     surfaceMap?: SurfaceLevelMap;
@@ -549,6 +550,14 @@ class AutolevelGcodeProcessor extends GcodeProcessor {
         }
         return gline;
     }
+
+    override preprocessInputGcode(this: void): ReadableStream<any>|void {
+        // No action
+    }
+    override flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
+        // No action
+    }
+
 }
 
 /*

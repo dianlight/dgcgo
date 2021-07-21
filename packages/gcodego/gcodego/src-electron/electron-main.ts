@@ -11,7 +11,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import electron_cfg from 'electron-cfg';
 import { autoUpdater } from 'electron-updater';
-import yaml from 'yaml';
+//import yaml from 'yaml';
 import { ChildProcess, fork } from 'child_process';
 import portfinder from 'portfinder';
 import { TightCNCConfig } from '@dianlight/tightcnc-core';
@@ -166,11 +166,11 @@ if (!fs.existsSync(tight_path)) {
   tight_path = path.join(__dirname, '..', '..', '..', 'tightcnc', 'server', 'bin', 'tightcnc-server.js')
 }
 
-const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');
+//const tightcnc_conf = path.join(app.getPath('temp'), 'tightcnc.conf');
 
-const tightcnc_env = Object.assign(process.env, {
-  TIGHTCNC_CONFIG: tightcnc_conf,
-});
+//const tightcnc_env = Object.assign(process.env, {
+//  TIGHTCNC_CONFIG: tightcnc_conf,
+//});
 
 let tightcnc: ChildProcess | undefined = undefined;
 let serverPort = 0;
@@ -191,6 +191,7 @@ async function startTightCNC(_event: unknown, ...args: unknown[]) {
       console.warn('Tight Server PID already running ', tightcnc.pid);
       resolve({ pid: tightcnc?.pid, host: host, serverPort: serverPort, newInstance: false });
     } else {
+      /*
       console.log(tightcnc_env['TIGHTCNC_CONFIG']);
 
       // Setting basedit to AppData
@@ -198,7 +199,10 @@ async function startTightCNC(_event: unknown, ...args: unknown[]) {
       console.log('TightCNC BaseDir:', (args[0] as TightCNCConfig).baseDir)
 
       fs.writeFileSync(tightcnc_conf, yaml.stringify(args[0]));
-      //  const tightcnc = spawn(process.argv[0], [tight_path], {
+      */
+      const tightcnc_env = Object.assign(process.env, {
+        'NODE_CONFIG':JSON.stringify(args[0])
+      });
       tightcnc = fork(tight_path, {
         env: tightcnc_env,
         silent: true,

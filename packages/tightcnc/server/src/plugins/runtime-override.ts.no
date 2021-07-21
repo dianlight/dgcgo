@@ -1,4 +1,4 @@
-import {Operation, GcodeVM, GcodeLine,errRegistry,GcodeProcessor } from '@dianlight/tightcnc-core';
+import {Operation, GcodeVM, GcodeLine,errRegistry,GcodeProcessor, VMState } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 import { JSONSchema7 } from 'json-schema';
 import TightCNCServer from '../server/tightcnc-server';
@@ -17,6 +17,16 @@ import TightCNCServer from '../server/tightcnc-server';
  */
 class RuntimeOverride extends GcodeProcessor {
 
+    initProcessor(): Promise<void> {
+       return Promise.resolve();
+    }
+    preprocessInputGcode(this: void): void | ReadableStream<any> {
+        // nothing to do
+    }
+    flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
+        // nothing to do
+    }
+
     static DEFAULT_ORDER = 950000;
 
     maxTotalLinesBuffered:number;
@@ -28,10 +38,11 @@ class RuntimeOverride extends GcodeProcessor {
 
     constructor(options = {}) {
         super(options, 'runtimeoverride', true);
-        this.maxTotalLinesBuffered = (options as any).maxTotalLinesBuffered || 40;
+        this.maxTotalLinesBuffered = options.maxTotalLinesBuffered || 40;
         this.vm = new GcodeVM(options);
     }
-    override getStatus() {
+
+    override getStatus(): Partial<VMState> {
         return {
             feedMultiplier: this.feedMultiplier
         };
