@@ -1,6 +1,6 @@
 <template>
   <q-page padding ref="page"> 
-    <div class="row wrap justify-start items-start content-start" style="height:75vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
+    <div class="row wrap justify-start items-start content-start" style="height:100vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
       <Q3DViewer
         :gcode="gcode"
         :gcgrid="false"
