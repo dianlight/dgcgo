@@ -18,7 +18,7 @@
           @change="changeFrame"
       />
     </div>
-    <div class="row control">
+    <div class="row control" ref="control">
       <q-btn-group outline>
         <q-btn outline icon="photo_camera_front" @click="front">
           <q-tooltip>Front</q-tooltip>
@@ -116,7 +116,8 @@ export default class Q3DViewer extends Vue {
     @Prop() homeDirection?:('+'|'-')[];
 
   declare $refs: {
-    container: HTMLDivElement
+    container: HTMLDivElement,
+    control: HTMLDivElement
   }
 
   defaultColor = new THREE.Color(colornames('lightgrey'));
@@ -579,6 +580,10 @@ export default class Q3DViewer extends Vue {
           this.controls.update(0);
         }
         this.render3d();
+        if(this.$refs.control){
+          this.$refs.control.style.top = `-${this.$refs.container.clientHeight}px`;
+         // console.log(this.$refs.control.style.top,this.$refs.container.clientHeight);
+        }
       }
     }
 
@@ -634,7 +639,7 @@ export default class Q3DViewer extends Vue {
 }
 
 .control {
-  position: absolute;
+  position: relative;
 }
 
 .infobox {
