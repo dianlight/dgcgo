@@ -34,6 +34,7 @@
         "patch-package": "^6.4.7",
         "prettier": "^2.3.2",
         "rimraf": "^3.0.2",
+        "scss-loader": "^0.0.1",
         "ts-loader": "^9.2.3",
         "ts-node": "^10.0.0",
         "tslib": "^2.3.0",

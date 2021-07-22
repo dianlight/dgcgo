@@ -6,7 +6,9 @@
     "src/**/*.vue",
   ],
   "exclude": [
-    "babel.config.js"
+    "babel.config.js",
+    "src/demo/**/*.ts",
+    "src/demo/**/*.vue",
   ],
   "compilerOptions": {
     "noEmit": false,

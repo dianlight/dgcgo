@@ -3,5 +3,14 @@
       "include": [
         "src/**/*.ts",
         "src/**/*.vue",
-      ]
+      ],
+      "exclude":[
+        "src/index.ts"
+      ],
+      "compilerOptions": {
+        "noEmit": false,
+        "sourceMap": true,
+        "strict": true,
+        "jsx": "preserve",        
+      }
 }

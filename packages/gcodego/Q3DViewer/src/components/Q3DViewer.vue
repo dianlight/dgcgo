@@ -614,7 +614,7 @@ export default class Q3DViewer extends Vue {
       workpiece.geometry.setAttribute( 'color',new THREE.BufferAttribute(newColorArray,3)) 
       this.render3d()
     }
-};
+}
 </script>
 
 <style scoped>

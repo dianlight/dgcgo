@@ -1,7 +1,12 @@
 'use strict';
 
-const autolevel = require('..');
+import { mount } from '@vue/test-utils'
+import Q3DViewer from '../../src/components/Q3DViewer.vue'
 
-describe('3Dviewer', () => {
-    it('needs tests');
-});
+test('renders a todo', () => {
+  const wrapper = mount(Q3DViewer)
+
+  const todo = wrapper.get('[data-test="todo"]')
+
+  expect(todo.text()).toBe('Learn Vue.js 3')
+})
