@@ -133,6 +133,8 @@ export default class Q3DViewer extends Vue {
   width = 0
   height = 0
 
+  resizeObserver?: ResizeObserver;
+
   motionColor = new MotionColor(false)
 
   reload = true
@@ -166,8 +168,14 @@ export default class Q3DViewer extends Vue {
           console.log('GridPosition:',position)
           this.surface?.move(position)
     }
+    this.initObserver()
     //console.log(dom.height(this.$refs.container))
     //this.animate();
+  }
+
+  initObserver() {
+        this.resizeObserver = new ResizeObserver(()=>this.resize())
+        this.resizeObserver.observe(this.$refs.container);
   }
 
   override updated(): void {
@@ -554,13 +562,12 @@ export default class Q3DViewer extends Vue {
 
 
       //window.addEventListener("resize", this.resize, false);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      this.$refs.container?.parentElement?.addEventListener('resize', this.resize, false);
+      //this.$refs.container?.addEventListener('resize',(event)=>this.resize(event), false);
       this.resize();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     resize(_event?: Event): void {
+      console.log('Event resize',_event);
       if (this.$refs.container) {
         const clientWidth = this.$refs.container?.clientWidth || 0;
         const clientHeight = this.$refs.container?.clientHeight || 0;

@@ -23,7 +23,7 @@
       <!-- drawer content -->
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container style="height:100vh;">
       <Q3DViewer
         :gcode="gcode"
         :gcgrid="false"
