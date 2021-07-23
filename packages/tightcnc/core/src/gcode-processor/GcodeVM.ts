@@ -232,7 +232,7 @@ export class GcodeVM {
         }
 
         // Active coord sys
-        if (vmState?.activeCoordSys !== null && vmState?.activeCoordSys !== undefined && shouldInclude('activeCoordSys')) {
+        if (vmState?.activeCoordSys !== undefined && shouldInclude('activeCoordSys')) {
             // TODO: Support for higher coordinate systems
             if (vmState.activeCoordSys < 6) {
                 ret.push(new GcodeLine(`G${54 + vmState.activeCoordSys}`));

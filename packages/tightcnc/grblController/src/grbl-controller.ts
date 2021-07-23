@@ -225,6 +225,7 @@ export class GRBLController extends Controller {
     }
 
     _handleStatusUpdate(obj: Partial<GrblControllerStatus>) {
+        //this.debug('_handleStatusUpdate():'+JSON.stringify(obj));
         let changed = false;
         const wasReady = this.ready;
         for (const key in obj) {
@@ -863,6 +864,7 @@ export class GRBLController extends Controller {
         matches = this._regexParserState.exec(line);
         if (!matches)
             matches = this._regexParserState09.exec(line);
+        console.log('Parder feedback:',matches,line);
         if (matches) {
             this._handleDeviceParserUpdate(matches[1]);
             return;
@@ -913,6 +915,7 @@ export class GRBLController extends Controller {
     }
 
     _handleDeviceParserUpdate(str: string) {
+        console.log('_handleDeviceParaser');
         // Ignore this if there's anything in the sendQueue with gcode attached (so we know the controller's parser is in sync)
         for (const entry of this.sendQueue) {
             if (entry.gcode)
@@ -1768,9 +1771,7 @@ export class GRBLController extends Controller {
             this._handleStatusUpdate(statusUpdates);
             return;
         }
-        const zeropoint = [];
-        for (let i = 0; i < this.axisLabels.length; i++)
-            zeropoint.push(0);
+        const zeropoint: number[] = new Array<number>(this.axisLabels.length).fill(0);
         if (gline.has('G10') && gline.has('L2') && gline.has('P')) {
             const csys = gline.get('P') as number - 1;
             statusUpdates[`coordSysOffsets.${csys}`] = [];
@@ -1781,7 +1782,7 @@ export class GRBLController extends Controller {
                     val = gline.get(axis) as number;
                 (statusUpdates[`coordSysOffsets.${csys}`] as number[])[axisNum] = val;
             }
-          //  this.debug(`Update L2 coordSysOffsets ${statusUpdates[`coordSysOffsets.${csys}`]}`)
+            this.debug(`Update L2 coordSysOffsets ${JSON.stringify(statusUpdates[`coordSysOffsets.${csys}`])}`)
         }
         if (gline.has('G10') && (gline.has('L20')) && gline.has('P')) {
             const csys = gline.get('P') as number - 1;
@@ -1803,6 +1804,7 @@ export class GRBLController extends Controller {
             statusUpdates[`storedPositions.${posnum}`] = this.mpos.slice();
         }
         const csysCode = gline.get('G', 'G54') as number;
+        this.debug(`Update coordSysOffsets ${csysCode} ${JSON.stringify(statusUpdates[`coordSysOffsets.${csysCode}`])}`);
         if (csysCode && csysCode >= 54 && csysCode <= 59 && Math.floor(csysCode) === csysCode) {
             statusUpdates.activeCoordSys = csysCode - 54;
         }

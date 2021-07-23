@@ -144,11 +144,12 @@ export class GcodeLine extends CrispHooks {
 			else mgroup = undefined;
 		}
 
-		let matches:T|T[]|undefined = multi ? [] as T[] : undefined;
+		let matches: T | T[] | undefined = multi ? [] as T[] : undefined;
+		//console.log(`Gruppo:${JSON.stringify(mgroup)} ${JSON.stringify(mgroupMap)} letter:${letter} Words:${JSON.stringify(this.words)}`);
 		if(this.words) for (const word of this.words) {
 			if (word[0] === letter) {
 				if (mgroup) {
-					const fullCode =`letter${word[1]}`;
+					const fullCode =`${letter}${word[1]}`;
 					if (!mgroupMap || mgroup !== mgroupMap[fullCode]) continue;
 				}
 				if (multi) {
