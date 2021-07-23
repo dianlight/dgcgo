@@ -140,8 +140,8 @@ export class GcodeVM {
      */
     syncMachineToState(options: {
         vmState?:VMState,
-        include: string[],
-        exclude: string[]
+        include?: string[],
+        exclude?: string[]
     }):GcodeLine[] {
         const shouldInclude = (prop:string) => {
             if (!options.include && !options.exclude) return true;
@@ -206,6 +206,14 @@ export class GcodeVM {
                 ret.push(new GcodeLine('G21'));
             }
         }
+
+        // Active Tool
+        if (vmState?.tool !== undefined && shouldInclude('tool')) {
+            if (vmState.tool >= 0) {
+                ret.push(new GcodeLine(`T${vmState.tool}`));
+            }
+        }
+        
 
         // spindle
         if (vmState?.spindle !== null && vmState?.spindle !== undefined && shouldInclude('spindle')) {

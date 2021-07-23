@@ -1,4 +1,4 @@
-import   { Controller, ControllerConfig, ControllerStatus, ExternalizablePromise } from '@dianlight/tightcnc-core';
+import   { Controller, ControllerConfig, ControllerStatus, ExternalizablePromise, VMState } from '@dianlight/tightcnc-core';
 import  SerialPort, { OpenOptions } from 'serialport';
 import { ERRORCODES, errRegistry } from '@dianlight/tightcnc-core';
 //import  pasync from 'pasync';
@@ -864,7 +864,6 @@ export class GRBLController extends Controller {
         matches = this._regexParserState.exec(line);
         if (!matches)
             matches = this._regexParserState09.exec(line);
-        console.log('Parder feedback:',matches,line);
         if (matches) {
             this._handleDeviceParserUpdate(matches[1]);
             return;
@@ -915,7 +914,7 @@ export class GRBLController extends Controller {
     }
 
     _handleDeviceParserUpdate(str: string) {
-        console.log('_handleDeviceParaser');
+    //    console.log('_handleDeviceParaser');
         // Ignore this if there's anything in the sendQueue with gcode attached (so we know the controller's parser is in sync)
         for (const entry of this.sendQueue) {
             if (entry.gcode)
@@ -956,12 +955,18 @@ export class GRBLController extends Controller {
             statusUpdates.coolant = 2;
         if (coolantMode === 9)
             statusUpdates.coolant = false;
+        const tool = gline.get('T');
+        if (typeof tool === 'number')
+            statusUpdates.tool = tool;
         const feed = gline.get('F');
         if (typeof feed === 'number')
             statusUpdates.feed = feed;
         const spindleSpeed = gline.get('S');
         if (typeof spindleSpeed === 'number')
             statusUpdates.spindleSpeed = spindleSpeed;
+        
+
+        
         // Perform status updates
         this._handleStatusUpdate(statusUpdates);
     }
@@ -1744,6 +1749,11 @@ export class GRBLController extends Controller {
         }
     }
 
+    /**
+     * Update the Controller Status based on Sent Gcode
+     * 
+     * @param {string} cmd - command to send
+     */
     _updateStateFromGcode(gline:GcodeLine) {
         this.debug('_updateStateFromGcode: ' + gline.toString());
         // Do not update state components that we have definite values for from status reports based on if we've ever received such a key in this.currentStatusReport
@@ -1855,6 +1865,9 @@ export class GRBLController extends Controller {
                 statusUpdates.coolant = 2;
             else
                 statusUpdates.coolant = false;
+        }
+        if (gline.has('T')) {
+            statusUpdates.tool = gline.get('T') as number;
         }
         this._handleStatusUpdate(statusUpdates);
     }
@@ -2026,13 +2039,14 @@ export class GRBLController extends Controller {
             }
             // Copy relevant parser state to restore later
             const restoreHomed = objtools.deepCopy(this.homed) as boolean[];
-//            const restoreState = {
-//                activeCoordSys: this.activeCoordSys,
-//                units: this.units,
-//                feed: this.feed,
-//                incremental: this.incremental,
-//                inverseFeed: this.inverseFeed
-//            };
+            const restoreState = {
+                activeCoordSys: this.activeCoordSys,
+                units: this.units,
+                feed: this.feed,
+                incremental: this.incremental,
+                inverseFeed: this.inverseFeed,
+                tool: this.tool,
+            } as VMState;
             // Perform the reset (inside a try so we can make sure to restore the ignored messages)
             this._ignoreUnlockPromptMessage = true;
             try {
@@ -2053,6 +2067,7 @@ export class GRBLController extends Controller {
             }
             // If alarmed due to a loss of position, assume the alarm is erroneous (since we did a feed hold before
             // the reset) and clear it.
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (this.error && this.errorData && this.errorData.getSubCode() === ERRORCODES.MACHINE_ERROR.subCode && this.errorData.getMetadata().data && this.errorData.getMetadata().data.subcode === 'position_unknown') {
                 this._ignoreUnlockedMessage = true;
                 try {
@@ -2064,8 +2079,8 @@ export class GRBLController extends Controller {
             }
             // Restore parser state after reset.  Uses timeEstVM but substitutes our own state object
             this.homed = restoreHomed;
-            //let restoreGcodes = this.timeEstVM.syncMachineToState({ vmState: restoreState });
-            //for (let l of restoreGcodes) this.send(l);
+            const restoreGcodes = this.timeEstVM.syncMachineToState({ vmState: restoreState });
+            for (const l of restoreGcodes) this.send(l);
         };
         doCancel().catch(() => {
             // ignore errors (errors in this process get reported in other ways)

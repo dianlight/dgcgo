@@ -452,7 +452,9 @@ export abstract class Controller  extends EventEmitter implements VMState  {
             countT: this.countT,
             seenWordSet: this.seenWordSet,
             totalTime: this.totalTime,
-            homeDirection: this.homeDirection
+            homeDirection: this.homeDirection,
+            tool: this.tool,
+            toolOffset: this.toolOffset,
         } as ControllerStatus;
     }
     listUsedAxisNumbers() {
