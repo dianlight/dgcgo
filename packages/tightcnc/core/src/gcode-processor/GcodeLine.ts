@@ -52,7 +52,7 @@ const coordOrder = [ 'P', 'X', 'Y', 'Z', 'A', 'B', 'C', 'F' ];
 export class GcodeLine extends CrispHooks {
 
 	modified = false
-	isGcodeLine = true
+	parseable:boolean
 	words?: (string | [string,number])[]
 	comment?:string | undefined
 	commentStyle?:string | undefined
@@ -63,7 +63,7 @@ export class GcodeLine extends CrispHooks {
 	after?: VMState
 	isMotion?:boolean
 
-/**
+	/**
 	 * The constructor can be called in one of the following forms:
 	 * - GcodeLine() - Creates an empty line to be filled in.
 	 * - GcodeLine(string) - Parses the line string.
@@ -79,20 +79,22 @@ export class GcodeLine extends CrispHooks {
 			this.commentStyle = '(';
 			delete this.origLine;
 			this.origLineNumber = origLineNumber;
+			this.parseable = false;
 		} else if (typeof arg === 'string') {
 			this.origLine = arg;
 			this.origLineNumber = origLineNumber
-			this.parse(arg);
+			this.parseable = this.parse(arg);
 		} else if (Array.isArray(arg) && typeof arg[0] === 'string') {
 			this.origLine = arg.join(' ');
 			this.origLineNumber = origLineNumber
-			this.parse(this.origLine);
+			this.parseable = this.parse(this.origLine);
 		} else if (Array.isArray(arg) && Array.isArray(arg[0])) {
 			this.words = arg;
 			this.comment = '';
 			this.commentStyle = '(';
 			this.origLine = this.toString();
 			this.origLineNumber = origLineNumber
+			this.parseable = false;
 		} else if (arg && arg instanceof GcodeLine) {
 			this.words = objtools.deepCopy(arg.words) as (string | [string, number])[] | undefined;
 			this.comment = arg.comment;
@@ -100,6 +102,7 @@ export class GcodeLine extends CrispHooks {
 			this.origLine = arg.origLine;
 			this.modified = arg.modified;
 			this.origLineNumber = arg.origLineNumber || origLineNumber
+			this.parseable = arg.parseable;
 		} else {
 			throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Invalid call to GcodeLine constructor');
 		}
@@ -189,8 +192,8 @@ export class GcodeLine extends CrispHooks {
 
 		letter = letter.toUpperCase();
 		let wordIdx:number|undefined = undefined;
-		for (let i = 0; i < this.words!.length; i++) {
-			if (this.words![i][0] === letter) {
+		if(this.words) for (let i = 0; i < this.words.length; i++) {
+			if (this.words[i][0] === letter) {
 				if (wordIdx) errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Multiple words with the same letter on gcode line');
 				wordIdx = i;
 			}
@@ -201,8 +204,8 @@ export class GcodeLine extends CrispHooks {
 				this.words?.splice(wordIdx, 1);
 				this.modified = true;
 			} else {
-				if (this.words![wordIdx][1] !== value) {
-					(this.words![wordIdx] as [string,number])[1] = value;
+				if (this.words && this.words[wordIdx][1] !== value) {
+					(this.words[wordIdx] as [string,number])[1] = value;
 					this.modified = true;
 				}
 			}
@@ -313,7 +316,7 @@ export class GcodeLine extends CrispHooks {
 		return ret;
 	}
 
-	parse(line:string) {
+	parse(line:string):boolean {
 		let matches;
 
 		// Pull out comments and %
@@ -347,9 +350,11 @@ export class GcodeLine extends CrispHooks {
 				this.words.push([ matches[1].toUpperCase(), (matches[2].indexOf('.') === -1) ? parseInt(matches[2], 10) : parseFloat(matches[2]) ]);
 				lastIndex = wordRegex.lastIndex;
 			} else {
-				throw errRegistry.newError('PARSE_ERROR','GCODE_PARSER_ERROR').formatMessage(`Error parsing gcode line '${line}'`).withMetadata({ line: line });
+				//throw errRegistry.newError('PARSE_ERROR','GCODE_PARSER_ERROR').formatMessage(`Error parsing gcode line '${line}'`).withMetadata({ line: line });
+				return false;
 			}
 		}
+		return true;
 	}
 
 	/**

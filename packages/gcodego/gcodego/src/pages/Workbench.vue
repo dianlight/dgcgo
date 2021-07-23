@@ -1,11 +1,11 @@
 <template>
   <q-page padding ref="page"> 
-    <div class="row wrap justify-start items-start content-start" style="height:100vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
+    <div class="row wrap justify-start items-start content-start" style="height:92vh;" _style="`min-height:${viewPortHight()}px; max-height:${viewPortHight()}px`">
       <Q3DViewer
         :gcode="gcode"
         :gcgrid="false"
         :dark-mode="$q.dark.isActive"
-        :current-line="$store.state.tightcnc.lastStatus?.job?.stats.lineCount"
+        :current-line="$store.state.tightcnc.lastStatus?.job?.stats?.lineCount"
         :cursor-position="$store.state.tightcnc.lastStatus?.controller?.mpos"
         :machine-surface="$store.state.tightcnc.lastStatus?.controller?.axisMaxTravel"
         :machine-offset="$store.state.tightcnc.lastStatus?.controller?.mposOffset"

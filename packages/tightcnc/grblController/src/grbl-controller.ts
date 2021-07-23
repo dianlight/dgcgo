@@ -68,6 +68,7 @@ export class GRBLController extends Controller {
     _initializing = false;
     _resetting = false;
     _serialListeners: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key:string]: (data?:any)=>void
     } = {};
     sendQueue: {
@@ -857,7 +858,7 @@ export class GRBLController extends Controller {
         matches = this._regexMessage.exec(line);
         if (matches) {
             this.lastMessage = matches[1];
-            this._handleReceivedMessage(matches[1], false);
+            this._handleReceivedMessage(matches[1]);
             return;
         }
         // Check if it's parser state feedback
@@ -883,7 +884,7 @@ export class GRBLController extends Controller {
         // Check if it's some other feedback value
         matches = this._regexFeedback.exec(line);
         if (matches) {
-            this._handleReceivedMessage(matches[1], true);
+            this._handleReceivedMessage(matches[1]);
             return;
         }
         // Unmatched line
@@ -903,7 +904,7 @@ export class GRBLController extends Controller {
         }
     }
 
-    _handleReceivedMessage(str: string, unwrapped = false) {
+    _handleReceivedMessage(str: string) {
         // suppress some messages during certain operations where the messages are handled automatically and
         // don't need to be reported to the user
         if (this._ignoreUnlockedMessage && str === 'Caution: Unlocked')
@@ -1058,7 +1059,7 @@ export class GRBLController extends Controller {
     _writeToSerial(strOrBuf:string|Buffer) {
         if (!this.serial)
             return;
-        const ret = this.serial.write(strOrBuf);
+        this.serial.write(strOrBuf);
     }
     _cancelRunningOps(err:BaseRegistryError) {
         this.debug('_cancelRunningOps()');
@@ -1150,7 +1151,7 @@ export class GRBLController extends Controller {
                     }
                 }
                 buf = newBuf.slice(0, newBufIdx);
-                const str = this.serialReceiveBuf + buf.toString('utf8');
+                const str = `${this.serialReceiveBuf||''}${buf.toString('utf8')}`;
                 const strlines = str.split(/[\r\n]+/);
                 if (!strlines[strlines.length - 1].trim()) {
                     // Received data ended in a newline, so don't need to buffer anything
@@ -1323,6 +1324,7 @@ export class GRBLController extends Controller {
         startUpdateLoop((this.config as GrblConfig).statusUpdateInterval || 250, async () => {
             if (this.serial)
                 this.send('?');
+            return Promise.resolve()
         });
     }
     _stopStatusUpdateLoops() {
@@ -1450,8 +1452,8 @@ export class GRBLController extends Controller {
         const entry = this.sendQueue.shift();
         this.sendQueueIdxToSend--;
         this.sendQueueIdxToReceive--;
-        if (entry!.hooks)
-            entry!.hooks.triggerSync('executed', entry);
+        if (entry?.hooks)
+            entry.hooks.triggerSync('executed', entry);
         if (this.sendQueue.length && this.sendQueueIdxToReceive) {
             this.lastLineExecutingTime = this._getCurrentMachineTime();
             //this.debug('_commsShiftSendQueue triggering executing hook: ' + this.sendQueue[0].str);
@@ -1908,7 +1910,7 @@ export class GRBLController extends Controller {
             // not yet sent to the controller.
             const sendQueueHighWater = (this.config as GrblConfig).streamSendQueueHighWaterMark || 20;
             const sendQueueLowWater = (this.config as GrblConfig).streamSendQueueLowWaterMark || Math.min(10, Math.floor(sendQueueHighWater / 5));
-            let streamPaused = false;
+//            let streamPaused = false;
             let canceled = false;
             const numUnsentLines = () => {
                 return this.sendQueue.length - this.sendQueueIdxToSend;
@@ -1917,7 +1919,7 @@ export class GRBLController extends Controller {
                 // Check if paused stream can be resumed
                 if (numUnsentLines() <= sendQueueLowWater) {
                     stream.resume();
-                    streamPaused = false;
+//                    streamPaused = false;
                 }
             };
             const cancelHandler = (err: unknown) => {
@@ -1945,7 +1947,7 @@ export class GRBLController extends Controller {
                 // if send queue is too full, pause the stream
                 if (numUnsentLines() >= sendQueueHighWater) {
                     stream.pause();
-                    streamPaused = true;
+//                    streamPaused = true;
                 }
             });
             stream.on('end', () => {
@@ -1988,7 +1990,7 @@ export class GRBLController extends Controller {
                     removeListeners();
                 }
             };
-            const checkSyncErrorHandler = (err:any) => {
+            const checkSyncErrorHandler = (err:unknown) => {
                 reject(err);
                 removeListeners();
             };
@@ -2217,8 +2219,12 @@ export class GRBLController extends Controller {
         o.capabilities.mistCoolant = this.grblBuildOptions.mistCoolant?true:false; //'M': 'mistCoolant',
         o.capabilities.floodCoolant = true;
         o.capabilities.coreXY = this.grblBuildOptions.coreXY?true:false; // 'C': 'coreXY',
-        o.capabilities.homingSingleAxis = this.grblBuildOptions.homingSingleAxis?true:false; //'H': 'homingSingleAxis', $HX $HY $HZ
-        o.capabilities.startUpHomeLock = this.grblBuildOptions.powerUpLockWithoutHoming?true:false; // 'L': 'powerUpLockWithoutHoming'
+        o.capabilities.homingSingleAxis = this.grblBuildOptions.homingSingleAxis ? true : false; //'H': 'homingSingleAxis', $HX $HY $HZ
+        o.capabilities.homing = o.capabilities.homingSingleAxis;
+        o.capabilities.startUpHomeLock = this.grblBuildOptions.powerUpLockWithoutHoming ? true : false; // 'L': 'powerUpLockWithoutHoming'
+        o.capabilities.toolchange = false;
+        o.capabilities.parking = this.grblBuildOptions.parking ? true : false; // 'P': 'parking',
+        o.capabilities.homeForce = this.grblBuildOptions.homingForceOrigin ? true : false; // 'Z': 'homingForceOrigin',
 
         (o as GrblControllerStatus).comms = {
             sendQueueLength: this.sendQueue.length,

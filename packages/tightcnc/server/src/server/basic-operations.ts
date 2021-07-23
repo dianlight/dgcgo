@@ -1,5 +1,5 @@
 import objtools from 'objtools';
-import { errRegistry,Operation } from '@dianlight/tightcnc-core';
+import { errRegistry,GcodeProcessor,Operation } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 import { StatusObject } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema';
@@ -65,20 +65,72 @@ class OpSend extends Operation {
                     type: 'boolean',
                     default: false,
                     description: 'Whether to wait for the line to be received'
+                },
+                gcodeProcessors: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties:{
+                            name: {
+                                type: 'string',
+                                description: 'Name of gcode processor',
+                            },
+                            options: {
+                                type: 'object',
+                                description: 'Options to pass to the gcode processor',
+                                default: {}
+                            },
+                            order: {
+                                type: 'number',
+                                description: 'Optional order number for gcode processor position in chain'
+                            }
+                        },
+                        required:['name']
+                    }
                 }
             },
             required: [ 'line' ]
         } as JSONSchema7
     }
 
-    async run(params:{line: string, wait?:boolean}) {
-        if (params.wait) {
-            this.tightcnc.controller?.send(params.line);
-            await this.tightcnc.controller?.waitSync();
-        }
-        else {
-            this.tightcnc.controller?.send(params.line);
-        }
+    async run(params:{line: string, wait?:boolean,gcodeProcessors?: {
+        name: string;
+        options: {
+            id: string;
+            updateOnHook?: string;
+        };
+        order?: number;
+        inst?: GcodeProcessor;
+    }[] | undefined
+    }): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (params.gcodeProcessors && params.gcodeProcessors.length > 0) {
+                const source = this.tightcnc.getGcodeSourceStream({
+                    // filename: jobOptions.filename,
+                    // macro: jobOptions.macro,
+                    // macroParams: jobOptions.macroParams,
+                    gcodeProcessors: params.gcodeProcessors,
+                    data: [params.line]
+                    // rawStrings: jobOptions.rawFile || false,
+                });
+                this.tightcnc.controller?.sendStream(source)
+                    .then(() => {
+                        if (params.wait) this.tightcnc.controller?.waitSync().then(() => { resolve(); });
+                        else resolve();
+                    })
+                    .catch(err => {
+                        reject(err);
+                    })
+            }
+            else if (params.wait) {
+                this.tightcnc.controller?.send(params.line);
+                this.tightcnc.controller?.waitSync().then(() => { resolve(); });
+            }
+            else {
+                this.tightcnc.controller?.send(params.line);
+                resolve();
+            }
+        })
     }
 }
 class OpHold extends Operation {

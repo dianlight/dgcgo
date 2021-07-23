@@ -13,8 +13,9 @@ export interface ControllerCapabilities {
         mistCoolant: boolean, //'M': 'mistCoolant',
         floodCoolant: boolean,
         coreXY: boolean, // 'C': 'coreXY',
-    //    'P': 'parking',
-    //    'Z': 'homingForceOrigin',
+        parking: boolean, //    'P': 'parking',
+        homeForce: boolean,//    'Z': 'homingForceOrigin',
+        homing: boolean, // 'H': 'homing',
         homingSingleAxis:boolean, //'H': 'homingSingleAxis', $HX $HY $HZ
     //    'T': 'twoLimitSwitch',
     //    'A': 'allowProbeFeedOverride',
@@ -24,7 +25,8 @@ export interface ControllerCapabilities {
     //    'I': 'disableBuildInfoStr',
     //    'E': 'disableSyncOnEEPROMWrite',
     //    'W': 'disableSyncOnWCOChange',
-        startUpHomeLock: boolean // 'L': 'powerUpLockWithoutHoming'
+    startUpHomeLock: boolean,// 'L': 'powerUpLockWithoutHoming'
+    toolchange: boolean,    
 }
 
 export interface ControllerStatus extends VMState {
@@ -294,11 +296,12 @@ export abstract class Controller  extends EventEmitter implements VMState  {
     abstract sendGcode(gline: GcodeLine, options?:unknown):void;
 
     send(thing: string | GcodeLine, options?:unknown):void {
-        if (typeof thing === 'object' && thing.isGcodeLine) {
-            this.sendGcode(thing, options);
+        if (typeof thing === 'string') {
+            this.sendLine(thing, options);
         } else {
-            this.sendLine(thing as string, options);
+            this.sendGcode(thing, options);
         }
+
     }
     /**
      * Streams lines to the controller, as in send().  Should only resolve once whole stream has been executed.
@@ -442,8 +445,12 @@ export abstract class Controller  extends EventEmitter implements VMState  {
                 mistCoolant: false, //'M': 'mistCoolant',
                 floodCoolant: false,
                 coreXY: false, // 'C': 'coreXY',
+                homeForce: false,
+                parking: false,
+                homing: false, 
                 homingSingleAxis:false, //'H': 'homingSingleAxis', $HX $HY $HZ
-                startUpHomeLock: false // 'L': 'powerUpLockWithoutHoming'
+                startUpHomeLock: false, // 'L': 'powerUpLockWithoutHoming'
+                toolchange:false
             },
             lineCounter: this.lineCounter,
             hasMovedToAxes: this.hasMovedToAxes,

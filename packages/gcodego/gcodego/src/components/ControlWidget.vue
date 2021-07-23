@@ -10,8 +10,8 @@
             <q-btn icon="location_searching" size="xs" label="Point on map..." rounded outline disable/>
             <q-btn icon="fmd_bad" size="xs" label="Machine Coords" rounded outline @click="goToPosition('machine')"/>
           </q-btn-dropdown>
-          <q-btn icon="engineering" size="xs" rounded outline disable>
-            <q-tooltip>Go to position...</q-tooltip>
+          <q-btn icon="construction" size="xs" rounded outline :disable="!$store.getters['tightcnc/capabilities']?.toolchange">
+            <q-tooltip>Tool Change</q-tooltip>
           </q-btn>
           <q-btn icon="engineering" size="xs" rounded outline disable>
             <q-tooltip>Go to position...</q-tooltip>

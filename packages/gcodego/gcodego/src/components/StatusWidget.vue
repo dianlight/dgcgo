@@ -58,6 +58,12 @@
           </div>
         </div>
         <div class="row text-center">
+          <div class="col text-capitalize">Active Tool</div>
+          <div class="col-8 items-center self-end">
+            {{ lastStatus?.controller?.tool }}
+          </div>
+        </div>
+        <div class="row text-center">
           <div class="col text-h6 text-capitalize">Status</div>
           <div class="col-8 text-h6 items-center self-end">
             <q-icon v-if="lastStatus?.controller" color="positive" name="link">

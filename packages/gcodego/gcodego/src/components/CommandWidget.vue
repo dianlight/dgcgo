@@ -6,6 +6,7 @@
           <div class="q-pa-none  q-gutter-y-xs col items-start">
             <q-btn-group>
               <q-btn-dropdown
+               v-if="$store.getters['tightcnc/capabilities']?.homing"
                split
                dense 
                outline 
@@ -43,15 +44,12 @@
               </q-btn>
             </q-btn-group>
             <q-btn-group>    
-              <!--q-btn dense outline icon="vertical_align_bottom" @click="probe()">
-                  <q-tooltip>Probe Z in current position</q-tooltip>
-              </!--q-btn-->
               <q-btn-dropdown
                 split
                 dense
                 outline
                 icon="vertical_align_bottom"
-                @click="probe({x:$store.state.tightcnc.lastStatus?.controller?.pos[0],y:$store.state.tightcnc.lastStatus?.controller?.pos[1]})"
+                @click="probe({x:$store.state.tightcnc.lastStatus?.controller?.pos[0]||0,y:$store.state.tightcnc.lastStatus?.controller?.pos[1]||0})"
               >
                 <template v-slot:label>
                     <q-tooltip>Probe Z in current position {{ format($store.state.tightcnc.lastStatus?.controller?.pos[0]||0) }} y: {{ format($store.state.tightcnc.lastStatus?.controller?.pos[1]||0) }}</q-tooltip>

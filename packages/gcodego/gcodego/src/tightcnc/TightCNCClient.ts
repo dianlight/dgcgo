@@ -3,6 +3,7 @@ import {
     PortInfo,
     StatusObject,
     JobSourceOptions,
+    GcodeProcessor,
 } from '@dianlight/tightcnc-core';
 import { JobStatus } from '@dianlight/tightcnc-core'
 import { uid } from 'quasar';
@@ -275,6 +276,18 @@ export class TightCNCClient extends AbstractTightCNCClient {
             }
             return status;
         });
+    }
+
+    send(cmd: { line: string, wait: boolean, gcodeProcessors?: {
+        name: string;
+        options: {
+            id: string;
+            updateOnHook?: string;
+        };
+        order?: number;
+        inst?: GcodeProcessor;
+    }[] | undefined; }): Promise<void> {
+        return this.op('send',cmd);
     }
 
     getAvailableSerials(): Promise<PortInfo[]> {

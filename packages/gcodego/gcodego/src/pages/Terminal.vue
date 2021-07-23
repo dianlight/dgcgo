@@ -32,7 +32,7 @@
     dense
     v-model="command" 
     style="width: 100%;" 
-    label="#>" 
+    label="#> [Enter => send] [Shift+Enter => send directly]" 
     @keyup="sendCommand" 
     >
       <template v-slot:append>
@@ -40,6 +40,7 @@
         </template>
       <template v-slot:after>
         <q-btn round dense flat icon="send" :loading="sendingCommand" :disable="!command" @click="sendCommand">
+          <q-tooltip>Send command. [Shift => send in direct mode]</q-tooltip>
           <template v-slot:loading>
               <q-spinner-gears />
           </template>
@@ -86,6 +87,8 @@ import hljs from 'highlight.js/lib/core';
 import gcode from 'highlight.js/lib/languages/gcode';
 import { QPage, QVirtualScroll } from 'quasar';
 import { dom } from 'quasar'
+import * as _ from 'lodash';
+import { GcodeGoConfig } from '@dianlight/gcodego-core';
 
 hljs.registerLanguage('gcode',gcode);
 
@@ -184,14 +187,36 @@ export default class Terminal extends Vue {
     }
   }
 
-  sendCommand(event: KeyboardEvent){
-    if(event.key && event.key !== 'Enter')return
+ sendCommand(event: KeyboardEvent|MouseEvent){
+    if(event instanceof KeyboardEvent && event.key && event.key !== 'Enter')return
     this.sendingCommand = true
-    void this.$tightcnc.op('send',{line:this.command, wait: false}).then( ()=> {
-      this.sendingCommand = false
-      this.command = ''
-//      this.$refs.terminal.refresh(this.$store.state.tightcnc.logs.lines.length-1)
-    })
+    if(event.shiftKey){
+      void this.$tightcnc.send({line:this.command, wait: false}).then( ()=> {
+        this.sendingCommand = false
+        this.command = ''
+      })    
+    } else {
+      void this.$tightcnc.send({
+        line:this.command, 
+        wait: false, 
+        gcodeProcessors: this.$tightcnc.getConfig().selectedProcessors?.map( (sel) => {
+          const options = this.$tightcnc.getConfig()[sel as keyof GcodeGoConfig];
+          return {
+            name: sel,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            options: {
+                id: _.kebabCase(sel),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...( options as any)
+            }
+          }
+        }),
+      }).then( ()=> {
+        this.sendingCommand = false
+        this.command = ''
+      })    
+    }
+ 
   }
 
 }
