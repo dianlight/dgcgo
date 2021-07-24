@@ -24,6 +24,18 @@ export default class App extends Vue {
   this.$globalEventBus.addListener(GlobalEventBus.NOTIFY, (opts)=>{
     this.$q.notify(opts)
   })
+  this.$globalEventBus.addListener(GlobalEventBus.DIALOG, (opts)=>{
+    this.$q.dialog(opts)
+      .onOk((values: unknown) => {
+        console.log('OK', values)
+        this.$globalEventBus.emit(GlobalEventBus.DIALOG_RESULT, values)
+      }).onCancel(() => {
+        console.log('Cancel')
+        this.$globalEventBus.emit(GlobalEventBus.DIALOG_RESULT)
+      }).onDismiss((values: unknown) => {
+        console.log('Called on OK or Cancel',values)
+      })
+  })
  }
 
 }

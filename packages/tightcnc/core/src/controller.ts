@@ -330,7 +330,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @method waitSync
      * @return {Promise}
      */
-    abstract waitSync(): Promise<void>;
+    abstract waitSync(debug?: boolean): Promise<void>;
     /**
      * Pauses machine / feed hold.
      *

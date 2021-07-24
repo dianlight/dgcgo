@@ -1025,7 +1025,8 @@ export  class TinyGController extends Controller {
             }, respTimeThreshold / 2);
         }
     }
-    override async waitSync() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    override async waitSync(_debug?:boolean) {
         // Fetch new status report to ensure up-to-date info (mostly in case a move was just requested and we haven't gotten an update from that yet)
         // If sends are disabled, instead just wait some time to make sure a response was received
         if (this._disableSending) {

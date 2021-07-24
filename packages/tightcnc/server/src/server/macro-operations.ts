@@ -35,9 +35,14 @@ class OpRunMacro extends Operation {
             $id: '/runMacro',
             type: 'object',
             properties: {
+                macroName: {
+                    type: 'string',
+                    description: 'Name of the macro to run',
+                    default: 'anonymous'
+                },
                 macro: {
                     type: 'string',
-                    description: 'Name of macro to run',
+                    description: 'Macro to run',
                     /*
                     // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'val' implicitly has an 'any' type.
                     validate: (val) => {
@@ -64,9 +69,10 @@ class OpRunMacro extends Operation {
         macro: string;
         params: { [key: string]: unknown };
         waitSync: boolean;
+        macroName: string;
     }) {
         this.checkReady();
-        return this.tightcnc.runMacro(params.macro, params.params, { waitSync: params.waitSync }).then(
+        return this.tightcnc.runMacro(params.macro, params.params, { waitSync: params.waitSync, macroName: params.macroName }).then(
             () => {
                 return {
                     status: 'ok'

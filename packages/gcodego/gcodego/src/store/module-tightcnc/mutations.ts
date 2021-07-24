@@ -23,6 +23,7 @@ const mutation: MutationTree<TightCNCStateInterface> = {
   setLogOptions(state: TightCNCStateInterface, options: {
     bufferSize?: number
     filterStatus?: boolean
+    filterControl?: boolean
     matchStatus?: boolean
     autoScroll?: boolean
   }) {
@@ -101,21 +102,13 @@ const mutation: MutationTree<TightCNCStateInterface> = {
             position: 'top-right',
             timeout: 30000
           })
-          /*
-          Notify.create({
-            type: 'info',
-            multiLine: true,
-            message: log.data.match(/\[MSG:(.*)]/ig) as unknown as string,
-            position: 'top-right',
-            timeout: 30000
-          })
-          */
         }
 
-        if (state.logs.options.filterStatus) {
-          return !(log.direction === '%' || log.data.indexOf('(sync)') > 0)
-        }
-        else return true;
+        if (state.logs.options.filterStatus && log.direction === '%') {
+          return false
+        } else if (state.logs.options.filterControl && log.data.indexOf('(ctrl:') > 0) {
+          return false
+        } else return true;
       })
     );
   }

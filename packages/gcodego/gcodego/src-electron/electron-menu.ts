@@ -158,11 +158,13 @@ export class ElectronMenu {
                     label: 'Restart TightCNC server',
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     click: (item, focusedWindow) => {
-                        this.mainWindow?.webContents.send('MenuEvent', { command: 'restartTightCNC' }),
-                            void dialog.showMessageBox({
-                                message: 'TightCNC restarting',
-                                buttons: ['OK'],
-                            });
+                        this.mainWindow?.webContents.send('MenuEvent', { command: 'restartTightCNC' })
+                        /*
+                        void dialog.showMessageBox({
+                            message: 'TightCNC restarting',
+                            buttons: ['OK'],
+                        });
+                        */
                     },
                 },
             ],

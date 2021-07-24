@@ -41,6 +41,7 @@ export abstract class AbstractJobManager {
      * @method startJob
      * @param {Object} jobOptions
      *   @param {String} jobOptions.filename - The input gcode file for the job.
+     *   @param {String[]} jobOptions.data - Instead of filename, get the gcode from a string array
      *   @param {Mixed} jobOptions.macro - Instead of filename, get the gcode from a generator macro
      *   @param {Object} jobOptions.macroParams - Parameters for the macro if running job from macro
      *   @param {Object[]} jobOptions.gcodeProcessors - The set of gcode processors to apply, in order, along with

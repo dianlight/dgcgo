@@ -1,7 +1,7 @@
 import { JsonSchema7, UISchemaElement } from '@jsonforms/core';
 import { JobStatusUpdateHookCallback } from '../tightcnc/TightCNCClient';
 import { ClientEvents, GlobalEventBus,GcPlugin, AbstractPluginAdapter } from '@dianlight/gcodego-core'
-import { Notify, Dialog } from 'quasar'
+//import { Dialog } from 'quasar'
 import JsonFormDialog from '../dialogs/JsonFormDialog.vue'
 import { RouteRecordRaw } from 'vue-router';
 
@@ -66,7 +66,7 @@ export class PluginAdapter extends AbstractPluginAdapter {
      */
     async showDialog(caption: string, text: string, exits: string[]): Promise<string> {
         return new Promise((resolve, reject) => {
-            Notify.create({
+            this.bus.emit(GlobalEventBus.NOTIFY,{
                 timeout: 0,
                 caption: caption,
                 message: text,
@@ -91,7 +91,7 @@ export class PluginAdapter extends AbstractPluginAdapter {
 
     async showJsonFormDialog<T>(text: string, schema: JsonSchema7, uischema: UISchemaElement, data?: T): Promise<T> {
         return new Promise((resolve, reject) => {
-            Dialog.create({
+            this.bus.emit( GlobalEventBus.DIALOG, {
                 component: JsonFormDialog,
                 position: 'standard',
                 persistent: true,
@@ -101,14 +101,13 @@ export class PluginAdapter extends AbstractPluginAdapter {
                     uischema,
                     data: data || {}
                 }
-            }).onOk((values: T) => {
-                console.log('OK', values)
-                resolve(values)
-            }).onCancel(() => {
-                console.log('Cancel')
-                reject()
-            }).onDismiss(() => {
-                console.log('Called on OK or Cancel')
+            });
+            this.bus.once(GlobalEventBus.DIALOG_RESULT, (result?: T) => {
+                if(result) {
+                    resolve(result)
+                } else {
+                    reject()
+                }
             })
         })
     }

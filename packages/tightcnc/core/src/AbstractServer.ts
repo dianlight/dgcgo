@@ -326,7 +326,8 @@ export abstract class AbstractServer extends EventEmitter {
     
     
     async runMacro(macro: string | string[], params = {}, options: MacroOptions):Promise<void> {
-        return this.macros?.runMacro(macro, params, options);
+        if(this.macros)return this.macros.runMacro(macro, params, options)
+        throw new Error('Nom macro engine!');
     }
 
 

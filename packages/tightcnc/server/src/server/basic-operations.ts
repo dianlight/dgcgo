@@ -1,5 +1,5 @@
 import objtools from 'objtools';
-import { errRegistry,GcodeProcessor,Operation } from '@dianlight/tightcnc-core';
+import { errRegistry,GcodeProcessor,JobState,Operation } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 import { StatusObject } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema';
@@ -104,23 +104,56 @@ class OpSend extends Operation {
     }[] | undefined
     }): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            if (params.gcodeProcessors && params.gcodeProcessors.length > 0) {
+            if (params.gcodeProcessors && params.gcodeProcessors.length > 0 && this.tightcnc.jobManager) {
+                const suspendJob = this.tightcnc.jobManager?.currentJob;
+                const job = new JobState({
+                    state: 'initializing',
+//                    jobOptions: {},
+//                    dryRunResults: {},
+                    startTime: new Date().toISOString()
+                });
+                this.tightcnc.jobManager.currentJob = job;
                 const source = this.tightcnc.getGcodeSourceStream({
                     // filename: jobOptions.filename,
                     // macro: jobOptions.macro,
                     // macroParams: jobOptions.macroParams,
                     gcodeProcessors: params.gcodeProcessors,
-                    data: [params.line]
+                    data: [params.line],
+                    job
                     // rawStrings: jobOptions.rawFile || false,
                 });
-                this.tightcnc.controller?.sendStream(source)
-                    .then(() => {
-                        if (params.wait) this.tightcnc.controller?.waitSync().then(() => { resolve(); });
-                        else resolve();
-                    })
-                    .catch(err => {
+                const initializer = new Promise<void>((resolve, reject) => {
+                    let finished = false;
+                    source.on('processorChainReady', (_chain:GcodeProcessor[]) => {
+                        if (finished)
+                            return;
+                        finished = true;
+                        job.gcodeProcessors = _chain.reduce((prev:Record<string,GcodeProcessor>, next) => { prev[next.id] = next; return prev; }, {} as Record<string,GcodeProcessor>);
+                        job.startTime = new Date().toISOString();
+                        resolve();
+                    });
+                    source.on('chainerror', (err:unknown) => {
+                        if (finished)
+                            return;
+                        finished = true;
+                        job.state = 'error';
+                        job.error = JSON.stringify(err);
                         reject(err);
-                    })
+                    });
+                });
+                void initializer.then(() => {
+                    job.state = 'running';
+                    this.tightcnc.controller?.sendStream(source)
+                        .then(() => {
+                            if (this.tightcnc.jobManager) this.tightcnc.jobManager.currentJob = suspendJob;
+                            if (params.wait) this.tightcnc.controller?.waitSync().then(() => { resolve(); });
+                            else resolve();
+                        })
+                        .catch(err => {
+                            if (this.tightcnc.jobManager) this.tightcnc.jobManager.currentJob = suspendJob;
+                            reject(err);
+                        })
+                })
             }
             else if (params.wait) {
                 this.tightcnc.controller?.send(params.line);

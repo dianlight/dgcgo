@@ -231,11 +231,11 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     }
 
     override pushGcode(gline?: string | GcodeLine | GcodeLine[]) {
-        if (!gline)
+        if (!gline) {
             return;
-        if (typeof gline === 'string')
-            gline = new GcodeLine(gline);
-        if (Array.isArray(gline)) {
+        } else if (typeof gline === 'string') {
+            this.pushGcode(new GcodeLine(gline));
+        } else if (Array.isArray(gline)) {
             gline.forEach( (g)=> this.pushGcode(g))
         } else {
             // handle tool offset by adjusting Z if present
@@ -252,6 +252,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     }
 
     async _doToolChange() {
+        console.log('Richiesto Tool Change');
         // create a map from axis letters to current position in job
         const vmState = _.cloneDeep(this.vm.getState()) //objtools.deepCopy(this.vm.getState());
         const controller = this.tightcnc.controller;
@@ -271,12 +272,15 @@ export default class ToolChangeProcessor extends GcodeProcessor {
                 await controller.waitSync();
             // Run pre-toolchange macro
             const preToolChange = this.tightcnc.config.toolChange.preToolChange;
-            await this.tightcnc.runMacro(preToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true });
+            console.log('Exec pre stop',preToolChange)
+            await this.tightcnc.runMacro(preToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true,macroName: 'preToolChange' });
+            console.log('Macro executed!')
             // Wait for resume
             await this._doProgramStop('tool_change');
+            console.log('Resumed...')
             // Run post-toolchange macro
             const postToolChange = this.tightcnc.config.toolChange.postToolChange;
-            await this.tightcnc.runMacro(postToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true });
+            await this.tightcnc.runMacro(postToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true, macroName: 'postToolChange' });
             // Restart spindle/coolant
             if (changedMachineProp) {
                 const lines = this.vm.syncMachineToState({ vmState: vmState, include: ['spindle', 'coolant'], exclude:[] });
@@ -302,9 +306,11 @@ export default class ToolChangeProcessor extends GcodeProcessor {
         }
     }
     async _doProgramStop(waitname = 'program_stop') {
+        console.log('Aspetto esecuzione comandi per eseguire lo stop!')
         if (this.programStopWaiter)
             return await this.programStopWaiter;
         this.currentlyStopped = waitname;
+        console.log('Chiedo Wait:', this.job);
         this.job?.addWait(waitname);
         this.programStopWaiter = new ExternalizablePromise<void>();
 
@@ -341,11 +347,11 @@ export default class ToolChangeProcessor extends GcodeProcessor {
         // Remove from the gline anything we're handling, and add a comment to it
         if (this.handleT && gline.has('T')) {
             gline.remove('T');
-            gline.addComment(this.toolChangeOnT ? 'tool change' : 'tool sel');
+            gline.addComment(this.toolChangeOnT ? '[ToolChange Plugin] tool change' : '[ToolChange Plugin] tool sel');
         }
         if (this.handleM6 && gline.has('M6')) {
             gline.remove('M6');
-            gline.addComment('tool change');
+            gline.addComment('[ToolChange Plugin] tool change');
         }
         if (this.handleProgramStop && (gline.has('M0') || gline.has('M1') || gline.has('M60'))) {
             gline.remove('M0');

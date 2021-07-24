@@ -26,7 +26,7 @@ export abstract class GcodeProcessor extends GcodeLineReadableStream {
     processorOptions:Partial<GcodeProcessorOptions>;
     processorId:unknown;
     tightcnc:AbstractServer;
-    job:JobState|undefined;
+    job?:JobState|undefined;
     //preprocessInputGcode: ()=>void
     gcodeProcessorChainById: { [key: string]: GcodeProcessor; } = {};
     

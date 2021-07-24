@@ -18,57 +18,59 @@ export default class JobManager extends AbstractJobManager {
         // nop
     }
 
-    override getStatus(job?:JobState):JobStatus|undefined {
+    override getStatus(job?: JobState): JobStatus | undefined {
+    //    console.log('JobManager getStatus:', job,this.currentJob)
         if (!job && this.currentJob) job = this.currentJob;
-        else if (!job) return;
-        else {
-            // Fetch the status from each gcode processor
-            const gcodeProcessorStatuses: MultipleGcodeStatus = {};
-            if (job.gcodeProcessors) {
-                for (const key in job.gcodeProcessors) {
-                    const s = job.gcodeProcessors[key].getStatus();
-                    if (s) {
-                        gcodeProcessorStatuses[key] = s;
-                    }
+         
+        if (!job) return;
+
+        //console.log('Request Status for:', job);
+        // Fetch the status from each gcode processor
+        const gcodeProcessorStatuses: MultipleGcodeStatus = {};
+        if (job.gcodeProcessors) {
+            for (const key in job.gcodeProcessors) {
+                const s = job.gcodeProcessors[key].getStatus();
+                if (s) {
+                    gcodeProcessorStatuses[key] = s;
                 }
             }
-            // Calculate main stats and progress
-            let progress = undefined;
-            const stats = this._mainJobStats(gcodeProcessorStatuses);
-            stats.predictedTime = stats.time;
-            const finalVMStatus = gcodeProcessorStatuses ? gcodeProcessorStatuses['final-job-vm'] : undefined;
-            if (finalVMStatus && finalVMStatus.updateTime && !job.dryRun) {
-                const curTime = new Date(finalVMStatus.updateTime);
-                stats.updateTime = curTime.toISOString();
-                stats.time = (curTime.getTime() - new Date(job.startTime).getTime()) / 1000;
-                // create job progress object
-                if (_.has(job,'dryRunResults.stats.time')) {
-                    let estTotalTime = _.get(job,'dryRunResults.stats.time') as number;
-                    if ((stats.lineCount as number) >= 300) { // don't adjust based on current time unless enough lines have been processed to compensate for stream buffering
-                        estTotalTime *= (curTime.getTime() - new Date(job.startTime).getTime()) / 1000 / (stats.predictedTime as number);
-                    }
-                    progress = {
-                        timeRunning: stats.time,
-                        gcodeLine: stats.gcodeLine,
-                        estTotalTime: estTotalTime,
-                        estTimeRemaining: Math.max(estTotalTime - (stats.time as number), 0),
-                        percentComplete: Math.min((stats.time as number) / (estTotalTime || 1) * 100, 100)
-                    };
-                }
-            }
-            // Return status
-            return {
-                state: (job.waitList && job.waitList.length && job.state === 'running') ? 'waiting' : job.state,
-                jobOptions: job.jobOptions,
-                dryRunResults: job.dryRunResults,
-                startTime: job.startTime,
-                error: (job.state === 'error' && job.error ) ? job.error.toString() : undefined,
-                gcodeProcessorsStatus: gcodeProcessorStatuses,
-                stats: stats,
-                progress: progress,
-                waits: job.waitList
-            } as JobStatus;
         }
+        // Calculate main stats and progress
+        let progress = undefined;
+        const stats = this._mainJobStats(gcodeProcessorStatuses);
+        stats.predictedTime = stats.time;
+        const finalVMStatus = gcodeProcessorStatuses ? gcodeProcessorStatuses['final-job-vm'] : undefined;
+        if (finalVMStatus && finalVMStatus.updateTime && !job.dryRun) {
+            const curTime = new Date(finalVMStatus.updateTime);
+            stats.updateTime = curTime.toISOString();
+            stats.time = (curTime.getTime() - new Date(job.startTime).getTime()) / 1000;
+            // create job progress object
+            if (_.has(job,'dryRunResults.stats.time')) {
+                let estTotalTime = _.get(job,'dryRunResults.stats.time') as number;
+                if ((stats.lineCount as number) >= 300) { // don't adjust based on current time unless enough lines have been processed to compensate for stream buffering
+                    estTotalTime *= (curTime.getTime() - new Date(job.startTime).getTime()) / 1000 / (stats.predictedTime as number);
+                }
+                progress = {
+                    timeRunning: stats.time,
+                    gcodeLine: stats.gcodeLine,
+                    estTotalTime: estTotalTime,
+                    estTimeRemaining: Math.max(estTotalTime - (stats.time as number), 0),
+                    percentComplete: Math.min((stats.time as number) / (estTotalTime || 1) * 100, 100)
+                };
+            }
+        }
+        // Return status
+        return {
+            state: (job.waitList && job.waitList.length && job.state === 'running') ? 'waiting' : job.state,
+            jobOptions: job.jobOptions,
+            dryRunResults: job.dryRunResults,
+            startTime: job.startTime,
+            error: (job.state === 'error' && job.error ) ? job.error.toString() : undefined,
+            gcodeProcessorsStatus: gcodeProcessorStatuses,
+            stats: stats,
+            progress: progress,
+            waits: job.waitList
+        } as JobStatus;
     }
 
     _mainJobStats(gcodeProcessorStats: Record<string,Record<string,unknown>>):Record<string,unknown> {
@@ -86,6 +88,7 @@ export default class JobManager extends AbstractJobManager {
      * @method startJob
      * @param {Object} jobOptions
      *   @param {String} jobOptions.filename - The input gcode file for the job.
+     *   @param {String[]} jobOptions.data - Instead of filename, get the gcode from a string array
      *   @param {Mixed} jobOptions.macro - Instead of filename, get the gcode from a generator macro
      *   @param {Object} jobOptions.macroParams - Parameters for the macro if running job from macro
      *   @param {Object[]} jobOptions.gcodeProcessors - The set of gcode processors to apply, in order, along with

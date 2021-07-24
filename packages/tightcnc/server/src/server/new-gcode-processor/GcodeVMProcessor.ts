@@ -140,7 +140,7 @@ export default class GcodeVMProcessor extends GcodeProcessor {
             gline.isMotion = r.isMotion;
         } else {
             this.lastLineProcessedTime = new Date();
-            let r = this.vm.runGcodeLine(gline);
+            const r = this.vm.runGcodeLine(gline);
             gline.isMotion = r.isMotion;
         }
         return gline;

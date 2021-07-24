@@ -10,6 +10,13 @@ const jobOptionsSchema = {
             type: 'string',
             description: 'Filename of gcode to run'
         },
+        data: {
+            type: 'array',
+            description: 'Job data - Filename alternative',
+            items: {
+                type: 'string'
+            }
+        },
         macro: {
             type: 'string',
             description: 'Name of generator macro to use as gcode source',
@@ -78,7 +85,9 @@ class OpStartJob extends Operation {
     
     async run(params?: JobSourceOptions) {
         const jobOptions: JobSourceOptions = {
-            filename: params?.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
+//            filename: params?.filename ? this.tightcnc.getFilename(params.filename, 'data') : undefined,
+            filename: params?.filename,
+            data: params?.data,
             macro: params?.macro,
             macroParams: params?.macroParams,
             gcodeProcessors: params?.gcodeProcessors,

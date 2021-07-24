@@ -78,7 +78,8 @@
     </q-page-container>
 
     <q-footer elevated class="bg-secondary" v-if="debug">
-      <code class='mini text-white'>{{ $store.state.tightcnc?.lastStatus}}</code>
+      <code class='mini text-white'>Controller:{{ $store.state.tightcnc?.lastStatus?.controller }}</code><br/>
+      <code class='mini text-yellow'>Job:{{ $store.state.tightcnc?.lastStatus?.job }}</code>
       <!--
       <q-toolbar>
         <q-toolbar-title>

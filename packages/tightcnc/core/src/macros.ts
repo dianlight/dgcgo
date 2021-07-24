@@ -1,21 +1,17 @@
 import { GcodeLine } from './gcode-processor/GcodeLine';
 import { errRegistry } from './errRegistry';
 import { GcodeProcessor } from './gcode-processor/GcodeProcessor';
-//import pasync from 'pasync';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-empty-function
 const AsyncFunction = Object.getPrototypeOf(async function () { }).constructor;
 import fs from 'fs';
 import path from 'path';
 import * as node_stream from 'stream'
-//import objtools from 'objtools';
-//import { createSchema } from 'common-schema';
-//import { TightCNCServer } from '..'; // Avoid Circular dependency issue
 import { BaseRegistryError } from 'new-error';
 import { AbstractServer } from './AbstractServer';
 import * as _ from 'lodash';
-//import { GcodeProcessorOptions } from './gcode-processor/GcodeProcessorOptions';
 import { ExternalizablePromise } from './ExternalizablePromise';
 import { JSONSchema7 } from 'json-schema';
+import vm from 'vm';
 
 interface MacroMetaData {
     params: Record<string,unknown>;
@@ -31,6 +27,7 @@ interface MacroData {
 
 
 export interface MacroOptions {
+    macroName: string;
     gcodeProcessor?: GcodeProcessor;
     push?: (gline: GcodeLine) => Promise<void>
     sync?: () => Promise<never>
@@ -289,23 +286,24 @@ export class Macros {
                 if (typeof gline === 'string' || Array.isArray(gline))
                     gline = new GcodeLine(gline);
                 if (options.push) {
+//                    console.log('Options Push:',gline);
                     void options.push(gline);
-                }
-                else if (options.gcodeProcessor) {
+                } else if (options.gcodeProcessor) {
+                    //console.log('Preprocessor Push:',options.gcodeProcessor,gline);
                     options.gcodeProcessor.pushGcode(gline);
-                }
-                else {
+                } else {
+//                    console.log('Normal Send',gline);
                     this.tightcnc.controller?.sendGcode(gline);
                 }
             },
             // Waits until all sent gcode has been executed and machine is stopped
             sync: async () => {
-                if (options.sync)
+                if (options.sync) {
                     return await options.sync();
-                if (options.gcodeProcessor) {
+                } else if (options.gcodeProcessor) {
                     await options.gcodeProcessor.flushDownstreamProcessorChain();
                 }
-                await this.tightcnc.controller?.waitSync();
+                await this.tightcnc.controller?.waitSync(true);
             },
             // Runs a named operation
             op: async (name: string, params: Record<string, unknown>) => {
@@ -352,21 +350,33 @@ export class Macros {
         env.allparams = params;
         return env;
     }
-    async runJS(code: string, params:Record<string, unknown> = {}, options:MacroOptions={}) {
-        if (options.waitSync)
-            code += '\n;await sync();';
-        const env = await this._makeMacroEnv(code, params, options);
-        const envKeys = Object.keys(env);
-        const fnCtorArgs = envKeys.concat([code]);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-        const fn = new AsyncFunction(...fnCtorArgs);
-        const fnArgs = [];
-        for (const key of envKeys) {
-            // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-            fnArgs.push(env[key]);
+    async runJS(code: string, params: Record<string, unknown> = {}, options: MacroOptions = { macroName: 'inline'}): Promise<void> {
+        code = `(async function (){
+            message('[${options.waitSync?'Sync':'Async'}Macro:${options.macroName}]');
+             ${code}`;
+        if (options.waitSync) {
+            code += `;\nreturn new Promise( async (resolve,reject) => { 
+                await sync().then(()=>{
+                    message("[SyncMacro: end]");
+                    resolve()
+                }).catch((err)=>{
+                    message("[SyncMacro: with errors] "+err);
+                    reject(err)
+                })
+            });`;
+            code += '\n})();';
+        } else {
+            code += ';\nmessage("[AsyncMacro: end]");'
+            code += '\nreturn Promise.resolve();\n})();';
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
-        return fn(...fnArgs);
+        //console.log('Pre loading Macro environment',code)
+        const env = await this._makeMacroEnv(code, params, options);
+        const ctx = vm.createContext(env, {
+            name: 'macro',
+        });
+        const fn = new vm.Script(code) //new AsyncFunction(...fnCtorArgs);
+        const result = fn.runInContext(ctx) as Promise<void>;
+        return result;
     }
     _readFile(filename:string):Promise<string> {
         return new Promise((resolve, reject) => {
@@ -422,7 +432,7 @@ export class Macros {
      *     output stream instead of being directly executed on the controller.
      *   @param {Function} options.push - Provide a function for handling pushing gcode lines.
      */
-    async runMacro(macro: string | string[], params:Record<string, unknown> = {}, options: MacroOptions) {
+    async runMacro(macro: string | string[], params:Record<string, unknown> = {}, options: MacroOptions):Promise<void> {
         if (typeof macro === 'string' && macro.indexOf(';') !== -1) {
             // A javascript string blob
             return this.runJS(macro, params, options);
@@ -453,6 +463,7 @@ export class Macros {
             for (const str of macro) {
                 code += 'push(`' + str + '`);\n';
             }
+            console.log('Running macro js:', code);
             return this.runJS(code, params, options);
         }
         else {
@@ -477,6 +488,7 @@ class MacroGcodeSourceStream extends node_stream.Readable {
             }
         });
         macros.runMacro(macro, macroParams, {
+            macroName: 'MacroGcodeSourceStream',
             push: async (gline:GcodeLine) => {
                 const r = this.push(gline);
                 if (!r) {

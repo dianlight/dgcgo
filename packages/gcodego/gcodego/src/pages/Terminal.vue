@@ -66,7 +66,12 @@
     <q-toggle
         size="xs"
         v-model="filterStatus"
-        label="Filter Status Lines"
+        label="Filter Status messages"
+    />
+    <q-toggle
+        size="xs"
+        v-model="filterControl"
+        label="Filter Control messaged"
     />
     <q-toggle
         size="xs"
@@ -119,6 +124,14 @@ export default class Terminal extends Vue {
     })
   }
 
+  get filterControl(){
+    return this.$store.state.tightcnc.logs.options.filterControl
+  }
+  set filterControl(value:boolean){
+    this.$store.commit('tightcnc/setLogOptions',{
+      filterControl:value
+    })
+  }
   get matchStatus(){
     return this.$store.state.tightcnc.logs.options.matchStatus
   }

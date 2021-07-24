@@ -8,6 +8,7 @@ export interface TightCNCStateInterface {
     options: {
       bufferSize: number
       filterStatus: boolean
+      filterControl: boolean
       matchStatus: boolean
       autoScroll: boolean
     },
@@ -23,6 +24,7 @@ function state(): TightCNCStateInterface {
       options: {
         bufferSize: 1000,
         filterStatus: true,
+        filterControl: true,
         matchStatus: true,
         autoScroll: true
       },

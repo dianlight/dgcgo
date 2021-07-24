@@ -24,9 +24,10 @@ export class ToolChange extends GcPlugin {
     }
 
     statusHook = (state: JobStatus) => {
-        //console.log('Nuovo stato job:', state)
+        console.log('Nuovo stato job:', state)
         const jobWaiting = (state.state === 'waiting' && state.waits)?state.waits[0]:undefined;
         if (jobWaiting === 'tool_change') {
+            console.log('Waiting Status Hook! -- Show Dialog!');
             const toolNum = objtools.getPath(state, 'gcodeProcessors.toolchange.tool') as string;
             let textobj = '<b>Waiting for Tool Change</b><br/>';
             if (toolNum !== null && toolNum !== undefined) {

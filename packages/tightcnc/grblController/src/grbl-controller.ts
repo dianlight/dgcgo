@@ -911,6 +911,7 @@ export class GRBLController extends Controller {
             return;
         if (this._ignoreUnlockPromptMessage && str === "'$H'|'$X' to unlock")
             return;
+        console.log('**Sending Message:',str)
         this.emit('message', this._humanReadableMessage(str));
     }
 
@@ -1466,7 +1467,7 @@ export class GRBLController extends Controller {
     _commsHandleAckResponseReceived(error?:BaseRegistryError) {
         //this.debug('_commsHandleAckResponseReceived');
         if (this.sendQueueIdxToReceive >= this.sendQueueIdxToSend) {
-            // Got a response we weren't expecting; ignore it
+            console.log('Got a response we weren\'t expecting; ignore it');
             return;
         }
         const entry = this.sendQueue[this.sendQueueIdxToReceive];
@@ -1966,7 +1967,7 @@ export class GRBLController extends Controller {
             (this.sendQueue.length === 0 || (this._disableSending && this.sendQueueIdxToReceive === this.sendQueueIdxToSend)) &&
             this._lastRecvSrOrAck === 'sr';
     }
-    override waitSync():Promise<void> {
+    override waitSync(debug?:boolean):Promise<void> {
         // Consider the machine to be synced when all of these conditions hold:
         // 1) The machine state indicated by the last received status report indicates that the machine is not moving
         // 2) this.sendQueue is empty (or sending is disabled, and all lines sent out have been processed)
@@ -1974,42 +1975,59 @@ export class GRBLController extends Controller {
         //
         // Check if these conditions hold immediately.  If not, send out a status report request, and
         // wait until the conditions become true.
+        if (debug) {
+            console.log(`waitSync() called with state:${JSON.stringify(this.currentStatusReport.machineState)}`);
+            console.log(`waitSync() called with queue:${JSON.stringify(this.sendQueue,undefined,2)}`);
+            console.log(`waitSync() called with lastAck:${JSON.stringify(this._lastRecvSrOrAck)}`);
+        }
         if (this.error)
             return Promise.reject(this.errorData || errRegistry.newError('MACHINE_ERROR','MACHINE_ERROR').formatMessage('Error waiting for sync'));
-        this.send('G4 P0.01 (sync)'); // grbl won't ack this until its planner buffer is empty
-        //if (this._isSynced()) return Promise.resolve();	
+        this.send('G4 P0.001 (ctrl: grbl won\'t ack this until its planner buffer is empty)'); // grbl won't ack this until its planner buffer is empty
+        //if (this._isSynced()) return Promise.resolve();	 // Already synced
         //this.send('?');
         return new Promise<void>((resolve, reject) => {
             const checkSyncHandler = () => {
+                if (debug) {
+                    console.log(`checkSyncHandler() called with error:${JSON.stringify(this.error)}`);
+                    console.log(`checkSyncHandler() called with state:${JSON.stringify(this.currentStatusReport.machineState)}`);
+                    console.log(`checkSyncHandler() called with queue:\n${this.sendQueue.map( q=>JSON.stringify(q)).join('\n\n')}`);
+                    console.log(`checkSyncHandler() called with lastAck:${JSON.stringify(this._lastRecvSrOrAck)}`);
+                }        
                 if (this.error) {
-                    reject(this.errorData || errRegistry.newError('MACHINE_ERROR','MACHINE_ERROR').formatMessage('Error waiting for sync'));
+                    this.debug(`waitSync() error: ${JSON.stringify(this.errorData)}`);
                     removeListeners();
+                    reject(this.errorData || errRegistry.newError('MACHINE_ERROR', 'MACHINE_ERROR').formatMessage('Error waiting for sync'));
                 }
                 else if (this._isSynced()) {
-                    resolve();
                     removeListeners();
+                    resolve();
                 }
             };
             const checkSyncErrorHandler = (err:unknown) => {
-                reject(err);
                 removeListeners();
+                reject(err);
             };
             const okHandler = () => {
                 // expedites syncing
                 this.send('?');
             };
             const removeListeners = () => {
+                //console.log('Remove Listeners', this.listenerCount('_sendQueueDrain'), this.listenerCount('_sendingDisabled'));
                 this.removeListener('cancelRunningOps', checkSyncErrorHandler);
+                this.removeListener('statusReportReceived', checkSyncHandler);
                 this.removeListener('_sendQueueDrain', checkSyncHandler);
                 this.removeListener('_sendingDisabled', checkSyncHandler);
                 this.removeListener('receivedOk', okHandler);
             };
+            if (this.rawListeners('_sendQueueDrain').length > 1) {
+                console.log('Ci sono troppi lissener!!!!!!', this.rawListeners('_sendQueueDrain'));
+            }
             this.on('cancelRunningOps', checkSyncErrorHandler);
             // events that can cause a sync: sr received, this.sendQueue drain, sending disabled
-            this.on('statusReportReceived', checkSyncHandler);
+            this.on('statusReportReceived',checkSyncHandler);
             this.on('_sendQueueDrain', checkSyncHandler);
-            this.on('_sendingDisabled', checkSyncHandler);
-            this.on('receivedOk', okHandler);
+            this.on('_sendingDisabled',checkSyncHandler);
+            //this.on('receivedOk', okHandler);
         });
     }
     override hold() {

@@ -187,11 +187,13 @@ export default class TightCNCServer extends AbstractServer {
     }
 
 
+    /*
     override message(msg:string) {
         this.messageLog?.log(msg);
         this.loggerMem?.log('other', 'Message: ' + msg);
         this.loggerDisk?.log('other', 'Message: ' + msg);
     }
+    /*
     /*
     debug(str:string) {
         if (!this.config!.enableDebug)
@@ -294,9 +296,9 @@ export default class TightCNCServer extends AbstractServer {
         return new Promise((resolve) => {
             const statusObj: StatusObject = {};
             // Fetch controller status
-            statusObj.controller = this.controller ? this.controller.getStatus() : undefined;
+            statusObj.controller = this.controller?.getStatus();
             // Fetch job status
-            statusObj.job = this.jobManager ? this.jobManager.getStatus() : undefined;
+            statusObj.job = this.jobManager?.getStatus();
             // Emit 'statusRequest' event so other components can modify the status object directly
             this.emit('statusRequest', statusObj);
             // Add input request
@@ -411,10 +413,6 @@ export default class TightCNCServer extends AbstractServer {
         else if (macroStreamFn) return buildProcessorChain(macroStreamFn, gcodeProcessorInstances);
         
         throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Unable to create GCODE stream')
-    }
-
-    override async runMacro(macro: string | string[], params = {}, options: MacroOptions) {
-        return this.macros.runMacro(macro, params, options);
     }
 
     async requestInput(prompt?:string|object, schema?:any):Promise<any>{
