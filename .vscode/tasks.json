@@ -1,0 +1,51 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "options": {
+                "env": {
+                    "PATH":"/opt/homebrew/opt/node@14/bin:${env:PATH}"
+                }
+            },
+            "script": "build",
+            "group": "build",
+            "problemMatcher": ["$ts-webpack", "$ts-checker-webpack","$ts-checker-eslint-webpack"]
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "options": {
+                "env": {
+                    "PATH":"/opt/homebrew/opt/node@14/bin:${env:PATH}"
+                }
+            },
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": ["$ts-webpack-watch", "$ts-checker-webpack-watch","$ts-checker-eslint-webpack-watch"]
+        },
+        {
+            "type": "npm",
+            "script": "dev",
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "options": {
+                "env": {
+                    "PATH":"/opt/homebrew/opt/node@14/bin:${env:PATH}"
+                }
+            },
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": ["$ts-webpack-watch", "$ts-checker-webpack-watch","$ts-checker-eslint-webpack-watch"]
+        }
+    ]
+}
