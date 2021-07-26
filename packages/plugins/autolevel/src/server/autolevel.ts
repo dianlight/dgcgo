@@ -1,14 +1,28 @@
 import  cross from 'cross';
 import { Operation, AbstractServer } from '@dianlight/tightcnc-core';
 import { errRegistry } from '@dianlight/tightcnc-core';
-import  objtools from'objtools';
+//import  objtools from'objtools';
 import { kdTree } from 'kd-tree-javascript';
 import fs from 'fs';
 import { GcodeLine, GcodeVM, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import { MoveSplitter } from './move-splitter';
 import { JSONSchema7 } from 'json-schema';
 import { UISchemaElement } from '@jsonforms/core'
+import * as _ from 'lodash';
 
+
+interface ProbeOptions {
+    gcodeFilename?: string;
+    bounds: number[][],
+    probeSpacing: number,
+    surfaceMapFilename?: string
+    clearanceHeight: number,
+    autoClearanceMin: number,
+    autoClearance?: boolean,
+    numProbeSamples?: number,
+    probeMinZ: number,
+    extraProbeSampleClearance?:number
+}
 
 export class SurfaceLevelMap {
 
@@ -35,12 +49,12 @@ export class SurfaceLevelMap {
         if (!this.pointList.length)
             return null;
         // Check for exact hit
-        let theNearest = this.getNearestPoints(point, 1);
+        const theNearest = this.getNearestPoints(point, 1);
         if (theNearest[0][0] === point[0] && theNearest[0][1] === point[1])
             return theNearest[0][2];
         // Predict based on plane of 3 nearest points
         if (this.pointList.length >= 3) {
-            let nps = this.getNearest3PlanePoints(point);
+            const nps = this.getNearest3PlanePoints(point);
             if (nps)
                 return this._planeZAtPoint(point, nps[0], nps[1]);
         }
@@ -49,10 +63,10 @@ export class SurfaceLevelMap {
         }
         // There are no suitable plane-defining points.  But it's possible we might still be able to
         // predict the Z of point ifs x,y falls along the line of known points.
-        let nearest2 = this.getNearestPoints(point, 2);
-        let zdiff = nearest2[1][2] - nearest2[0][2];
-        let ydiff = nearest2[1][1] - nearest2[0][1];
-        let xdiff = nearest2[1][0] - nearest2[0][0];
+        const nearest2 = this.getNearestPoints(point, 2);
+        const zdiff = nearest2[1][2] - nearest2[0][2];
+        const ydiff = nearest2[1][1] - nearest2[0][1];
+        const xdiff = nearest2[1][0] - nearest2[0][0];
         if (xdiff === 0) {
             // line is parallel to Y axis; handle separately to avoid divide by 0
             if (point[0] !== nearest2[0][0] || ydiff === 0) {
@@ -65,8 +79,8 @@ export class SurfaceLevelMap {
             return z;
         }
         else {
-            let xySlope = ydiff / xdiff;
-            let xyIntercept = nearest2[0][1] - xySlope * nearest2[0][0];
+            const xySlope = ydiff / xdiff;
+            const xyIntercept = nearest2[0][1] - xySlope * nearest2[0][0];
             if (xySlope * point[0] + xyIntercept !== point[1]) {
                 // point not on line
                 return null;
@@ -78,8 +92,8 @@ export class SurfaceLevelMap {
         }
     }
     // Returns the n nearest points to the given [x, y], sorted from nearest to farthest
-    getNearestPoints(point:number[], n:number = 3):number[][] {
-        let results = this.kdtree.nearest(point, n);
+    getNearestPoints(point:number[], n = 3):number[][] {
+        const results = this.kdtree.nearest(point, n);
         results.sort((a, b) => {
             return a[1] - b[1];
         });
@@ -92,9 +106,9 @@ export class SurfaceLevelMap {
         // Keep a tally of the closest 2 points, then keep searching for a third that's not colinear with the first two
         let curPoints:number[][]|undefined;
         let vA:number[] = [];
-        let crossResult:number[] = [];
+        const crossResult:number[] = [];
         for (let n = 3; n <= this.pointList.length; n++) {
-            let results = this.getNearestPoints(point, n);
+            const results = this.getNearestPoints(point, n);
             if (curPoints) {
                 curPoints[2] = results[n - 1];
             }
@@ -103,8 +117,8 @@ export class SurfaceLevelMap {
                 vA = [curPoints[1][0] - curPoints[0][0], curPoints[1][1] - curPoints[0][1], curPoints[1][2] - curPoints[0][2]];
             }
             // Check if orthogonal to XY or colinear
-            let vB = [curPoints[2][0] - curPoints[0][0], curPoints[2][1] - curPoints[0][1], curPoints[2][2] - curPoints[0][2]];
-            let norm = cross(crossResult, vA, vB);
+            const vB = [curPoints[2][0] - curPoints[0][0], curPoints[2][1] - curPoints[0][1], curPoints[2][2] - curPoints[0][2]];
+            const norm = cross(crossResult, vA, vB);
             if (norm[2] !== 0) {
                 // not orthogonal to XY
                 if (norm[0] !== 0 || norm[1] !== 0) {
@@ -122,16 +136,16 @@ export class SurfaceLevelMap {
      */
     _planeZAtPoint(point:number[], planePoints: number[][], norm?:number[]):number|null {
         if (!norm) {
-            let vA = [planePoints[1][0] - planePoints[0][0], planePoints[1][1] - planePoints[0][1], planePoints[1][2] - planePoints[0][2]];
-            let vB = [planePoints[2][0] - planePoints[0][0], planePoints[2][1] - planePoints[0][1], planePoints[2][2] - planePoints[0][2]];
+            const vA = [planePoints[1][0] - planePoints[0][0], planePoints[1][1] - planePoints[0][1], planePoints[1][2] - planePoints[0][2]];
+            const vB = [planePoints[2][0] - planePoints[0][0], planePoints[2][1] - planePoints[0][1], planePoints[2][2] - planePoints[0][2]];
             norm = cross([], vA, vB);
         }
         if (norm[0] === 0 && norm[1] === 0 && norm[2] === 0)
             return null; // points are colinear
         if (norm[2] === 0)
             return null; // point does not intersect plane
-        let d = -(norm[0] * planePoints[0][0] + norm[1] * planePoints[0][1] + norm[2] * planePoints[0][2]);
-        let z = (-d - norm[0] * point[0] - norm[1] * point[1]) / norm[2];
+        const d = -(norm[0] * planePoints[0][0] + norm[1] * planePoints[0][1] + norm[2] * planePoints[0][2]);
+        const z = (-d - norm[0] * point[0] - norm[1] * point[1]) / norm[2];
         if (z === 0)
             return 0;
         else
@@ -139,7 +153,7 @@ export class SurfaceLevelMap {
     }
 }
 
-let surfaceProbeStatus: {
+interface ProbeStatus {
     state: 'none'|'running'|'complete'|'error'
     resultFilename?: string,
     probePointsX?: number,
@@ -151,7 +165,9 @@ let surfaceProbeStatus: {
     currentProbePoint?: number,
     percentComplete?: number,
     error?: string    
-} = {
+}
+
+let surfaceProbeStatus:ProbeStatus = {
     state: 'none'
 };
 
@@ -166,25 +182,15 @@ let surfaceProbeResults: {
    points: number[][]
 };
 
-function startProbeSurface(tightcnc: AbstractServer, options: {
-    bounds: number[][],
-    probeSpacing: number,
-    surfaceMapFilename: string
-    clearanceHeight: number,
-    autoClearanceMin: number,
-    autoClearance?: boolean,
-    numProbeSamples?: number,
-    probeMinZ: number,
-    extraProbeSampleClearance?:number
-}) {
+function startProbeSurface(tightcnc: AbstractServer, options: ProbeOptions) {
     if (surfaceProbeStatus.state === 'running')
         throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Surface probe already running');
     surfaceProbeStatus = { state: 'running' };
     // Calculate number of probe points along X and Y, and actual probe spacing
-    let lowerBound = options.bounds[0];
-    let upperBound = options.bounds[1];
-    let probeAreaSizeX = upperBound[0] - lowerBound[0];
-    let probeAreaSizeY = upperBound[1] - lowerBound[1];
+    const lowerBound = options.bounds[0];
+    const upperBound = options.bounds[1];
+    const probeAreaSizeX = upperBound[0] - lowerBound[0];
+    const probeAreaSizeY = upperBound[1] - lowerBound[1];
     if (probeAreaSizeX <= 0 || probeAreaSizeY <= 0)
         throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Invalid bounds');
     let probePointsX = Math.ceil(probeAreaSizeX / options.probeSpacing) + 1;
@@ -193,14 +199,14 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
         probePointsX = 2;
     if (probePointsY < 2)
         probePointsY = 2;
-    let spacingX = probeAreaSizeX / (probePointsX - 1);
-    let spacingY = probeAreaSizeY / (probePointsY - 1);
+    const spacingX = probeAreaSizeX / (probePointsX - 1);
+    const spacingY = probeAreaSizeY / (probePointsY - 1);
     surfaceProbeStatus.resultFilename = options.surfaceMapFilename;
     surfaceProbeStatus.probePointsX = probePointsX;
     surfaceProbeStatus.probePointsY = probePointsY;
     surfaceProbeStatus.spacingX = spacingX;
     surfaceProbeStatus.spacingY = spacingY;
-    let startPoint = [lowerBound[0], lowerBound[1]];
+    const startPoint = [lowerBound[0], lowerBound[1]];
     surfaceProbeStatus.startPoint = startPoint;
     surfaceProbeStatus.probePoints = probePointsX * probePointsY;
     surfaceProbeStatus.currentProbePoint = 0;
@@ -218,7 +224,7 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
     };
 
     const runProbeSurface = async () => {
-        let slm = new SurfaceLevelMap([]);
+        const slm = new SurfaceLevelMap([]);
         // Move to above starting point
         sendMove(undefined, undefined, options.clearanceHeight);
         sendMove(startPoint[0], startPoint[1], undefined);
@@ -228,18 +234,18 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
             surfaceProbeStatus.currentProbePoint = pointNum;
             surfaceProbeStatus.percentComplete = pointNum / (probePointsX * probePointsY) * 100;
             // Calculate the point number X and point number Y in such a way to move the machine in a "zig zag" pattern
-            let pointNumX = Math.floor(pointNum / probePointsY);
+            const pointNumX = Math.floor(pointNum / probePointsY);
             let pointNumY = pointNum - pointNumX * probePointsY;
             if (pointNumX % 2 === 1)
                 pointNumY = probePointsY - 1 - pointNumY;
-            let pointPosX = pointNumX * spacingX + startPoint[0];
-            let pointPosY = pointNumY * spacingY + startPoint[1];
+            const pointPosX = pointNumX * spacingX + startPoint[0];
+            const pointPosY = pointNumY * spacingY + startPoint[1];
             // Calculate the clearance height to get to this point.  If autoClearance is disabled, this is just the predefined
             // clearance.  For autoClearance, the height is determined by predicting the height of the next point and adding autoClearanceMin.
             let clearanceZ = options.clearanceHeight;
             if (options.autoClearance && pointNum >= 2) {
                 // Try to predict the z of the next probe point based on existing probe data, and use a smaller clearance to that
-                let predictedZ = slm.predictZ([pointPosX, pointPosY]);
+                const predictedZ = slm.predictZ([pointPosX, pointPosY]);
                 if (typeof predictedZ === 'number')
                     clearanceZ = predictedZ + options.autoClearanceMin;
             }
@@ -250,11 +256,11 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
             if (clearanceZ < currentZ)
                 sendMove(undefined, undefined, clearanceZ);
             // Probe down towards the point the requisite number of times
-            let numProbes = options.numProbeSamples || 1;
-            let probesResults = [];
+            const numProbes = options.numProbeSamples || 1;
+            const probesResults = [];
             for (let i = 0; i < numProbes; i++) {
-                let tripPos = await tightcnc.controller?.probe([false, false, options.probeMinZ]);
-                let tripZ = tripPos![2];
+                const tripPos = await tightcnc.controller?.probe([false, false, options.probeMinZ]) || [];
+                const tripZ = tripPos[2];
                 probesResults.push(tripZ);
                 if (i + 1 < numProbes) {
                     // move up small clearance for next sample
@@ -266,7 +272,7 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
             }
             // Average together the probe results for each sample
             let tripZ = 0;
-            for (let r of probesResults)
+            for (const r of probesResults)
                 tripZ += r;
             tripZ /= probesResults.length;
             // Add point to list of points
@@ -291,7 +297,7 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
         };
         if (options.surfaceMapFilename) {
             await new Promise((resolve, reject) => {
-                fs.writeFile(options.surfaceMapFilename, JSON.stringify(surfaceProbeResults, null, 2), (err) => {
+                fs.writeFile(options.surfaceMapFilename as string, JSON.stringify(surfaceProbeResults, null, 2), (err) => {
                     if (err)
                         reject(errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error saving probe result file').withMetadata(err));
                     else
@@ -309,7 +315,7 @@ function startProbeSurface(tightcnc: AbstractServer, options: {
     })
         .catch((err) => {
         surfaceProbeStatus.state = 'error';
-        surfaceProbeStatus.error = err.toObject ? err.toObject() : ('' + err);
+        surfaceProbeStatus.error =`${JSON.stringify(err)}`;
     });
 }
 
@@ -325,41 +331,49 @@ class OpProbeSurface extends Operation {
         super(tightcnc);
     }
 
-    async _getBounds(params: {
-        bounds: true,
-        gcodeFilename: string
-    }) {
-        if (params.bounds)
-            return params.bounds;
-        if (!params.gcodeFilename)
-            throw errRegistry.newError('INTERNAL_ERROR','BAD_REQUEST').formatMessage('Must supply either bounds or gcodeFilename');
-        let dryRunResults = await this.tightcnc!.jobManager?.dryRunJob({ filename: params.gcodeFilename });
-        if (dryRunResults) {
-            let bounds = objtools.getPath(dryRunResults, 'gcodeProcessors.final-job-vm.bounds');
-            if (!bounds)
-                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Could not determine bounds from gcode file');
-            return bounds;
-        } else throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Could not determine bounds from gcode file - no dryRunResults');
+    async _getBounds(params: ProbeOptions): Promise<number[][]> {
+        return new Promise((resolve, reject) => {
+            if (params.bounds)
+                return params.bounds;
+            if (!params.gcodeFilename)
+                throw errRegistry.newError('INTERNAL_ERROR', 'BAD_REQUEST').formatMessage('Must supply either bounds or gcodeFilename');
+            void this.tightcnc.jobManager?.dryRunJob({ filename: params.gcodeFilename }).then(
+                (dryRunResults) => {
+                    const bounds = _.get(dryRunResults, 'gcodeProcessors.final-job-vm.bounds') as number[][];
+                    if (!bounds)
+                        throw errRegistry.newError('INTERNAL_ERROR', 'GENERIC').formatMessage('Could not determine bounds from gcode file');
+                    resolve(bounds);
+                }
+            ).catch((err) => {
+                reject(errRegistry.newError('INTERNAL_ERROR', 'GENERIC').formatMessage('Could not determine bounds from gcode file - no dryRunResults',err));
+            })
+        })
     }
 
-    async run(params: {
-        bounds: true,
-        gcodeFilename: string
-    }) {
-        let options = objtools.deepCopy(params);
-        if (options.gcodeFilename)
-            options.gcodeFilename = this.tightcnc.getFilename(options.gcodeFilename, 'data');
-        if (options.surfaceMapFilename)
-            options.surfaceMapFilename = this.tightcnc.getFilename(options.surfaceMapFilename, 'data');
-        options.bounds = await this._getBounds(params);
-        startProbeSurface(this.tightcnc, options);
-        return surfaceProbeStatus;
+    async run(params?: Partial<ProbeOptions>): Promise<ProbeStatus> {
+        return new Promise((resolve, reject) => {
+            if (!params) reject(errRegistry.newError('INTERNAL_ERROR', 'BAD_REQUEST').formatMessage('Must supply probe options'));
+            else {
+                const options = _.cloneDeep(params) as ProbeOptions;
+                if (options?.gcodeFilename)
+                    options.gcodeFilename = this.tightcnc.getFilename(options.gcodeFilename, 'data');
+                if (options?.surfaceMapFilename)
+                    options.surfaceMapFilename = this.tightcnc.getFilename(options.surfaceMapFilename, 'data');
+                void this._getBounds(options).then((bounds) => {
+                    options.bounds = bounds;
+                    startProbeSurface(this.tightcnc, options);
+                    resolve(surfaceProbeStatus);
+                }).catch((err) => {
+                    reject(err);
+                });
+            }
+        });
     }
     
     getParamSchema() {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            $id: "/probeSurface",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            $id: '/probeSurface',
             type: 'object',
             properties: {
                 surfaceMapFilename: {
@@ -460,13 +474,13 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
 
     static override getOptionSchema(): JSONSchema7 {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            type: "object",
-            $id: "/autolevel",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            type: 'object',
+            $id: '/autolevel',
             properties: {
-                "surfaceMapFilename": {
-                    type: "string",
-                    description: "Filename for surface data",
+                'surfaceMapFilename': {
+                    type: 'string',
+                    description: 'Filename for surface data',
                 },
             },
             required: ['surfaceMapFilename']
@@ -501,8 +515,9 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
             fs.readFile(this.surfaceMapFilename, (err, data) => {
                 if (err)
                     return reject(errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Error loading surface map').withMetadata(err));
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 this.surfaceMapData = JSON.parse(data.toString('utf8'));
-                this.surfaceMap = new SurfaceLevelMap(this.surfaceMapData!.points);
+                this.surfaceMap = new SurfaceLevelMap(this.surfaceMapData?.points||[]);
                 resolve();
             });
         });
@@ -511,9 +526,9 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
         await this._loadSurfaceMap();
         chain.push(new MoveSplitter({
             tightcnc: this.tightcnc,
-            maxMoveLength: this.surfaceMapData!.minSpacing
+            maxMoveLength: this.surfaceMapData?.minSpacing || 0
         }));
-        super.addToChain(chain);
+        void super.addToChain(chain);
     }
 
     override async initProcessor() {
@@ -521,10 +536,10 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
     }
 
     override processGcode(gline:GcodeLine) {
-        let startVMState = objtools.deepCopy(this.vm.getState());
+        //const startVMState = _.cloneDeep(this.vm.getState());
         // Run the line through the gcode VM
-        let { isMotion, changedCoordOffsets, motionCode } = this.vm.runGcodeLine(gline);
-        let endVMState = this.vm.getState();
+        const { isMotion, changedCoordOffsets, motionCode } = this.vm.runGcodeLine(gline);
+        const endVMState = this.vm.getState();
         // Make sure the line represents motion
         if (!isMotion)
             return gline;
@@ -536,13 +551,13 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
             return gline; // incremental mode not supported
         // Make sure the motion mode is one of the supported motion modes
         if (motionCode !== 'G0' && motionCode !== 'G1' && motionCode !== 'G2' && motionCode !== 'G3')
-            throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Motion code ' + motionCode + ' not supported for autolevel');
+            throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage(`Motion code ${JSON.stringify(motionCode)} not supported for autolevel`);
         // Get the Z value for the X and Y ending position
-        let toXY = [endVMState.pos[0], endVMState.pos[1]];
-        let zOffset = this.surfaceMap?.predictZ(toXY);
+        const toXY = [endVMState.pos[0], endVMState.pos[1]];
+        const zOffset = this.surfaceMap?.predictZ(toXY);
         if (!zOffset || zOffset === null)
             return gline;
-        let newZ = endVMState.pos[2] + zOffset;
+        const newZ = endVMState.pos[2] + zOffset;
         // Set the new Z value
         if (newZ !== gline.get('Z')) {
             gline.set('Z', newZ);
@@ -551,7 +566,7 @@ export class AutolevelGcodeProcessor extends GcodeProcessor {
         return gline;
     }
 
-    override preprocessInputGcode(this: void): ReadableStream<any>|void {
+    override preprocessInputGcode(this: void): ReadableStream<unknown>|void {
         // No action
     }
     override flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
@@ -877,12 +892,13 @@ export function registerServerComponents(tightcnc:AbstractServer) {
     tightcnc.registerGcodeProcessor(/*'autolevel',*/ AutolevelGcodeProcessor);
     tightcnc.registerOperation(/*'probeSurface',*/ OpProbeSurface);
     tightcnc.on('statusRequest', (status) => {
-        let probeStatus = getProbeStatus();
+        const probeStatus = getProbeStatus();
         if (probeStatus) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             status.probeSurface = probeStatus;
         }
     });
-};
+}
 /*
 // @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.registerConsoleUIComponents = function (consoleui) {

@@ -3,6 +3,7 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin')
 const nodeExternals = require('webpack-node-externals');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 
 const serverConfig = (env, argv) => {
@@ -17,8 +18,11 @@ const serverConfig = (env, argv) => {
         module: {
             rules: [{
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                loader: 'ts-loader',
                 exclude: /node_modules/,
+                options: {
+                    transpleonly: true,
+                }
             }, ],
         },
         resolve: {
@@ -36,6 +40,7 @@ const serverConfig = (env, argv) => {
         plugins: [
             new NodePolyfillPlugin(),
             new WebpackManifestPlugin({}),
+            new ForkTsCheckerWebpackPlugin(),
         ]
     };
     if (argv.mode === 'development') {

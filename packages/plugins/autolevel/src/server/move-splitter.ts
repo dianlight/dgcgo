@@ -1,8 +1,9 @@
 import { GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core'
-import  objtools from 'objtools';
+//import  objtools from 'objtools';
 import { AbstractServer } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema'
 import { UISchemaElement } from '@jsonforms/core'
+import * as _ from 'lodash';
 
 interface MoveSplitterProcessorOptions extends GcodeProcessorOptions {
     maxMoveLength: number
@@ -30,13 +31,13 @@ export class MoveSplitter extends GcodeProcessor {
 
     static override getOptionSchema(): JSONSchema7 {
         return {
-            $schema: "http://json-schema.org/draft-07/schema#",
-            type: "object",
-            $id: "/moves-plitter",
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            type: 'object',
+            $id: '/moves-plitter',
             properties: {
-                "maxMoveLength": {
-                    type: "number",
-                    description: "Max allowed move lenght before cut",
+                'maxMoveLength': {
+                    type: 'number',
+                    description: 'Max allowed move lenght before cut',
                     default: 10,
                     min: 0.1
                 },
@@ -48,7 +49,7 @@ export class MoveSplitter extends GcodeProcessor {
     override initProcessor(): Promise<void> {
         return Promise.resolve();
     }
-    override preprocessInputGcode(this: void): void | ReadableStream<any> {
+    override preprocessInputGcode(this: void): void | ReadableStream<unknown> {
         // No action
     }
     override flushGcode(): void | GcodeLine | GcodeLine[] | Promise<GcodeLine | GcodeLine[]> {
@@ -74,9 +75,9 @@ export class MoveSplitter extends GcodeProcessor {
     }
 
     override processGcode(gline:GcodeLine) {
-        let startVMState = objtools.deepCopy((this as any).vm.getState());
+        const startVMState = _.cloneDeep(this.vm.getState());
         // Run the line through the gcode VM
-        let { isMotion, changedCoordOffsets, motionCode } = (this as any).vm.runGcodeLine(gline);
+        const { isMotion, changedCoordOffsets, motionCode } = this.vm.runGcodeLine(gline);
         // Make sure the line represents motion
         if (!isMotion)
             return gline;
@@ -84,8 +85,8 @@ export class MoveSplitter extends GcodeProcessor {
         if (changedCoordOffsets || gline.has('G53'))
             return gline;
         // Get position diffs for all changed axes
-        let endVMState = (this as any).vm.getState();
-        let axisDiffs = [];
+        const endVMState = this.vm.getState();
+        const axisDiffs = [];
         let numChangedAxes = 0;
         for (let axisNum = 0; axisNum < startVMState.pos.length; axisNum++) {
             if (startVMState.pos[axisNum] !== endVMState.pos[axisNum]) {
@@ -110,11 +111,11 @@ export class MoveSplitter extends GcodeProcessor {
             return gline;
         // Calculate the distance moved and check if it's above the threshold
         let dist = 0;
-        for (let p of axisDiffs) {
+        for (const p of axisDiffs) {
             dist += p * p;
         }
         dist = Math.sqrt(dist);
-        if (dist <= (this as any).maxMoveLength)
+        if (dist <= this.maxMoveLength)
             return gline;
         // This is a move that needs to be split up.
         // Output a version of the original gline without any of the coordinates specified, to set any other modes it may be setting (including feed)
@@ -122,24 +123,24 @@ export class MoveSplitter extends GcodeProcessor {
             gline.set(endVMState.axisLabels[i]);
         }
         // don't send if line is now empty, or only contains the motion gcode
-        if (gline.words!.length > 1 || (gline.words!.length === 1 && 'G' + gline.get('G') !== motionCode) || gline.comment) {
+        if (gline.words && ( gline.words.length > 1 || (gline.words.length === 1 && `G${gline.get<number>('G')||9}` !== motionCode) || gline.comment)) {
             gline.addComment('sp');
             this.pushGcode(gline);
         }
         else {
-            let l = new GcodeLine();
+            const l = new GcodeLine();
             l.addComment('sp');
-            (this as any).push(l);
+            this.push(l);
         }
         // Output movement segments
-        let numMoves = Math.ceil(dist / (this as any).maxMoveLength);
+        const numMoves = Math.ceil(dist / this.maxMoveLength);
         for (let i = 0; i < numMoves; i++) {
-            let newgline = new GcodeLine(motionCode);
+            const newgline = new GcodeLine(motionCode);
             newgline.addComment('sp+');
             for (let axisNum = 0; axisNum < axisDiffs.length; axisNum++) {
                 if (axisDiffs[axisNum]) {
-                    let moveAxisDiff = (i + 1) * axisDiffs[axisNum] / numMoves;
-                    let moveAxisCoord = startVMState.pos[axisNum] + moveAxisDiff;
+                    const moveAxisDiff = (i + 1) * axisDiffs[axisNum] / numMoves;
+                    const moveAxisCoord = startVMState.pos[axisNum] + moveAxisDiff;
                     newgline.set(startVMState.axisLabels[axisNum], moveAxisCoord);
                 }
             }
@@ -151,4 +152,4 @@ export class MoveSplitter extends GcodeProcessor {
 
 export function registerServerComponents(tightcnc: AbstractServer) {
     tightcnc.registerGcodeProcessor(/*'movesplitter',*/ MoveSplitter);
-};
+}

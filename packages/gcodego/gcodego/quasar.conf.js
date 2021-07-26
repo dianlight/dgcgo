@@ -21,6 +21,9 @@ module.exports = configure(function(ctx) {
                     enabled: true,
                     files: './src/**/*.{ts,tsx,js,jsx,vue}',
                 },
+                typescript: {
+                    typescriptPath: require.resolve('typescript'),
+                }
             }
         },
 

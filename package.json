@@ -27,6 +27,7 @@
         "eslint-plugin-prettier": "^3.4.0",
         "eslint-plugin-promise": "^5.1.0",
         "eslint-plugin-vue": "^7.13.0",
+        "fork-ts-checker-webpack-plugin": "^6.2.13",
         "lerna": "^4.0.0",
         "markdownlint-cli": "^0.27.1",
         "node-polyfill-webpack-plugin": "^1.1.4",

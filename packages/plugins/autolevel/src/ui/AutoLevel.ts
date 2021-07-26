@@ -9,6 +9,7 @@ export class AutoLevel extends GcPlugin {
             {menu: 'menu.view.autolevel', to: '/autolevel', icon:'calendar_view_month', tooltip:'plugin.autolevel.tooltip' }
         )
         this.adapter.registerRoute(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             { name: 'autolevel', path: 'autolevel', component: AutoLevelPage } as RouteRecordRaw
         )
         return true

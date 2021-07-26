@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const rootPath = path.resolve(__dirname, './');
 const srcPath = path.resolve(rootPath, 'src');
@@ -29,7 +30,8 @@ module.exports = {
         exclude: /node_modules/,
         options: {
           appendTsSuffixTo: [/\.vue$/],
-          configFile: 'tsconfig.eslint.json'
+          configFile: 'tsconfig.eslint.json',
+          transpileOnly: true,
         }
       },
       {
@@ -49,7 +51,20 @@ module.exports = {
   },
   plugins: [new VueLoaderPlugin({
     //compilerSfc: true
-  }), new CleanWebpackPlugin(), new NodePolyfillPlugin(), new webpack.WatchIgnorePlugin({
+  }), new CleanWebpackPlugin(),new ForkTsCheckerWebpackPlugin({
+    typescript: {
+      configFile: "tsconfig.eslint.json",
+      extensions: {
+        vue: {
+          enabled: true,
+          compiler: "@vue/compiler-sfc"
+        }
+      }
+    },
+    eslint: {
+      files: './src/**/*.{ts,vue}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`
+    }
+  }), new NodePolyfillPlugin(), new webpack.WatchIgnorePlugin({
     paths: [/\.js$/,/\.d\.ts$/]
   })],
   resolve: {
