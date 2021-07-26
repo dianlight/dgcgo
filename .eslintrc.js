@@ -33,6 +33,7 @@ module.exports = {
 
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
     // ESLint typescript rules
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     // consider disabling this class of rules if linting takes too long
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
@@ -46,8 +47,14 @@ module.exports = {
 
     // https://github.com/prettier/eslint-config-prettier#installation
     // usage with Prettier, provided by 'eslint-config-prettier'.
-    //'prettier/prettier',
+    'prettier/prettier',
+    'prettier/@typescript-eslint',
+    'prettier/vue',
     //"plugin:prettier/recommended"
+
+    // https://github.com/quasarframework/eslint-plugin-quasar
+    'plugin:quasar/standard',
+
   ],
 
   plugins: [
@@ -57,6 +64,9 @@ module.exports = {
     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-file
     // required to lint *.vue files
     'vue',
+
+    // https://github.com/quasarframework/eslint-plugin-quasar
+    'quasar',
 
     // https://github.com/typescript-eslint/typescript-eslint/issues/389#issuecomment-509292674
     // Prettier has not been included as plugin to avoid performance impact
@@ -86,6 +96,10 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
     // allow debugger during development only
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+
+    // https://github.com/quasarframework/eslint-plugin-quasar
+    'quasar/no-invalid-props': "error",
+    'quasar/no-invalid-qfield-usage': "error"   
   }
 }

@@ -4,5 +4,6 @@
         "src/ui/**/*.ts",
         "src/ui/**/*.vue",
         "src/server/**/*.ts",
-      ]
+      ],
+      "exclude": []
 }

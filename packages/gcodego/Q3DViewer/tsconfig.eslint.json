@@ -1,12 +1,10 @@
 {
       "extends": "./tsconfig.json",
       "include": [
-        "src/**/*.ts",
-        "src/**/*.vue",
+        "./src/**/*.ts",
+        "./src/**/*.vue",
       ],
-      "exclude":[
-        "src/index.ts"
-      ],
+      "exclude":[],
       "compilerOptions": {
         "noEmit": false,
         "sourceMap": true,
