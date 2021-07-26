@@ -4,6 +4,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const rootPath = path.resolve(__dirname, './');
 const srcPath = path.resolve(rootPath, 'src');
@@ -64,7 +65,11 @@ module.exports = {
     eslint: {
       files: './src/**/*.{ts,vue}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`
     }
-  }), new NodePolyfillPlugin(), new webpack.WatchIgnorePlugin({
+  }), new NodePolyfillPlugin(),
+    new TsconfigPathsPlugin({
+      configFile: 'tsconfig.eslint.json',
+    }),
+    new webpack.WatchIgnorePlugin({
     paths: [/\.js$/,/\.d\.ts$/]
   })],
   resolve: {

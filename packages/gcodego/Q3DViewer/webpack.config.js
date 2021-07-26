@@ -5,6 +5,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack')
 //const WatchIgnorePlugin = require('watch-ignore-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const rootPath = path.resolve(__dirname, "./");
 const srcPath = path.resolve(rootPath, "src");
@@ -48,7 +49,11 @@ module.exports = {
   },
   plugins: [new VueLoaderPlugin({
     //compilerSfc: true
-  }), new CleanWebpackPlugin(),new ForkTsCheckerWebpackPlugin({
+  }), new CleanWebpackPlugin(),
+    new TsconfigPathsPlugin({
+      configFile: 'tsconfig.json',
+    }),
+    new ForkTsCheckerWebpackPlugin({
     typescript: {
 //      configFile: "tsconfig.eslint.json",
       extensions: {

@@ -8,8 +8,8 @@ declare module 'crisphooks' {
         hookSync<T>(doSomething: string,priority:number, callback: (value?:T) => void):T|void;
         hookSync<T>(doSomething: string, callback: (value?:T) => void):T|void;
         hookASync<T>(doSomething: string, callback: (value?:T, next?:()=>void) => void):T|void;
-        triggerASync<T>(doSomething: string, priority?: number, callback: (error: eny) => void): void;
-        triggerSync<T>(doSomething: string, error?: eny): void;
+        triggerASync(doSomething: string, priority?: number, callback: (error: eny) => void): void;
+        triggerSync(doSomething: string, error?: eny): void;
         on<T>(someEvent: string,callback: (param: T) => void)
         emit<T>(someEvent: string, param: T)
         

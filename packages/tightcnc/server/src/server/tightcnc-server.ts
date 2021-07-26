@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import JobManager from './job-manager';
 import stable from 'stable';
-import { Macros, MacroOptions } from '@dianlight/tightcnc-core';
+import { Macros } from '@dianlight/tightcnc-core';
 import pasync from 'pasync';
 import { createSchema } from 'common-schema';
 //import littleconf from 'littleconf'

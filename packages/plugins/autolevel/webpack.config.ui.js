@@ -4,6 +4,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const rootPath = path.resolve(__dirname, "./");
 const srcPath = path.resolve(rootPath, "src/ui");
@@ -45,7 +46,11 @@ module.exports = {
       }
     ]
   },
-  plugins: [new VueLoaderPlugin(), new ForkTsCheckerWebpackPlugin({
+  plugins: [new VueLoaderPlugin(),
+    new TsconfigPathsPlugin({
+      configFile: 'tsconfig.ui.json',
+    }),
+    new ForkTsCheckerWebpackPlugin({
     typescript: {
       configFile: "tsconfig.ui.json",
       extensions: {

@@ -5,7 +5,7 @@ module.exports = (env, argv) => {
 
   if (argv.mode === "development") {
     uiConfig.devtool = "inline-source-map";
-    uiConfig.watch = true;
+//    uiConfig.watch = true;
   }
 
   if (argv.mode === "production") {

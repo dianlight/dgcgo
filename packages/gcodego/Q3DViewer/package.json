@@ -31,7 +31,7 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
     "build": "webpack --mode=production --config webpack.config.build.js",
-    "dev": "webpack --mode=development --config webpack.config.build.js",
+    "dev": "webpack --mode=development --config webpack.config.build.js --watch --progress",
     "demo": "webpack-dev-server --config webpack.config.demo.js"
   },
   "bugs": {

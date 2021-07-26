@@ -7,6 +7,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const rootPath = path.resolve(__dirname, "./");
 const srcPath = path.resolve(rootPath, "src/server");
 const libPath = path.resolve(rootPath, "dist/src/server");
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
   entry: srcPath + "/index.ts",
@@ -33,7 +34,11 @@ module.exports = {
       }
     ]
   },
-  plugins: [new CleanWebpackPlugin(),new ForkTsCheckerWebpackPlugin({
+  plugins: [new CleanWebpackPlugin(),
+    new TsconfigPathsPlugin({
+      configFile: 'tsconfig.server.json',
+    }),
+    new ForkTsCheckerWebpackPlugin({
     typescript: {
       configFile: "tsconfig.server.json",
 //      extensions: {

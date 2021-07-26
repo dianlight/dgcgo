@@ -56,6 +56,7 @@ import { WorkBenchSessionData } from './WorkBenchSessionData'
 
 
 @Options({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   components: { Q3DViewer },
   layout:{
     name: 'default',

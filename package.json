@@ -38,6 +38,7 @@
         "scss-loader": "^0.0.1",
         "ts-loader": "^9.2.3",
         "ts-node": "^10.0.0",
+        "tsconfig-paths-webpack-plugin": "^3.5.1",
         "tslib": "^2.3.0",
         "typescript": "^4.4.0-dev.20210702",
         "webpack-cli": "^4.7.2",
