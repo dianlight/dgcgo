@@ -19,7 +19,7 @@
         },
         {
             "type": "npm",
-            "script": "watch",
+            "script": "reboot",
             "runOptions": {
                 "instanceLimit": 1
             },
@@ -46,6 +46,20 @@
             "group": "build",
             "isBackground": true,
             "problemMatcher": ["$ts-webpack-watch", "$ts-checker-webpack-watch","$ts-checker-eslint-webpack-watch"]
-        }
-    ]
+        },
+        {
+            "type": "npm",
+            "script": "ts:lint",
+            "runOptions": {
+                "instanceLimit": 1
+            },
+            "options": {
+                "env": {
+                    "PATH":"/opt/homebrew/opt/node@14/bin:${env:PATH}"
+                }
+            },
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": ["$ts-webpack-watch", "$ts-checker-webpack-watch","$ts-checker-eslint-webpack-watch"]
+        }    ]
 }

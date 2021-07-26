@@ -78,6 +78,7 @@ import Q3DViewer from '../components/Q3DViewer.vue'
 //import { useQuasar, QToolbar, QTabs, QHeader, QDrawer, QBtn, QAvatar, QToolbarTitle, QPageContainer, QFooter, QLayout } from 'quasar'
 
 @Options({
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   components: { Q3DViewer },
 })
 export default class App extends Vue {
