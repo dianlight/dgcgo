@@ -35,9 +35,6 @@ module.exports = {
     ]
   },
   plugins: [new CleanWebpackPlugin(),
-    new TsconfigPathsPlugin({
-      configFile: 'tsconfig.server.json',
-    }),
     new ForkTsCheckerWebpackPlugin({
     typescript: {
       configFile: "tsconfig.server.json",
@@ -59,7 +56,12 @@ module.exports = {
     alias: {
       'pty.js': false,
       'vertx': false
-    }
+    },
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: 'tsconfig.server.json',
+      }),
+    ]  
   },
   externals: {
     // define module 'vue' which will point to window.Vue in result bundle

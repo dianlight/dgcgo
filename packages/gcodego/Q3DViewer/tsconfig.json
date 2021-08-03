@@ -2,8 +2,9 @@
 //  "extends": "@quasar/app/tsconfig-preset",
   "extends": "../../../tsconfig.json",
   "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
+    "./src/index.ts",
+    "./src/**/*.ts",
+    "./src/**/*.vue",
   ],
   "exclude": [
     "babel.config.js",
@@ -11,6 +12,7 @@
     "./src/demo/**/*.vue",
   ],
   "compilerOptions": {
+    "baseUrl": ".",
     "noEmit": false,
     "outDir": "./dist/src",                              /* Redirect output structure to the directory. */
     "declaration": true,

@@ -47,9 +47,6 @@ module.exports = {
     ]
   },
   plugins: [new VueLoaderPlugin(),
-    new TsconfigPathsPlugin({
-      configFile: 'tsconfig.ui.json',
-    }),
     new ForkTsCheckerWebpackPlugin({
     typescript: {
       configFile: "tsconfig.ui.json",
@@ -67,7 +64,12 @@ module.exports = {
     paths: [/\.js$/,/\.d\.ts$/]
   })],
   resolve: {
-    extensions: [".ts", ".js", ".vue"]
+    extensions: [".ts", ".js", ".vue"],
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: 'tsconfig.ui.json',
+        baseUrl: './'
+      }),]  
   },
   externals: {
     // define module 'vue' which will point to window.Vue in result bundle

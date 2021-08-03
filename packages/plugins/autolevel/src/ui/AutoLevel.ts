@@ -10,7 +10,7 @@ export class AutoLevel extends GcPlugin {
         )
         this.adapter.registerRoute(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            { name: 'autolevel', path: 'autolevel', component: AutoLevelPage } as RouteRecordRaw
+            { name: 'autolevel', path: 'autolevel', component: AutoLevelPage } as unknown as RouteRecordRaw
         )
         return true
     }

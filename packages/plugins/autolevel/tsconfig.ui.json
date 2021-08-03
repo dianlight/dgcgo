@@ -10,6 +10,7 @@
     "src/server/**/*.ts"
   ],
   "compilerOptions": {
+    "baseUrl": "./",
     "noEmit": false,
     "outDir": "./dist/src/ui",                              /* Redirect output structure to the directory. */
     "declaration": true,

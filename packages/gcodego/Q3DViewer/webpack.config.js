@@ -3,7 +3,6 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack')
-//const WatchIgnorePlugin = require('watch-ignore-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
@@ -24,11 +23,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.vue$/,
-        use: "vue-loader",
-        exclude: /node_modules/
-      },
-      {
         test: /\.ts$/,
         loader: "ts-loader",
         exclude: [/node_modules/,/demo/],
@@ -38,6 +32,24 @@ module.exports = {
           configFile: 'tsconfig.json'
         }
       },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        exclude: /node_modules/,
+        options: {
+          loaders: {
+            'scss': 'vue-style-loader!css-loader!sass-loader',
+            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+          },
+        },        
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 8192,
+        },
+      },      
       {
         test: /\.css$/,
         use: [
@@ -50,9 +62,6 @@ module.exports = {
   plugins: [new VueLoaderPlugin({
     //compilerSfc: true
   }), new CleanWebpackPlugin(),
-    new TsconfigPathsPlugin({
-      configFile: 'tsconfig.json',
-    }),
     new ForkTsCheckerWebpackPlugin({
     typescript: {
 //      configFile: "tsconfig.eslint.json",
@@ -73,7 +82,12 @@ module.exports = {
     extensions: [".ts", ".js", ".vue"],
     alias: {
       'fs': false
-    }
+    },
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: 'tsconfig.json',
+      }),
+    ]
   },
   externals: {
     // define module 'vue' which will point to window.Vue in result bundle

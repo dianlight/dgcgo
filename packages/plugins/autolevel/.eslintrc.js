@@ -1,5 +1,8 @@
+const path = require('path');
+const rootPath = path.resolve(__dirname, "./");
+
 module.exports = {
     parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: rootPath + '/tsconfig.eslint.json',
     }
 }

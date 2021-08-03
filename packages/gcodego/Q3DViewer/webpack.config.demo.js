@@ -21,11 +21,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.vue$/,
-        use: 'vue-loader',
-        exclude: /node_modules/
-      },
-      {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
@@ -34,6 +29,24 @@ module.exports = {
           configFile: 'tsconfig.eslint.json',
           transpileOnly: true,
         }
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        exclude: /node_modules/,
+        options: {
+          loaders: {
+            'scss': 'vue-style-loader!css-loader!sass-loader',
+            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+          },
+        },        
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 8192,
+        },
       },
       {
         test: /\.css$/,
@@ -51,7 +64,8 @@ module.exports = {
       }    ]
   },
   plugins: [new VueLoaderPlugin({
-    //compilerSfc: true
+    //compilerSfc: true,
+    exposeFilename: true,
   }), new CleanWebpackPlugin(),new ForkTsCheckerWebpackPlugin({
     typescript: {
       configFile: "tsconfig.eslint.json",
@@ -66,17 +80,20 @@ module.exports = {
       files: './src/**/*.{ts,vue}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`
     }
   }), new NodePolyfillPlugin(),
-    new TsconfigPathsPlugin({
-      configFile: 'tsconfig.eslint.json',
-    }),
     new webpack.WatchIgnorePlugin({
     paths: [/\.js$/,/\.d\.ts$/]
   })],
   resolve: {
     extensions: ['.ts', '.js', '.vue'],
     alias: {
-      'fs': false
-    }
+      'fs': false,
+  //    'vue$': 'vue/dist/vue.esm.js',
+    },
+    plugins: [
+      new TsconfigPathsPlugin({
+        configFile: 'tsconfig.eslint.json',
+      }),
+    ]  
   },
   externals: {
     // define module 'vue' which will point to window.Vue in result bundle
