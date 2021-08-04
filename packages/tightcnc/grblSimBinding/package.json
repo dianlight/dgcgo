@@ -9,8 +9,8 @@
   "author": "dianlight <lucio.tarantino@gmail.com>",
   "homepage": "https://github.com/dianlight/dgcgo#readme",
   "license": "GPL-3.0-or-later",
-  "main": "dist/src/grblSimBinding.js",
-  "types": "types/src/grblSimBinding.d.ts",
+  "main": "dist/src/grblsimBinding.js",
+  "types": "types/src/grblsimBinding.d.ts",
   "directories": {
     "lib": "dist/src",
     "test": "__tests__"

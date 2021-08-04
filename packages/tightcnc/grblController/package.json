@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@dianlight/grblsimbinding": "^1.0.0",
-    "@dianlight/tightcnc-core": "0.3.2-alpha.2",
+    "@dianlight/tightcnc-core": "^0.3.2-alpha.2",
     "pasync": "^2.0.2",
     "serialport": "^9.2.0"
   }
