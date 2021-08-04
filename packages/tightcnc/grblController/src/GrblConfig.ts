@@ -1,4 +1,4 @@
-import { ControllerConfig } from "@dianlight/tightcnc-core";
+import { ControllerConfig } from '@dianlight/tightcnc-core';
 
 export interface GrblConfig extends ControllerConfig {
     usedAxes: [boolean, boolean, boolean];

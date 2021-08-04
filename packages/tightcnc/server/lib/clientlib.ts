@@ -15,14 +15,14 @@ export default class TightCNCClient {
     async op<T>(opname: string, params: {
         [key:string]:any
     } = {}):Promise<T> {
-        let url = this.config.host + ':' + (this.config.port || this.config.serverPort || 2363) + '/v1/jsonrpc';
-        let requestData = {
+        const url = this.config.host + ':' + (this.config.port || this.config.serverPort || 2363) + '/v1/jsonrpc';
+        const requestData = {
             id: this.idseq++,
-            jsonrpc: "2.0",
+            jsonrpc: '2.0',
             method: opname,
             params: params
         };
-        let response = await axios.post<{ error: unknown, result:T}>(url,JSON.stringify(requestData),{
+        const response = await axios.post<{ error: unknown, result:T}>(url,JSON.stringify(requestData),{
             headers: {
                 Authorization: 'Key ' + this.config.authKey,
                 'Content-type': 'application/json'

@@ -77,13 +77,13 @@ function parseString() {
 
 function parseUnwrappedString() {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
-	let start = idx;
+	const start = idx;
 	let c, cc;
 	while (true) {		
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
 		if (idx >= l) {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-			let r = str.slice(start);
+			const r = str.slice(start);
 			if (!r.length) throw new Error('TinyG JSON Parse Error: Unexpected end of input');
 			return r;
 		}
@@ -98,7 +98,7 @@ function parseUnwrappedString() {
 			(cc < ccA || cc > ccZ)
 		) {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-			let r = str.slice(start, idx);
+			const r = str.slice(start, idx);
 			if (!r.length) throw new Error('TinyG JSON Parse Error: Unexpected token ' + c);
 			return r;
 		}
@@ -124,7 +124,7 @@ function parseObject() {
 	idx++;
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
 	if (idx >= l) throw new Error('TinyG JSON Parse Error: Unexpected end of input');
-	let obj = {};
+	const obj = {};
 	while (true) {
 		// Skip whitespace
 		skipWhitespace();
@@ -138,7 +138,7 @@ function parseObject() {
 			return obj;
 		}
 		// Parse the object key
-		let key = parseObjectKey();
+		const key = parseObjectKey();
 		skipWhitespace();
 		// Ensure the next character is :
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
@@ -174,7 +174,7 @@ function parseArray() {
 	idx++;
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
 	if (idx >= l) throw new Error('TinyG JSON Parse Error: Unexpected end of input');
-	let ar = [];
+	const ar = [];
 	while (true) {
 		skipWhitespace();
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
@@ -201,14 +201,14 @@ function parseArray() {
 
 function parseNumber() {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
-	let start = idx;
+	const start = idx;
 	while (true) {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
 		if (idx >= l) break;
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-		let c = str[idx];
+		const c = str[idx];
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-		let cc = str.charCodeAt(idx);
+		const cc = str.charCodeAt(idx);
 		if (
 			c !== '-' &&
 			c !== '.' &&
@@ -221,7 +221,7 @@ function parseNumber() {
 		idx++;
 	}
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-	let numStr = str.slice(start, idx);
+	const numStr = str.slice(start, idx);
 	if (!numStr.length || isNaN(numStr)) {
 		throw new Error('TinyG JSON Parse Error: Invalid number ' + numStr);
 	}
@@ -233,9 +233,9 @@ function parseInternal() {
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'idx' implicitly has an 'any' type.
 	if (idx >= l) throw new Error('TinyG JSON Parse Error: Unexpected end of input');
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-	let c = str[idx];
+	const c = str[idx];
 // @ts-expect-error ts-migrate(7005) FIXME: Variable 'str' implicitly has an 'any' type.
-	let cc = str.charCodeAt(idx);
+	const cc = str.charCodeAt(idx);
 	if (c === '{') {
 		// parse object
 		return parseObject();
@@ -250,7 +250,7 @@ function parseInternal() {
 		return parseNumber();
 	} else {
 		// parse token (boolean, null)
-		let tok = parseUnwrappedString();
+		const tok = parseUnwrappedString();
 		if (tok === 'null' || tok === 'n') return null;
 		else if (tok === 'true' || tok === 't') return true;
 		else if (tok === 'false' || tok === 'f') return false;
@@ -263,13 +263,13 @@ export function parse(s:string) {
 	str = s;
 	l = s.length;
 	skipWhitespace();
-	let r = parseInternal();
+	const r = parseInternal();
 	skipWhitespace();
 	if (idx < str.length) throw new Error('TinyG JSON Parse Error: Unexpected token ' + str[idx]);
 	return r;
 }
 
-let validShortKeyRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+const validShortKeyRegex = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 
 export function stringify(data:any, precision = 5) {
 	if (data === undefined) return 'n';
@@ -293,8 +293,8 @@ export function stringify(data:any, precision = 5) {
 	if (typeof data === 'object') {
 		let ret = '{';
 		let first = true;
-		for (let key in data) {
-			let val = data[key];
+		for (const key in data) {
+			const val = data[key];
 			if (val !== undefined) {
 				if (!first) ret += ',';
 				else first = false;

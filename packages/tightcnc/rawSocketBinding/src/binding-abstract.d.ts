@@ -1,5 +1,5 @@
 declare module '@serialport/binding-abstract' {
-    import { OpenOptions, PortInfo } from "serialport"
+    import { OpenOptions, PortInfo } from 'serialport'
 
     export default class AbstractBinding {
         static list(): Promise<PortInfo[]>

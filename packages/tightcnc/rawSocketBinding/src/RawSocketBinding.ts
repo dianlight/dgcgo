@@ -1,5 +1,5 @@
-import AbstractBinding from "@serialport/binding-abstract"
-import { OpenOptions, PortInfo } from "serialport"
+import AbstractBinding from '@serialport/binding-abstract'
+import { OpenOptions, PortInfo } from 'serialport'
 import * as net from 'net'
 
 export default class RawSocketBinding extends AbstractBinding {
@@ -31,7 +31,7 @@ export default class RawSocketBinding extends AbstractBinding {
         this.options = options
         return new Promise<void>((resolve, reject) => {
             const url = new URL(path)
-            if (url.protocol !== 'socket:') return reject(new Error("Only socket://<server>:<port> path are supported"))
+            if (url.protocol !== 'socket:') return reject(new Error('Only socket://<server>:<port> path are supported'))
             this.socket = net.createConnection(
                 parseInt(url.port),
                 url.hostname,
@@ -45,14 +45,14 @@ export default class RawSocketBinding extends AbstractBinding {
             //    console.log("Connection open!")
             //})
             this.socket.on('timeout', () => {
-                console.log("Timeout!")
+                console.log('Timeout!')
               //  reject(new Error("Connection Timeout"))
             })
             this.socket.on('error', (err) => {
                 //console.error(err)
                 reject(err)
             })
-            this.socket.on("data", (data) => {
+            this.socket.on('data', (data) => {
                // console.log("<-",data.toString())
                 this._buffer.push(data)
             })
@@ -90,7 +90,7 @@ export default class RawSocketBinding extends AbstractBinding {
      */
     override async read(buffer: Buffer, offset: number, length: number): Promise<{ bytesRead: number, buffer: Buffer }> {
         return new Promise((resolve, reject) => {
-            if (!this.socket)return reject(new Error("Socket closed!"))
+            if (!this.socket)return reject(new Error('Socket closed!'))
             const reader = () => {
                 if (this._buffer.length == 0) {
                     setTimeout(reader, 1000)
@@ -129,11 +129,11 @@ export default class RawSocketBinding extends AbstractBinding {
     override async write(buffer: Buffer): Promise<void> {
         //console.log("->",buffer.toString())
         return new Promise((resolve, reject) => {
-            if (!this.socket)return reject(new Error("Socket is closed!"))
+            if (!this.socket)return reject(new Error('Socket is closed!'))
             if (this.socket.write(buffer)) {
                 resolve()
             } else {
-                reject(new Error("Unable to write to socket!"))
+                reject(new Error('Unable to write to socket!'))
             }
         })
     }

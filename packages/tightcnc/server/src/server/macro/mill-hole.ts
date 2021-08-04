@@ -75,24 +75,24 @@ if (toolDiameter >= holeDiameter) {
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'push'.
 	push(`G0 X${pos[0]} Y${pos[1]}`);
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'push'.
-	push(`G0 Z0`);
+	push('G0 Z0');
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'push'.
 	push(`G1 Z${-depth} F${zFeed}`);
 } else {
 	// mill hole cycle
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'precision'.
-	let angleInc = 2 * precision / holeDiameter; // radians
+	const angleInc = 2 * precision / holeDiameter; // radians
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'passDepth'.
 	for (let z = -passDepth; z > -depth - passDepth; z -= passDepth) {
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'depth'.
 		if (z < -depth) z = -depth;
 		for (let a = 0; a <= 2 * Math.PI; a += angleInc) {
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'holeDiameter'.
-			let r = (holeDiameter - toolDiameter) / 2;
+			const r = (holeDiameter - toolDiameter) / 2;
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pos'.
-			let x = pos[0] + Math.cos(a) * r;
+			const x = pos[0] + Math.cos(a) * r;
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pos'.
-			let y = pos[1] + Math.sin(a) * r * (climbMill ? 1 : -1);
+			const y = pos[1] + Math.sin(a) * r * (climbMill ? 1 : -1);
 			if (a === 0) {
 // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'push'.
 				push(`G0 X${x} Y${y}`);

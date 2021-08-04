@@ -1,4 +1,4 @@
-import { ErrorRegistry } from "new-error";
+import { ErrorRegistry } from 'new-error';
 
 export const ERRORS = {
     INTERNAL_SERVER_ERROR: {

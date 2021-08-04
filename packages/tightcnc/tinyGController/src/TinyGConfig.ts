@@ -1,4 +1,4 @@
-import { ControllerConfig } from "@dianlight/tightcnc-core";
+import { ControllerConfig } from '@dianlight/tightcnc-core';
 
 export interface TinyGConfig extends ControllerConfig {
     // serial port settings

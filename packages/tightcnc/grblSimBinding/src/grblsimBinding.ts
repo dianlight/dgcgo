@@ -1,5 +1,5 @@
-import AbstractBinding from "@serialport/binding-abstract"
-import { OpenOptions, PortInfo } from "serialport"
+import AbstractBinding from '@serialport/binding-abstract'
+import { OpenOptions, PortInfo } from 'serialport'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { addExitCallback } from 'catch-exit';
 import * as path from 'path'
@@ -35,7 +35,7 @@ export default class GrblsimBinding extends AbstractBinding {
         return new Promise<void>((resolve, reject) => {
             const url = new URL(_path)
             //console.log(url,url.href.substr(8))
-            if (url.protocol !== 'grblsim:') return reject(new Error("Only grblsim://<path to grbl_sim.exe > path are supported"))
+            if (url.protocol !== 'grblsim:') return reject(new Error('Only grblsim://<path to grbl_sim.exe > path are supported'))
             this.process = spawn(url.href.substr(8), ['-t','10','-n','-r','1','-s',path.join(os.tmpdir(), '/log_step.out'),'-b',path.join(os.tmpdir(),'/log_block.out')], {
                 shell: false,
                 stdio: ['pipe','pipe','pipe']
@@ -45,15 +45,15 @@ export default class GrblsimBinding extends AbstractBinding {
                 console.error('Z:',err)
                 reject(err)
             })
-            this.process.stdout.on("data", (data) => {
+            this.process.stdout.on('data', (data) => {
             //    console.log("<",JSON.stringify(data.toString()))
                 this._buffer.push(data)
             })
-            this.process.stderr.on("data", (data) => {
-                console.error("<grbl>",JSON.stringify(data.toString()))
+            this.process.stderr.on('data', (data) => {
+                console.error('<grbl>',JSON.stringify(data.toString()))
             })
             this.process.on('exit', (code,signal) => {
-                console.error("<grbl>Exit:", code,'Signal:',signal)
+                console.error('<grbl>Exit:', code,'Signal:',signal)
                 this.isOpen = false
                 delete this.process
                 if(!signal)this.open(_path,options)
@@ -75,7 +75,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * Closes an open port
      */
     override async close(): Promise<void> {
-        console.log("Closign GRBLSym")
+        console.log('Closign GRBLSym')
         return new Promise<void>((resolve, reject) => {
             if (!this.process) return reject(new Error('no process to close!'))
             return super.close().then(() => {
@@ -86,9 +86,9 @@ export default class GrblsimBinding extends AbstractBinding {
     }
 
     private closeSync():void {
-        console.error("Process Alive. Kill it!")
+        console.error('Process Alive. Kill it!')
         this.process?.kill('SIGINT')
-        console.error("Process closed?", !this.process?.connected);
+        console.error('Process closed?', !this.process?.connected);
         delete this.process;
         this.isOpen = false;
     }
@@ -107,7 +107,7 @@ export default class GrblsimBinding extends AbstractBinding {
      */
     override async read(buffer: Buffer, offset: number, length: number): Promise<{ bytesRead: number, buffer: Buffer }> {
         return new Promise((resolve, reject) => {
-            if (!this.process)return reject(new Error("Process not exist!"))
+            if (!this.process)return reject(new Error('Process not exist!'))
             const reader = () => {
                 if (this._buffer.length == 0) {
                     setTimeout(reader, 1000)
@@ -146,7 +146,7 @@ export default class GrblsimBinding extends AbstractBinding {
     override async write(buffer: Buffer): Promise<void> {
        // console.log(">", JSON.stringify(buffer.toString()))
         return new Promise((resolve, reject) => {
-            if (!this.process) return reject(new Error("GRBL_sim process is closed!"))
+            if (!this.process) return reject(new Error('GRBL_sim process is closed!'))
             this.process.stdin.write(buffer, (error) => {
                 if (error) {
                     console.error(error)
