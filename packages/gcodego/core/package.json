@@ -35,7 +35,7 @@
   "devDependencies": {
     "@manuth/typescript-eslint-plugin": "^1.4.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.0-dev.20210702"
+    "typescript": "^4.4.1-rc"
   },
   "dependencies": {
     "@dianlight/tightcnc-core": "^0.3.2-alpha.2"

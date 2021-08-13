@@ -65,7 +65,7 @@ export class ElectronMenu {
                       */
                 {
                     label: 'menu.file.open',
-                    click: async () => {
+                    click: () => {
                         //if (!this.mainWindow) await createWindow();
                         void dialog
                             .showOpenDialog(this.mainWindow, {

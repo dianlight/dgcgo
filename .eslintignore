@@ -1,4 +1,4 @@
-/dist
+**/dist/**/*.ts
 /src-bex/www
 /src-capacitor
 /src-cordova
@@ -9,3 +9,4 @@ babel.config.js
 /src-ssr
 types
 *.js
+**/consoleui/**/*.ts

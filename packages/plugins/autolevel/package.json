@@ -47,16 +47,16 @@
     "not dead"
   ],
   "devDependencies": {
-    "@intlify/vue-i18n-loader": "^2.1.2",
+    "@intlify/vue-i18n-loader": "^3.0.0",
     "@manuth/typescript-eslint-plugin": "^1.4.1",
     "@quasar/app": "^3.0.4",
-    "@vue/compiler-sfc": "^3.1.5",
+    "@vue/compiler-sfc": "^3.2.2",
     "clean-webpack-plugin": "^3.0.0",
-    "eslint-plugin-vue": "^7.15.0",
+    "eslint-plugin-vue": "^7.16.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "rimraf": "^3.0.2",
-    "ts-loader": "^9.2.4",
-    "typescript": "^4.4.0-dev.20210702"
+    "ts-loader": "^9.2.5",
+    "typescript": "^4.4.1-rc"
   },
   "peerDependencies": {
     "vue-router": "^4.0.10"
@@ -64,7 +64,7 @@
   "dependencies": {
     "@dianlight/gcodego-core": "^0.2.0-alpha.1",
     "@dianlight/tightcnc-core": "^0.3.2-alpha.2",
-    "@quasar/extras": "^1.10.9",
+    "@quasar/extras": "^1.10.10",
     "cross": "^1.0.0",
     "lodash": "^4.17.21",
     "quasar": "^2.0.3",

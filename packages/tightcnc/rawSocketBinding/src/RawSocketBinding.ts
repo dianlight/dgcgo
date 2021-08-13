@@ -64,14 +64,18 @@ export default class RawSocketBinding extends AbstractBinding {
      */
     override async close(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            if (!this.socket) return reject(new Error('no socket to close!'))
-            return super.close().then(() => {
-                this.socket?.end(() => {
-                    delete this.socket;
-                    this.isOpen = false;
-                    resolve()
+            if (!this.socket) reject(new Error('no socket to close!'))
+            else {
+                super.close().then(() => {
+                    this.socket?.end(() => {
+                        delete this.socket;
+                        this.isOpen = false;
+                        resolve()
+                    })
+                }).catch((err) => {
+                    reject(err)
                 })
-            });
+            };
         })
     }
 
@@ -142,7 +146,7 @@ export default class RawSocketBinding extends AbstractBinding {
      * Changes connection settings on an open port. Only `baudRate` is supported.
      * @returns {Promise} Resolves once the port's baud rate changes.
      */
-    override async update(options: { baudRate: number }): Promise<void> {
+    override async update(/*options: { baudRate: number }*/): Promise<void> {
         //console.log('U->',options)
         return Promise.resolve()
     }
@@ -158,7 +162,7 @@ export default class RawSocketBinding extends AbstractBinding {
      * @param {Boolean} [options.rts=true] flag for rts
      * @returns {Promise} Resolves once the port's flags are set.
      */
-    override async set(options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }): Promise<void> {
+    override async set(/*options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }*/): Promise<void> {
         //console.log('S>',options)
         return Promise.resolve()
     }

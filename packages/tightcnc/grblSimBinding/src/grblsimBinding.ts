@@ -50,19 +50,19 @@ export default class GrblsimBinding extends AbstractBinding {
                 this._buffer.push(data)
             })
             this.process.stderr.on('data', (data) => {
-                console.error('<grbl>',JSON.stringify(data.toString()))
+                console.error('<grbl>',JSON.stringify(data))
             })
             this.process.on('exit', (code,signal) => {
                 console.error('<grbl>Exit:', code,'Signal:',signal)
                 this.isOpen = false
                 delete this.process
-                if(!signal)this.open(_path,options)
+                if(!signal)void this.open(_path,options)
             })
             process.on('beforeExit', (code) => {
                 console.error(`TightCNC server shutdown.. ${code}`)
                 this.closeSync()
             })
-            addExitCallback(signal => {
+            addExitCallback(() => {
                 console.log('TighCNC Exit hook')
                 this.closeSync()
             });
@@ -77,11 +77,15 @@ export default class GrblsimBinding extends AbstractBinding {
     override async close(): Promise<void> {
         console.log('Closign GRBLSym')
         return new Promise<void>((resolve, reject) => {
-            if (!this.process) return reject(new Error('no process to close!'))
-            return super.close().then(() => {
-                this.closeSync()
-                resolve()
-            });
+            if (!this.process) reject(new Error('no process to close!'))
+            else {
+                super.close().then(() => {
+                    this.closeSync()
+                    resolve()
+                }).catch((err) => {
+                    reject(err)
+                })
+            };
         })
     }
 
@@ -163,7 +167,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * Changes connection settings on an open port. Only `baudRate` is supported.
      * @returns {Promise} Resolves once the port's baud rate changes.
      */
-    override async update(options: { baudRate: number }): Promise<void> {
+    override async update(/*options: { baudRate: number }*/): Promise<void> {
         //console.log('U->',options)
         return Promise.resolve()
     }
@@ -179,7 +183,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * @param {Boolean} [options.rts=true] flag for rts
      * @returns {Promise} Resolves once the port's flags are set.
      */
-    override async set(options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }): Promise<void> {
+    override async set(/*options: { brk: boolean, cts: boolean, dsr: boolean, dtr: boolean, rts: boolean }*/): Promise<void> {
         //console.log('S>',options)
         return Promise.resolve()
     }

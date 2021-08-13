@@ -51,29 +51,29 @@
     "not dead"
   ],
   "devDependencies": {
-    "@intlify/vue-i18n-loader": "^2.1.2",
+    "@intlify/vue-i18n-loader": "^3.0.0",
     "@manuth/typescript-eslint-plugin": "^1.4.1",
     "@quasar/app": "^3.0.4",
-    "@vue/compiler-sfc": "^3.1.5",
+    "@vue/compiler-sfc": "^3.2.2",
     "clean-webpack-plugin": "^3.0.0",
-    "eslint-plugin-vue": "^7.15.0",
+    "eslint-plugin-vue": "^7.16.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "rimraf": "^3.0.2",
     "scss-loader": "^0.0.1",
-    "ts-loader": "^9.2.4",
-    "typescript": "^4.4.0-dev.20210702"
+    "ts-loader": "^9.2.5",
+    "typescript": "^4.4.1-rc"
   },
   "peerDependencies": {
     "vue-router": "^4.0.10"
   },
   "dependencies": {
-    "@quasar/extras": "^1.10.9",
+    "@quasar/extras": "^1.10.10",
     "camera-controls": "^1.30.0",
     "colornames": "^1.1.1",
     "gcode-toolpath": "^2.2.0",
     "quasar": "^2.0.3",
     "split2": "^3.2.2",
-    "three": "^0.131.1",
+    "three": "^0.131.3",
     "through2": "^4.0.2",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-i18n": "^9.1.6",
