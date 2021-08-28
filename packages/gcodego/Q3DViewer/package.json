@@ -52,28 +52,28 @@
   ],
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^3.0.0",
-    "@manuth/typescript-eslint-plugin": "^1.4.1",
-    "@quasar/app": "^3.0.4",
-    "@vue/compiler-sfc": "^3.2.2",
+    "@manuth/typescript-eslint-plugin": "^1.4.2",
+    "@quasar/app": "^3.1.0",
+    "@vue/compiler-sfc": "^3.2.6",
     "clean-webpack-plugin": "^3.0.0",
-    "eslint-plugin-vue": "^7.16.0",
+    "eslint-plugin-vue": "^7.17.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "rimraf": "^3.0.2",
     "scss-loader": "^0.0.1",
     "ts-loader": "^9.2.5",
-    "typescript": "^4.4.1-rc"
+    "typescript": "^4.4.2"
   },
   "peerDependencies": {
     "vue-router": "^4.0.10"
   },
   "dependencies": {
-    "@quasar/extras": "^1.10.10",
+    "@quasar/extras": "^1.10.11",
     "camera-controls": "^1.30.0",
     "colornames": "^1.1.1",
     "gcode-toolpath": "^2.2.0",
-    "quasar": "^2.0.3",
+    "quasar": "^2.0.4",
     "split2": "^3.2.2",
-    "three": "^0.131.3",
+    "three": "^0.132.2",
     "through2": "^4.0.2",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-i18n": "^9.1.6",

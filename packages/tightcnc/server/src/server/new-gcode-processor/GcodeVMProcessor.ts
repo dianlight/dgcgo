@@ -1,9 +1,9 @@
 import { GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 import objtools from 'objtools';
-import  {Controller, GcodeVM ,VMState,GcodeLine } from '@dianlight/tightcnc-core';
+import { Controller, GcodeVM, VMState, GcodeLine } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema';
 
-interface GcodeVMProcessorOptions extends GcodeProcessorOptions{
+interface GcodeVMProcessorOptions extends GcodeProcessorOptions {
     noInit: boolean,
     controller: Controller, // - The machine controller class instance for the gcode to run on.  Used to fetch initial state.
     axisLabels: string[], // - Override default axis labels.  Defaults come from the controller, or are [ 'x', 'y', 'z' ].
@@ -62,9 +62,9 @@ export default class GcodeVMProcessor extends GcodeProcessor {
 
     vm: GcodeVM
     _statusVMState?: VMState
-    lastLineProcessedTime?: Date 
+    lastLineProcessedTime?: Date
 
-    constructor(options:GcodeVMProcessorOptions) {
+    constructor(options: GcodeVMProcessorOptions) {
         super(options, 'gcodevm', false);
         const vmOptions = objtools.deepCopy(options) as GcodeVMProcessorOptions;
         vmOptions.noInit = true;
@@ -97,7 +97,7 @@ export default class GcodeVMProcessor extends GcodeProcessor {
 
 
 
-    override getStatus():Partial<VMState>|void {
+    override getStatus(): Partial<VMState> | void {
         // return a reduced set of state information for the general status data; this is just used for
         // returning job data to clients - gline.before and gline.after still contain the full vmstate for internal use
         let vmState;
@@ -108,12 +108,12 @@ export default class GcodeVMProcessor extends GcodeProcessor {
         }
         if (!vmState) return;
         return {
-            units: vmState.units,
-            line: vmState.line,
+            units: vmState.units || 'mm',
+            line: vmState.line || 0,
             totalTime: vmState.totalTime,
             lineCounter: vmState.lineCounter,
-            bounds: vmState.bounds,
-            updateTime: this.lastLineProcessedTime?this.lastLineProcessedTime.toISOString():undefined
+            bounds: vmState.bounds || [[], []],
+            updateTime: this.lastLineProcessedTime ? this.lastLineProcessedTime.toISOString() : undefined,
         };
     }
 

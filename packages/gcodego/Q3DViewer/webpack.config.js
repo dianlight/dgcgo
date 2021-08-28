@@ -20,14 +20,19 @@ module.exports = {
       type: "umd",
     }
   },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
   module: {
     rules: [
       {
         test: /\.ts$/,
         loader: "ts-loader",
-        exclude: [/node_modules/,/demo/],
+        exclude: [/node_modules/, /demo/],
         options: {
-//          transpileOnly: true,
+          //          transpileOnly: true,
           appendTsSuffixTo: [/\.vue$/],
           configFile: 'tsconfig.json'
         }
@@ -41,7 +46,7 @@ module.exports = {
             'scss': 'vue-style-loader!css-loader!sass-loader',
             'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
           },
-        },        
+        },
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
@@ -49,7 +54,7 @@ module.exports = {
         options: {
           limit: 8192,
         },
-      },      
+      },
       {
         test: /\.css$/,
         use: [
@@ -62,9 +67,9 @@ module.exports = {
   plugins: [new VueLoaderPlugin({
     //compilerSfc: true
   }), new CleanWebpackPlugin(),
-    new ForkTsCheckerWebpackPlugin({
+  new ForkTsCheckerWebpackPlugin({
     typescript: {
-//      configFile: "tsconfig.eslint.json",
+      //      configFile: "tsconfig.eslint.json",
       extensions: {
         vue: {
           enabled: true,
@@ -76,7 +81,7 @@ module.exports = {
       files: './src/**/*.{ts,vue}' // required - same as command `eslint ./src/**/*.{ts,tsx,js,jsx} --ext .ts,.tsx,.js,.jsx`
     }
   }), new NodePolyfillPlugin(), new webpack.WatchIgnorePlugin({
-    paths: [/\.js$/,/\.d\.ts$/]
+    paths: [/\.js$/, /\.d\.ts$/]
   })],
   resolve: {
     extensions: [".ts", ".js", ".vue"],
@@ -93,6 +98,6 @@ module.exports = {
     // define module 'vue' which will point to window.Vue in result bundle
     vue: "vue",
     compilerSfc: "@vue/compiler-sfc",
-    quasar:"quasar"
+    quasar: "quasar"
   }
 };

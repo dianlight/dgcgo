@@ -1,7 +1,7 @@
 import AbstractBinding from '@serialport/binding-abstract'
 import { OpenOptions, PortInfo } from 'serialport'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
-import { addExitCallback } from 'catch-exit';
+import { addExitCallback } from 'catch-exit/dist/index';
 import * as path from 'path'
 import * as os from 'os'
 
@@ -18,11 +18,11 @@ export default class GrblsimBinding extends AbstractBinding {
         super(opt)
     }
 
-    static override async list(): Promise<PortInfo[]>{
+    static override async list(): Promise<PortInfo[]> {
         //console.log('L>')
         return Promise.resolve([])
     }
-  
+
     /**
      * Opens a connection to the serial port referenced by the path. Promise resolves after the port
      * is opened, configured and ready for use.
@@ -36,27 +36,27 @@ export default class GrblsimBinding extends AbstractBinding {
             const url = new URL(_path)
             //console.log(url,url.href.substr(8))
             if (url.protocol !== 'grblsim:') return reject(new Error('Only grblsim://<path to grbl_sim.exe > path are supported'))
-            this.process = spawn(url.href.substr(8), ['-t','10','-n','-r','1','-s',path.join(os.tmpdir(), '/log_step.out'),'-b',path.join(os.tmpdir(),'/log_block.out')], {
+            this.process = spawn(url.href.substr(8), ['-t', '10', '-n', '-r', '1', '-s', path.join(os.tmpdir(), '/log_step.out'), '-b', path.join(os.tmpdir(), '/log_block.out')], {
                 shell: false,
-                stdio: ['pipe','pipe','pipe']
+                stdio: ['pipe', 'pipe', 'pipe']
             })
-            console.log('grblsim pid',this.process.pid)
+            console.log('grblsim pid', this.process.pid)
             this.process.on('error', (err) => {
-                console.error('Z:',err)
+                console.error('Z:', err)
                 reject(err)
             })
             this.process.stdout.on('data', (data) => {
-            //    console.log("<",JSON.stringify(data.toString()))
+                //    console.log("<",JSON.stringify(data.toString()))
                 this._buffer.push(data)
             })
             this.process.stderr.on('data', (data) => {
-                console.error('<grbl>',JSON.stringify(data))
+                console.error('<grbl>', JSON.stringify(data))
             })
-            this.process.on('exit', (code,signal) => {
-                console.error('<grbl>Exit:', code,'Signal:',signal)
+            this.process.on('exit', (code, signal) => {
+                console.error('<grbl>Exit:', code, 'Signal:', signal)
                 this.isOpen = false
                 delete this.process
-                if(!signal)void this.open(_path,options)
+                if (!signal) void this.open(_path, options)
             })
             process.on('beforeExit', (code) => {
                 console.error(`TightCNC server shutdown.. ${code}`)
@@ -89,7 +89,7 @@ export default class GrblsimBinding extends AbstractBinding {
         })
     }
 
-    private closeSync():void {
+    private closeSync(): void {
         console.error('Process Alive. Kill it!')
         this.process?.kill('SIGINT')
         console.error('Process closed?', !this.process?.connected);
@@ -111,7 +111,7 @@ export default class GrblsimBinding extends AbstractBinding {
      */
     override async read(buffer: Buffer, offset: number, length: number): Promise<{ bytesRead: number, buffer: Buffer }> {
         return new Promise((resolve, reject) => {
-            if (!this.process)return reject(new Error('Process not exist!'))
+            if (!this.process) return reject(new Error('Process not exist!'))
             const reader = () => {
                 if (this._buffer.length == 0) {
                     setTimeout(reader, 1000)
@@ -148,7 +148,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * @returns {Promise} Resolves after the data is passed to the operating system for writing.
      */
     override async write(buffer: Buffer): Promise<void> {
-       // console.log(">", JSON.stringify(buffer.toString()))
+        // console.log(">", JSON.stringify(buffer.toString()))
         return new Promise((resolve, reject) => {
             if (!this.process) return reject(new Error('GRBL_sim process is closed!'))
             this.process.stdin.write(buffer, (error) => {
@@ -157,9 +157,9 @@ export default class GrblsimBinding extends AbstractBinding {
                     reject(error)
                 } else {
                     resolve()
-                }             
+                }
             })
-            
+
         })
     }
 
@@ -209,7 +209,7 @@ export default class GrblsimBinding extends AbstractBinding {
      * Get the OS reported baud rate for the open port. Used mostly for debugging custom baud rates.
      */
     override async getBaudRate(): Promise<number> {
-       return Promise.resolve(this.opt.baudRate?this.opt.baudRate:0)
+        return Promise.resolve(this.opt.baudRate ? this.opt.baudRate : 0)
     }
 
     /**

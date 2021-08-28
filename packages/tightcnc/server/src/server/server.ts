@@ -4,7 +4,7 @@ import TightCNCServer from './tightcnc-server';
 import { Operation, TightCNCConfig } from '@dianlight/tightcnc-core'
 import { createJSONRPCErrorResponse, JSONRPC, JSONRPCID, JSONRPCMethod, JSONRPCRequest, JSONRPCResponse, JSONRPCResponsePromise, JSONRPCServer } from 'json-rpc-2.0';
 import cors from 'cors'
-import { addExitCallback, CatchSignals } from 'catch-exit';
+import { addExitCallback, CatchSignals } from 'catch-exit/dist/index';
 //import { JSONSchema7 } from 'json-schema';
 import Ajv, { Schema } from 'ajv'
 import config from 'config';
@@ -21,7 +21,7 @@ async function startServer() {
 	// const router = new APIRouter();
 	const server = new JSONRPCServer()
 	const app = express();
-	app.use(express.json({ limit:'1Gb'}))
+	app.use(express.json({ limit: '1Gb' }))
 	app.use(cors())
 
 	const tightcnc = new TightCNCServer(config as unknown as TightCNCConfig);
@@ -50,7 +50,7 @@ async function startServer() {
 							res.sendStatus(204);
 						}
 					});
-				  } else {
+				} else {
 					res.sendStatus(401)
 				}
 			} else {
@@ -63,65 +63,65 @@ async function startServer() {
 		console.error('Unknown request ', req)
 		next()
 	})
-	
-	
+
+
 	function registerOperationAPICall(operationName: string, operation: Operation) {
 
 		const mapResultToJSONRPCResponse = (
 			id: JSONRPCID | undefined,
 			result: unknown
-		  ): JSONRPCResponse | null => {
+		): JSONRPCResponse | null => {
 			if (id !== undefined) {
-			  return {
-				jsonrpc: JSONRPC,
-				id,
-				result: result === undefined ? null : result,
-			  };
+				return {
+					jsonrpc: JSONRPC,
+					id,
+					result: result === undefined ? null : result,
+				};
 			} else {
-			  return null;
+				return null;
 			}
 		};
-		
+
 		const mapErrorToJSONRPCResponse = (
 			id: JSONRPCID | undefined,
 			error?: BaseError
-		  ): JSONRPCResponse | null => {
+		): JSONRPCResponse | null => {
 			if (id !== undefined) {
-			  return createJSONRPCErrorResponse(
-				id,
-				0 /*DefaultErrorCode*/,
-				(error && error.message) || 'An unexpected error occurred'
-			  );
+				return createJSONRPCErrorResponse(
+					id,
+					0 /*DefaultErrorCode*/,
+					(error && error.message) || 'An unexpected error occurred'
+				);
 			} else {
-			  return null;
+				return null;
 			}
 		};
-		
+
 
 		function toJSONRPCObject(
 			object: Operation
 		): JSONRPCMethod {
 			return (request: JSONRPCRequest): JSONRPCResponsePromise => {
-				const validator = ajv.getSchema(object.getParamSchema().$id || '') || ajv.compile(object.getParamSchema() as Schema)				
+				const validator = ajv.getSchema(object.getParamSchema().$id || '') || ajv.compile(object.getParamSchema() as Schema)
 				const valid = validator(request.params)
 				if (!valid) {
-					console.warn(request.params,object.getParamSchema().$id, validator.errors)
+					console.warn(request.params, object.getParamSchema().$id, validator.errors)
 				}
 				const response = object.run(request.params as Record<string, unknown>)
 				return Promise.resolve(response).then(
 					(result: unknown) => mapResultToJSONRPCResponse(request.id, result),
 					(error: BaseError) => {
-					console.warn(
-						`JSON-RPC method ${request.method} responded an error`,
-						error
-					);
-					return mapErrorToJSONRPCResponse(request.id, error);
+						console.warn(
+							`JSON-RPC method ${request.method} responded an error`,
+							error
+						);
+						return mapErrorToJSONRPCResponse(request.id, error);
 					}
 				);
 			};
 		}
 		server.addMethodAdvanced(operationName, toJSONRPCObject(operation))
-		
+
 	}
 
 	for (const operationName in tightcnc.operations) {
@@ -140,7 +140,7 @@ async function startServer() {
 
 // Exit hook 
 
-addExitCallback( (signal: CatchSignals, exitCode?: number, error?: Error) => {
+addExitCallback((signal: CatchSignals, exitCode?: number, error?: Error) => {
 	console.log('TightCNC exit for signal ', signal, exitCode)
 	if (error) {
 		console.error(error)

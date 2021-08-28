@@ -1,5 +1,5 @@
 import objtools from 'objtools';
-import { errRegistry,GcodeProcessor,JobState,Operation } from '@dianlight/tightcnc-core';
+import { errRegistry, GcodeProcessor, JobState, Operation } from '@dianlight/tightcnc-core';
 import TightCNCServer from './tightcnc-server';
 import { StatusObject } from '@dianlight/tightcnc-core';
 import { JSONSchema7 } from 'json-schema';
@@ -9,7 +9,7 @@ class OpGetStatus extends Operation {
     async run(params: {
         fields: string[],
         sync?: boolean
-    }):Promise<Partial<StatusObject>> {
+    }): Promise<Partial<StatusObject>> {
         if (params.sync && this.tightcnc.controller) {
             await this.tightcnc.controller.waitSync();
         }
@@ -42,15 +42,15 @@ class OpGetStatus extends Operation {
                 'sync': {
                     type: 'boolean',
                     description: 'Whether to wait for machine to stop and all commands to be processed before returning status',
-                    default: false                    
+                    default: false
                 }
             }
-         } as JSONSchema7
+        } as JSONSchema7
     }
 
 
 }
-class OpSend extends Operation {    
+class OpSend extends Operation {
     getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -70,7 +70,7 @@ class OpSend extends Operation {
                     type: 'array',
                     items: {
                         type: 'object',
-                        properties:{
+                        properties: {
                             name: {
                                 type: 'string',
                                 description: 'Name of gcode processor',
@@ -85,31 +85,32 @@ class OpSend extends Operation {
                                 description: 'Optional order number for gcode processor position in chain'
                             }
                         },
-                        required:['name']
+                        required: ['name']
                     }
                 }
             },
-            required: [ 'line' ]
+            required: ['line']
         } as JSONSchema7
     }
 
-    async run(params:{line: string, wait?:boolean,gcodeProcessors?: {
-        name: string;
-        options: {
-            id: string;
-            updateOnHook?: string;
-        };
-        order?: number;
-        inst?: GcodeProcessor;
-    }[] | undefined
+    async run(params: {
+        line: string, wait?: boolean, gcodeProcessors?: {
+            name: string;
+            options: {
+                id: string;
+                updateOnHook?: string;
+            };
+            order?: number;
+            inst?: GcodeProcessor;
+        }[] | undefined
     }): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (params.gcodeProcessors && params.gcodeProcessors.length > 0 && this.tightcnc.jobManager) {
                 const suspendJob = this.tightcnc.jobManager?.currentJob;
                 const job = new JobState({
                     state: 'initializing',
-//                    jobOptions: {},
-//                    dryRunResults: {},
+                    //                    jobOptions: {},
+                    //                    dryRunResults: {},
                     startTime: new Date().toISOString()
                 });
                 this.tightcnc.jobManager.currentJob = job;
@@ -124,15 +125,15 @@ class OpSend extends Operation {
                 });
                 const initializer = new Promise<void>((resolve, reject) => {
                     let finished = false;
-                    source.on('processorChainReady', (_chain:GcodeProcessor[]) => {
+                    source.on('processorChainReady', (_chain: GcodeProcessor[]) => {
                         if (finished)
                             return;
                         finished = true;
-                        job.gcodeProcessors = _chain.reduce((prev:Record<string,GcodeProcessor>, next) => { prev[next.id] = next; return prev; }, {} as Record<string,GcodeProcessor>);
+                        job.gcodeProcessors = _chain.reduce((prev: Record<string, GcodeProcessor>, next) => { prev[next.id] = next; return prev; }, {} as Record<string, GcodeProcessor>);
                         job.startTime = new Date().toISOString();
                         resolve();
                     });
-                    source.on('chainerror', (err:unknown) => {
+                    source.on('chainerror', (err: unknown) => {
                         if (finished)
                             return;
                         finished = true;
@@ -171,7 +172,8 @@ class OpHold extends Operation {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/hold',
-    } as JSONSchema7; }
+        } as JSONSchema7;
+    }
     run() {
         this.tightcnc.controller?.hold();
         return Promise.resolve();
@@ -182,7 +184,8 @@ class OpResume extends Operation {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/resume'
-    } as JSONSchema7; }
+        } as JSONSchema7;
+    }
     run() {
         this.tightcnc.controller?.resume();
         return Promise.resolve();
@@ -193,7 +196,8 @@ class OpCancel extends Operation {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/cancel',
-    } as JSONSchema7; }
+        } as JSONSchema7;
+    }
     run() {
         this.tightcnc.controller?.cancel();
         this.tightcnc.cancelInput();
@@ -205,7 +209,8 @@ class OpReset extends Operation {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/reset',
-    }as JSONSchema7; }
+        } as JSONSchema7;
+    }
     run() {
         this.tightcnc.controller?.reset();
         return Promise.resolve();
@@ -216,7 +221,8 @@ class OpClearError extends Operation {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/clearError',
-    }as JSONSchema7; }
+        } as JSONSchema7;
+    }
     run() {
         this.tightcnc.controller?.clearError();
         return Promise.resolve();
@@ -238,20 +244,20 @@ class OpRealTimeMove extends Operation {
                     description: 'Amount to move the axis'
                 },
             },
-            required: ['axis','inc']
+            required: ['axis', 'inc']
         } as JSONSchema7;
     }
-    run(params:{axis:number, inc:number}) {
+    run(params: { axis: number, inc: number }) {
         this.checkReady();
         this.tightcnc.controller?.realTimeMove(params.axis, params.inc);
         return Promise.resolve();
     }
 }
 class OpMove extends Operation {
-    
+
     getParamSchema() {
         return {
-            $schema: 'http://json-schema.org/draft-07/schema#', 
+            $schema: 'http://json-schema.org/draft-07/schema#',
             $id: '/move',
             type: 'object',
             properties: {
@@ -260,7 +266,7 @@ class OpMove extends Operation {
                     items: {
                         oneOf: [
                             { type: 'number' },
-                            { type: 'boolean'}
+                            { type: 'boolean' }
                         ]
                     },
                     description: 'Position to move to'
@@ -273,14 +279,14 @@ class OpMove extends Operation {
             required: ['pos']
         } as JSONSchema7;
     }
-    
-    async run(params:{pos:(number|false)[],feed?:number}) {
+
+    async run(params: { pos: (number | false)[], feed?: number }) {
         this.checkReady();
         await this.tightcnc.controller?.move(params.pos, params.feed);
     }
 }
 class OpHome extends Operation {
-    
+
     getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -297,8 +303,8 @@ class OpHome extends Operation {
             }
         } as JSONSchema7;
     }
-    
-    async run(params:{axes:boolean[]}) {
+
+    async run(params: { axes: boolean[] }) {
         this.checkReady();
         await this.tightcnc.controller?.home(params.axes);
     }
@@ -326,7 +332,7 @@ class OpSetAbsolutePos extends Operation {
     }
 
     async run(params: {
-        pos:(number|boolean)[]
+        pos: (number | boolean)[]
     }) {
         let pos = params.pos;
         await this.tightcnc.controller?.waitSync();
@@ -348,7 +354,7 @@ class OpSetAbsolutePos extends Operation {
             }
         }
         let gcode = 'G53 G0';
-        if(this.tightcnc.controller) for (const axisNum of this.tightcnc.controller.listUsedAxisNumbers()) {
+        if (this.tightcnc.controller) for (const axisNum of this.tightcnc.controller.listUsedAxisNumbers()) {
             const axis = this.tightcnc.controller.axisLabels[axisNum].toUpperCase();
             if (typeof pos[axisNum] === 'number') {
                 gcode += ' ' + axis + pos[axisNum].toString();
@@ -371,7 +377,7 @@ class OpProbe extends Operation {
                     items: {
                         anyOf: [
                             { type: 'number' },
-                            { type: 'boolean'}
+                            { type: 'boolean' }
                         ]
                     },
                     description: 'Position to probe to'
@@ -385,7 +391,7 @@ class OpProbe extends Operation {
         } as JSONSchema7;
     }
 
-    async run(params: { pos: (number|boolean)[], feed?: number }) {
+    async run(params: { pos: (number | boolean)[], feed?: number }) {
         this.checkReady();
         return await this.tightcnc.controller?.probe(params.pos, params.feed);
     }
@@ -407,7 +413,7 @@ class OpSetOrigin extends Operation {
                     items: {
                         oneOf: [
                             { type: 'number' },
-                            { type: 'boolean'}
+                            { type: 'boolean' }
                         ]
                     },
                     description: 'Position offsets of new origin.  If null, current position is used.  Elements can also be true (to use current position for that axis) or false (to ignore that axis).'
@@ -415,8 +421,8 @@ class OpSetOrigin extends Operation {
             }
         } as JSONSchema7
     }
-    
-    async run(params:{coordSys?:number,pos?:(number|boolean)[]}) {
+
+    async run(params: { coordSys?: number, pos?: (number | boolean)[] }) {
         let pos = params.pos;
         const posHasBooleans = pos && pos.some((c) => typeof c === 'boolean');
         if (!pos || posHasBooleans || !params.coordSys) {
@@ -433,7 +439,7 @@ class OpSetOrigin extends Operation {
         }
         const coordSys = params.coordSys || this.tightcnc.controller?.activeCoordSys || 0;
         let gcode = `G10 L2 P${coordSys + 1}`;
-        if(this.tightcnc.controller) for (const axisNum of this.tightcnc.controller.listUsedAxisNumbers()) {
+        if (this.tightcnc.controller) for (const axisNum of this.tightcnc.controller.listUsedAxisNumbers()) {
             const axis = this.tightcnc.controller?.axisLabels[axisNum].toUpperCase();
             if (pos && typeof pos[axisNum] === 'number') {
                 gcode += ' ' + axis + pos[axisNum].toString();
@@ -445,7 +451,7 @@ class OpSetOrigin extends Operation {
 }
 
 class OpWaitSync extends Operation {
-    
+
     override getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -453,13 +459,13 @@ class OpWaitSync extends Operation {
             type: 'null'
         } as JSONSchema7;
     }
-    
+
     override async run() {
         return this.tightcnc.controller?.waitSync();
     }
 }
 class OpGetLog extends Operation {
-    
+
     override getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -488,8 +494,8 @@ class OpGetLog extends Operation {
             required: ['logType']
         } as JSONSchema7
     }
-    
-    override async run(params:{logType:'comms'|'message',start:number,end:number,limit:number}) {
+
+    override async run(params: { logType: 'comms' | 'message', start: number, end: number, limit: number }) {
         let logger;
         if (params.logType === 'comms') {
             logger = this.tightcnc.loggerMem;
@@ -498,13 +504,13 @@ class OpGetLog extends Operation {
             logger = this.tightcnc.messageLog;
         }
         else {
-            throw errRegistry.newError('INTERNAL_SERVER_ERROR','INVALID_ARGUMENT').formatMessage('Bad log type');
+            throw errRegistry.newError('INTERNAL_SERVER_ERROR', 'INVALID_ARGUMENT').formatMessage('Bad log type');
         }
-        return  Promise.resolve(logger?.section(params.start, params.end, params.limit));
+        return Promise.resolve(logger?.section(params.start, params.end, params.limit));
     }
 }
 class OpProvideInput extends Operation {
-    
+
     override getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -520,15 +526,15 @@ class OpProvideInput extends Operation {
                     description: 'Value of the input to provide'
                 }
             },
-            required: ['inputId','value']
+            required: ['inputId', 'value']
         } as JSONSchema7
     }
-    override async run(params:Record<string,unknown>) {
+    override async run(params: Record<string, unknown>) {
         if (this.tightcnc.waitingForInput && this.tightcnc.waitingForInput.id === params.inputId) {
             this.tightcnc.provideInput(params.value);
         }
         else {
-            throw errRegistry.newError('INTERNAL_SERVER_ERROR','BAD_REQUEST').formatMessage('Not waiting on input');
+            throw errRegistry.newError('INTERNAL_SERVER_ERROR', 'BAD_REQUEST').formatMessage('Not waiting on input');
         }
         return Promise.resolve();
     }
@@ -550,12 +556,12 @@ class OpCancelInput extends Operation {
         } as JSONSchema7;
     }
 
-    run(params: {inputId: number}) {
+    run(params: { inputId: number }) {
         if (this.tightcnc.waitingForInput && this.tightcnc.waitingForInput.id === params.inputId) {
             this.tightcnc.cancelInput();
         }
         else {
-            throw errRegistry.newError('INTERNAL_SERVER_ERROR','BAD_REQUEST').formatMessage('Not waiting on input')
+            throw errRegistry.newError('INTERNAL_SERVER_ERROR', 'BAD_REQUEST').formatMessage('Not waiting on input')
         }
         return Promise.resolve();
     }

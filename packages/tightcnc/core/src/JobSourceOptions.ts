@@ -16,7 +16,7 @@ export interface JobSourceOptions {
         order?: number;
         inst?: GcodeProcessor;
     }[] | undefined;
-    data?: string[];
+    data?: string[] | undefined;
     rawStrings?: boolean;
     dryRun?: boolean;
     job?: JobState;

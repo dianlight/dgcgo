@@ -1,4 +1,4 @@
-import { errRegistry,AbstractServer, ExternalizablePromise } from '@dianlight/tightcnc-core';
+import { errRegistry, AbstractServer, ExternalizablePromise } from '@dianlight/tightcnc-core';
 import { Operation, GcodeVM, GcodeLine, GcodeProcessor, GcodeProcessorLifeCycle, GcodeProcessorOptions } from '@dianlight/tightcnc-core';
 //import objtools from 'objtools';
 //import pasync from 'pasync';
@@ -45,33 +45,33 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     }
     static DEFAULT_ORDER = 800000;
 
-    vm:GcodeVM;
-    lastToolNumber?:number
-    stopSwitch:boolean
-    handleT:boolean
-    handleM6:boolean
-    toolChangeOnT:boolean
-    handleProgramStop:boolean
-    programStopWaiter?:ExternalizablePromise<void>;
-    maxDwell:number
-    currentToolOffset:number
-    toolOffsetAxis:number
-    toolOffsetAxisLetter:string
-    currentlyStopped?:boolean|string
+    vm: GcodeVM;
+    lastToolNumber?: number
+    stopSwitch: boolean
+    handleT: boolean
+    handleM6: boolean
+    toolChangeOnT: boolean
+    handleProgramStop: boolean
+    programStopWaiter?: ExternalizablePromise<void>;
+    maxDwell: number
+    currentToolOffset: number
+    toolOffsetAxis: number
+    toolOffsetAxisLetter: string
+    currentlyStopped?: boolean | string
 
 
     constructor(options: ToolChangeProcessorOptions) {
         super(options, 'toolchange', true);
         this.vm = new GcodeVM(options);
         this.stopSwitch = options.stopSwitch || false;
-        this.handleT = (options.handleT!==undefined) ? options.handleT : true;
-        this.handleM6 = (options.handleM6!==undefined) ? options.handleM6 : true;
+        this.handleT = (options.handleT !== undefined) ? options.handleT : true;
+        this.handleM6 = (options.handleM6 !== undefined) ? options.handleM6 : true;
         this.toolChangeOnT = (options.toolChangeOnT !== undefined) ? options.toolChangeOnT : true;
         this.handleProgramStop = (options.handleProgramStop !== undefined) ? options.handleProgramStop : true;
         this.maxDwell = 0;
         this.currentToolOffset = 0;
-        this.toolOffsetAxis = _.get(this,'tightcnc.config.toolChange.toolOffsetAxis',2) as number;
-        this.toolOffsetAxisLetter = _.get(this,`tightcnc.controller.axisLabels[${this.toolOffsetAxis}]`,'z') as string;
+        this.toolOffsetAxis = _.get(this, 'tightcnc.config.toolChange.toolOffsetAxis', 2) as number;
+        this.toolOffsetAxisLetter = _.get(this, `tightcnc.controller.axisLabels[${this.toolOffsetAxis}]`, 'z') as string;
     }
 
     static override getOptionSchema(): JSONSchema7 {
@@ -116,10 +116,10 @@ export default class ToolChangeProcessor extends GcodeProcessor {
                     items: {
                         type: 'string'
                     },
-                    default:[
-                    'G53 G0 Z0',
-                    'G0 X${x} Y${y}',
-                    'G1 Z${z + 0.4}'
+                    default: [
+                        'G53 G0 Z0',
+                        'G0 X${x} Y${y}',
+                        'G1 Z${z + 0.4}'
                     ],
                     description: 'Post ToolChange Gcode to execute'
                 },
@@ -133,7 +133,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
                     type: 'boolean',
                     default: false,
                     description: '**** Not known ***'
-                }        
+                }
             },
             required: ['toolOffsetAxis']
         } as JSONSchema7
@@ -142,7 +142,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     static override getOptionUISchema(): UISchemaElement {
         return {
             type: 'VerticalLayout',
-            elements: [{  
+            elements: [{
                 type: 'HorizontalLayout',
                 elements: [
                     {
@@ -172,38 +172,38 @@ export default class ToolChangeProcessor extends GcodeProcessor {
                     },
                 ]
             },
-                {
-                    type: 'Group',
-                    label: 'Advanced',
-                    elements: [{
-                        type: 'HorizontalLayout',
-                        elements: [
-                            {
-                                type: 'Control',
-                                label: 'Pre ToolChange Gcode',
-                                scope: '#/properties/preToolChange'
-                            },
-                            {
-                                type: 'Control',
-                                label: 'Post ToolChange Gcode',
-                                scope: '#/properties/postToolChange',
-                                options: {
-                                    showSortButtons: false
-                                }
-                            },
-                            {
-                                type: 'Control',
-                                label: 'Axis For ToolOffset',
-                                scope: '#/properties/toolOffsetAxis'
-                            },
-                            {
-                                type: 'Control',
-                                label: 'Negate Tool Offset',
-                                scope: '#/properties/negateToolOffset'
-                            },
-                        ]
-                    }]
-                }
+            {
+                type: 'Group',
+                label: 'Advanced',
+                elements: [{
+                    type: 'HorizontalLayout',
+                    elements: [
+                        {
+                            type: 'Control',
+                            label: 'Pre ToolChange Gcode',
+                            scope: '#/properties/preToolChange'
+                        },
+                        {
+                            type: 'Control',
+                            label: 'Post ToolChange Gcode',
+                            scope: '#/properties/postToolChange',
+                            options: {
+                                showSortButtons: false
+                            }
+                        },
+                        {
+                            type: 'Control',
+                            label: 'Axis For ToolOffset',
+                            scope: '#/properties/toolOffsetAxis'
+                        },
+                        {
+                            type: 'Control',
+                            label: 'Negate Tool Offset',
+                            scope: '#/properties/negateToolOffset'
+                        },
+                    ]
+                }]
+            }
             ]
         } as UISchemaElement
     }
@@ -226,7 +226,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
 
     resumeFromStop() {
         if (!this.programStopWaiter)
-            throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('Program is not stopped');
+            throw errRegistry.newError('INTERNAL_ERROR', 'INVALID_ARGUMENT').formatMessage('Program is not stopped');
         this.programStopWaiter?.resolve();
     }
 
@@ -236,10 +236,10 @@ export default class ToolChangeProcessor extends GcodeProcessor {
         } else if (typeof gline === 'string') {
             this.pushGcode(new GcodeLine(gline));
         } else if (Array.isArray(gline)) {
-            gline.forEach( (g)=> this.pushGcode(g))
+            gline.forEach((g) => this.pushGcode(g))
         } else {
             // handle tool offset by adjusting Z if present
-            if (this.tightcnc && this.tightcnc.config &&this.currentToolOffset && gline.has(this.toolOffsetAxisLetter) && !gline.has('G53')) {
+            if (this.tightcnc && this.tightcnc.config && this.currentToolOffset && gline.has(this.toolOffsetAxisLetter) && !gline.has('G53')) {
                 // by default use positive tool offsets (ie, a larger tool offset means a longer tool and increased Z height)
                 gline.set(this.toolOffsetAxisLetter, gline.get(this.toolOffsetAxisLetter) as number + this.currentToolOffset * (this.tightcnc.config.toolChange.negateToolOffset ? -1 : 1));
                 gline.addComment('to'); // to=tool offset
@@ -247,7 +247,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
             super.pushGcode(gline);
             this.vm.runGcodeLine(gline);
             if (this.vm.getState().incremental)
-                throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('Incremental mode not supported with tool change');
+                throw errRegistry.newError('INTERNAL_ERROR', 'GENERIC').formatMessage('Incremental mode not supported with tool change');
         }
     }
 
@@ -272,8 +272,8 @@ export default class ToolChangeProcessor extends GcodeProcessor {
                 await controller.waitSync();
             // Run pre-toolchange macro
             const preToolChange = this.tightcnc.config.toolChange.preToolChange;
-            console.log('Exec pre stop',preToolChange)
-            await this.tightcnc.runMacro(preToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true,macroName: 'preToolChange' });
+            console.log('Exec pre stop', preToolChange)
+            await this.tightcnc.runMacro(preToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true, macroName: 'preToolChange' });
             console.log('Macro executed!')
             // Wait for resume
             await this._doProgramStop('tool_change');
@@ -283,7 +283,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
             await this.tightcnc.runMacro(postToolChange, { pos: vmState.pos }, { gcodeProcessor: this, waitSync: true, macroName: 'postToolChange' });
             // Restart spindle/coolant
             if (changedMachineProp) {
-                const lines = this.vm.syncMachineToState({ vmState: vmState, include: ['spindle', 'coolant'], exclude:[] });
+                const lines = this.vm.syncMachineToState({ vmState: vmState, include: ['spindle', 'coolant'], exclude: [] });
                 for (const line of lines)
                     this.pushGcode(line);
                 await controller.waitSync();
@@ -302,7 +302,7 @@ export default class ToolChangeProcessor extends GcodeProcessor {
             }
             this.pushGcode(moveBackGcode);
         } else {
-            throw errRegistry.newError('INTERNAL_ERROR','INVALID_ARGUMENT').formatMessage('No controller');
+            throw errRegistry.newError('INTERNAL_ERROR', 'INVALID_ARGUMENT').formatMessage('No controller');
         }
     }
     async _doProgramStop(waitname = 'program_stop') {
@@ -329,12 +329,12 @@ export default class ToolChangeProcessor extends GcodeProcessor {
             // this should only be reached in the case that a chainerror has already occurred on this stream, so just ignore the error here and let the chainerror propagate
         }
         finally {
-            this.programStopWaiter = undefined;
+            delete this.programStopWaiter;
             this.removeListener('chainerror', chainerrorListener);
         }
     }
 
-    override async processGcode(gline: GcodeLine):Promise<GcodeLine> {
+    override async processGcode(gline: GcodeLine): Promise<GcodeLine> {
         // Track the tool number
         if (gline.has('T'))
             this.lastToolNumber = gline.get('T') as number;
@@ -378,10 +378,10 @@ export default class ToolChangeProcessor extends GcodeProcessor {
     }
 }
 
-function findCurrentJobGcodeProcessor<T extends GcodeProcessor>(tightcnc: AbstractServer, name:string):T {
+function findCurrentJobGcodeProcessor<T extends GcodeProcessor>(tightcnc: AbstractServer, name: string): T {
     const currentJob = tightcnc.jobManager?.currentJob;
     if (!currentJob || currentJob.state === 'cancelled' || currentJob.state === 'error' || currentJob.state === 'complete') {
-        throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('No currently running job');
+        throw errRegistry.newError('INTERNAL_ERROR', 'GENERIC').formatMessage('No currently running job');
     }
     const gcodeProcessors = currentJob.gcodeProcessors || {};
     for (const key in gcodeProcessors) {
@@ -389,7 +389,7 @@ function findCurrentJobGcodeProcessor<T extends GcodeProcessor>(tightcnc: Abstra
             return gcodeProcessors[key] as T;
         }
     }
-    throw errRegistry.newError('INTERNAL_ERROR','GENERIC').formatMessage('No ' + name + ' gcode processor found');
+    throw errRegistry.newError('INTERNAL_ERROR', 'GENERIC').formatMessage('No ' + name + ' gcode processor found');
 }
 class ResumeFromStopOperation extends Operation {
 
@@ -408,7 +408,7 @@ class ResumeFromStopOperation extends Operation {
     }
 }
 class SetToolOffsetOperation extends Operation {
-    
+
     getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -427,11 +427,11 @@ class SetToolOffsetOperation extends Operation {
             }
         } as JSONSchema7;
     }
-    
+
 
     async run(params: {
         toolOffset?: number
-        accountForAutolevel?:boolean
+        accountForAutolevel?: boolean
     }) {
         const toolchange = findCurrentJobGcodeProcessor<ToolChangeProcessor>(this.tightcnc, 'toolchange');
         if (typeof params.toolOffset === 'number') {
@@ -445,7 +445,7 @@ class SetToolOffsetOperation extends Operation {
             if (params.accountForAutolevel) {
                 const autolevel = findCurrentJobGcodeProcessor<autolevel.AutolevelGcodeProcessor>(this.tightcnc, 'autolevel');
                 if (autolevel && autolevel.surfaceMap && axisNum === 2) {
-                    const surfaceOffset = autolevel.surfaceMap.predictZ(pos?.slice(0, 2)|| []);
+                    const surfaceOffset = autolevel.surfaceMap.predictZ(pos?.slice(0, 2) || []);
                     if (typeof surfaceOffset === 'number') {
                         off -= surfaceOffset;
                     }

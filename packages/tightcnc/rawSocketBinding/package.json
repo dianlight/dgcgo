@@ -34,10 +34,10 @@
     "url": "https://github.com/dianlight/dgcgo/issues"
   },
   "devDependencies": {
-    "@manuth/typescript-eslint-plugin": "^1.4.1",
+    "@manuth/typescript-eslint-plugin": "^1.4.2",
     "@types/serialport": "^8.0.2",
     "rimraf": "^3.0.2",
-    "typescript": "^4.4.1-rc"
+    "typescript": "^4.4.2"
   },
   "dependencies": {
     "@serialport/binding-abstract": "^9.0.7"

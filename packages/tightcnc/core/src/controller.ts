@@ -8,15 +8,15 @@ import { errRegistry } from './errRegistry';
 import { ControllerConfig } from './ControllerConfig';
 
 export interface ControllerCapabilities {
-        variableSpindle:boolean // 'V': 'variableSpindle',
-   //     'N': 'lineNumbers',
-        mistCoolant: boolean, //'M': 'mistCoolant',
-        floodCoolant: boolean,
-        coreXY: boolean, // 'C': 'coreXY',
-        parking: boolean, //    'P': 'parking',
-        homeForce: boolean,//    'Z': 'homingForceOrigin',
-        homing: boolean, // 'H': 'homing',
-        homingSingleAxis:boolean, //'H': 'homingSingleAxis', $HX $HY $HZ
+    variableSpindle: boolean // 'V': 'variableSpindle',
+    //     'N': 'lineNumbers',
+    mistCoolant: boolean, //'M': 'mistCoolant',
+    floodCoolant: boolean,
+    coreXY: boolean, // 'C': 'coreXY',
+    parking: boolean, //    'P': 'parking',
+    homeForce: boolean,//    'Z': 'homingForceOrigin',
+    homing: boolean, // 'H': 'homing',
+    homingSingleAxis: boolean, //'H': 'homingSingleAxis', $HX $HY $HZ
     //    'T': 'twoLimitSwitch',
     //    'A': 'allowProbeFeedOverride',
     //    '*': 'disableRestoreAllEEPROM',
@@ -26,7 +26,7 @@ export interface ControllerCapabilities {
     //    'E': 'disableSyncOnEEPROMWrite',
     //    'W': 'disableSyncOnWCOChange',
     startUpHomeLock: boolean,// 'L': 'powerUpLockWithoutHoming'
-    toolchange: boolean,    
+    toolchange: boolean,
 }
 
 export interface ControllerStatus extends VMState {
@@ -64,61 +64,61 @@ export interface ControllerStatus extends VMState {
     line: number,
     */
     error: boolean,
-    errorData?: BaseRegistryError,
+    errorData?: BaseRegistryError | undefined,
     programRunning: boolean,
-    capabilities: ControllerCapabilities   
+    capabilities: ControllerCapabilities
     spindleSpeedMax?: number,
     spindleSpeedMin?: number
 }
 
-export abstract class Controller  extends EventEmitter implements VMState  {
+export abstract class Controller extends EventEmitter implements VMState {
 
-    axisLabels=['x', 'y', 'z'];
+    axisLabels = ['x', 'y', 'z'];
     ready = false;
     usedAxes = [true, true, true];
     homableAxes = [true, true, true];
-    axisMaxFeeds:number[] = [500, 500, 500];
-    axisMaxTravel:number[] = []
+    axisMaxFeeds: number[] = [500, 500, 500];
+    axisMaxTravel: number[] = []
     mpos = [0, 0, 0];
-    activeCoordSys?:number|undefined = 0;
+    activeCoordSys?: number | undefined = 0;
     coordSysOffsets = [[0, 0, 0]];
     offset = [0, 0, 0];
     offsetEnabled = false;
     storedPositions = [[0, 0, 0], [0, 0, 0]];
     homed = [false, false, false];
     held = false;
-    units:'mm'|'in' = 'mm';
+    units: 'mm' | 'in' = 'mm';
     feed = 0;
     incremental = false;
     moving = false;
-    coolant:false|1|2|3 = false;
+    coolant: false | 1 | 2 | 3 = false;
     spindle = false;
     line = 0;
     error = false;
-    errorData?:BaseRegistryError;
+    errorData?: BaseRegistryError | undefined;
     programRunning = false;
-    spindleDirection:-1|1 = 1;
-    spindleSpeed?:number;
+    spindleDirection: -1 | 1 = 1;
+    spindleSpeed?: number;
     inverseFeed = false;
     spindleSpeedMax?: number
     spindleSpeedMin?: number
-    homeDirection?: ('+'|'-')[]
+    homeDirection?: ('+' | '-')[]
 
     coord?: (coords: number[], axis: string | number, value?: number | undefined) => number | undefined;
     totalTime = 0;
     bounds?: [(number | null)[], (number | null)[]];
     mbounds?: [(number | null)[], (number | null)[]];
     lineCounter = 0;
-    hasMovedToAxes: boolean[] = [false,false,false];
+    hasMovedToAxes: boolean[] = [false, false, false];
     seenWordSet: {
-        [key:string]:boolean
+        [key: string]: boolean
     } = {};
     tool?: number;
     countT = 0;
     countM6 = 0;
-    motionMode?: 'G0' | 'G1' ;
+    motionMode?: 'G0' | 'G1';
     arcPlane?: number;
-    pos: number[] = [0,0,0];
+    pos: number[] = [0, 0, 0];
 
 
     /**
@@ -137,21 +137,21 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @constructor
      * @param {Object} config - Controller-specific configuration blob
      */
-    constructor(public config:ControllerConfig) {
+    constructor(public config: ControllerConfig) {
         super();
         // See resetState() for property definitions.
         this.resetState();
     }
 
     [key: string]: unknown;
-    
+
     gcodeLine?: string | undefined;
 
     /**
      *  Perform the disconnection from the controlle 
      */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async disconnect(): Promise<void> {}
+    async disconnect(): Promise<void> { }
 
 
     /**
@@ -160,7 +160,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @method getCoordOffsets
      * @return {Number[]}
      */
-    getCoordOffsets():number[] {
+    getCoordOffsets(): number[] {
         const offsets = [];
         for (let i = 0; i < this.axisLabels.length; i++)
             offsets[i] = 0;
@@ -271,7 +271,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {String} line - The string to send, without a \n at the end.
      * @param {Object} [options] - Controller-specific options
      */
-    abstract sendLine(line:string, options?:unknown):void 
+    abstract sendLine(line: string, options?: unknown): void
     /**
      * Send a GcodeLine object to the controller.  The GcodeLine object may optionally contain hooks as a
      * crisphooks instance (ie, using crisphooks.addHooks()).  If hooks are attached to the GcodeLine, the
@@ -293,9 +293,9 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @param {GcodeLine} gline
      * @param {Object} [options] - Controller-specific options
      */
-    abstract sendGcode(gline: GcodeLine, options?:unknown):void;
+    abstract sendGcode(gline: GcodeLine, options?: unknown): void;
 
-    send(thing: string | GcodeLine, options?:unknown):void {
+    send(thing: string | GcodeLine, options?: unknown): void {
         if (typeof thing === 'string') {
             this.sendLine(thing, options);
         } else {
@@ -312,12 +312,12 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      *   for the most part, but error handling is a bit different.
      * @return {Promise} - Resolves when whole stream has been sent, and movements processed.
      */
-    abstract sendStream(stream: node_stream.Readable ): Promise<void>;
+    abstract sendStream(stream: node_stream.Readable): Promise<void>;
 
-    sendFile(filename: string):Promise<void> {
-   //     let stream = zstreams.fromFile(filename).pipe(new zstreams.SplitStream());
+    sendFile(filename: string): Promise<void> {
+        //     let stream = zstreams.fromFile(filename).pipe(new zstreams.SplitStream());
         /** FIXME: Very bad for big file */
-        const stream =node_stream.Readable.from(fs.readFileSync(filename).toString().split(/\r?\n/))
+        const stream = node_stream.Readable.from(fs.readFileSync(filename).toString().split(/\r?\n/))
         return this.sendStream(stream);
     }
     /**
@@ -401,8 +401,8 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     probe(pos: (number | boolean)[], feed?: number): Promise<number[]> {
-        throw errRegistry.newError('INTERNAL_ERROR','UNSUPPORTED_OPERATION').formatMessage('Probe is not availble in this controller!')
-     }
+        throw errRegistry.newError('INTERNAL_ERROR', 'UNSUPPORTED_OPERATION').formatMessage('Probe is not availble in this controller!')
+    }
     /**
      * Return an object containing controller status.  Controller classes may override this, but should make an effort
      * to conform as much as possible to the format of this status object.
@@ -410,7 +410,7 @@ export abstract class Controller  extends EventEmitter implements VMState  {
      * @method getStatus
      * @return {Object}
      */
-    getStatus():ControllerStatus {
+    getStatus(): ControllerStatus {
         return {
             ready: this.ready,
             axisLabels: this.axisLabels,
@@ -435,22 +435,22 @@ export abstract class Controller  extends EventEmitter implements VMState  {
             spindleDirection: this.spindleDirection,
             spindleSpeed: this.spindleSpeed || 0,
             spindleSpeedMax: this.spindleSpeedMax,
-            spindleSpeedMin: this.spindleSpeedMin,            
+            spindleSpeedMin: this.spindleSpeedMin,
             line: this.line,
             error: this.error,
             errorData: this.errorData,
             programRunning: this.programRunning,
             capabilities: {
-                variableSpindle:false, // 'V': 'variableSpindle',
+                variableSpindle: false, // 'V': 'variableSpindle',
                 mistCoolant: false, //'M': 'mistCoolant',
                 floodCoolant: false,
                 coreXY: false, // 'C': 'coreXY',
                 homeForce: false,
                 parking: false,
-                homing: false, 
-                homingSingleAxis:false, //'H': 'homingSingleAxis', $HX $HY $HZ
+                homing: false,
+                homingSingleAxis: false, //'H': 'homingSingleAxis', $HX $HY $HZ
                 startUpHomeLock: false, // 'L': 'powerUpLockWithoutHoming'
-                toolchange:false
+                toolchange: false
             },
             lineCounter: this.lineCounter,
             hasMovedToAxes: this.hasMovedToAxes,

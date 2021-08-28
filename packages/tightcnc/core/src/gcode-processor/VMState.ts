@@ -3,7 +3,7 @@ export interface VMState {
     axisLabels: string[];
     coord?: (coords: number[], axis: number | string, value?: number) => number | undefined; // = this.coord.bind(this);
     totalTime: number; // seconds
-    bounds?: [(number | null)[], (number | null)[]]; // = [this.zerocoord(null), this.zerocoord(null)]; // min and max points
+    bounds?: [(number | null)[], (number | null)[]] | undefined; // = [this.zerocoord(null), this.zerocoord(null)]; // min and max points
     mbounds?: [(number | null)[], (number | null)[]]; // = [this.zerocoord(null), this.zerocoord(null)]; // bounds for machine coordinates
     lineCounter: number;
     hasMovedToAxes: boolean[]; // = this.zerocoord(false); // true for each axis that we've moved on, and have a definite position for
@@ -31,9 +31,9 @@ export interface VMState {
     offsetEnabled?: boolean;
     storedPositions: number[][];
     line?: number;
-    gcodeLine?: string;
+    gcodeLine?: string | undefined;
     homeDirection?: ('+' | '-')[];
 
-    updateTime?: string;
+    updateTime?: string | undefined;
     [key: string]: unknown;
 }

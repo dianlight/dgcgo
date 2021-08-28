@@ -1,13 +1,13 @@
 import { Operation } from '@dianlight/tightcnc-core';
-import  fs from 'fs';
-import  path from 'path';
+import fs from 'fs';
+import path from 'path';
 import TightCNCServer from './tightcnc-server';
-import {addExitCallback} from 'catch-exit';
+import { addExitCallback } from 'catch-exit/dist/index';
 //import { filemanager } from 'blessed';
 import { JSONSchema7 } from 'json-schema';
 
 class OpListFiles extends Operation {
-    
+
     override getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -21,10 +21,10 @@ class OpListFiles extends Operation {
                 }
             },
             required: ['dir']
-        } as JSONSchema7 ;
+        } as JSONSchema7;
     }
-    
-    async run(params:{dir:string}) {
+
+    async run(params: { dir: string }) {
         const dir = this.tightcnc.getFilename(undefined, params.dir, false, true, true);
         const files = await new Promise<string[]>((resolve, reject) => {
             fs.readdir(dir, (err: any, files: string[] | PromiseLike<string[]>) => {
@@ -75,7 +75,7 @@ class OpListFiles extends Operation {
     }
 }
 class OpUploadFile extends Operation {
-    
+
     override getParamSchema() {
         return {
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -100,14 +100,14 @@ class OpUploadFile extends Operation {
                     description: 'File data'
                 }
             },
-            required: ['filename','data']
+            required: ['filename', 'data']
         } as JSONSchema7;
     }
-    
+
     async run(params: {
         filename: string,
         data: string
-        makeTmp?:boolean
+        makeTmp?: boolean
     }) {
         const fullFilename = this.tightcnc.getFilename(params.filename, 'data', false, true);
         await new Promise<void>((resolve, reject) => {
@@ -119,7 +119,7 @@ class OpUploadFile extends Operation {
                         addExitCallback(signal => {
                             console.debug('Removing tmp file', fullFilename, signal)
                             fs.unlinkSync(fullFilename)
-                        } )
+                        })
                     }
                     resolve();
                 }
@@ -129,8 +129,8 @@ class OpUploadFile extends Operation {
 }
 
 export function registerOperations(tightcnc: TightCNCServer) {
-    
+
     tightcnc.registerOperation(/*'listFiles',*/ OpListFiles);
     tightcnc.registerOperation(/*'uploadFile',*/ OpUploadFile);
-    
+
 }
